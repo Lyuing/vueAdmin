@@ -1,4 +1,4 @@
-import http from '@/utils/http'
+import http from './http'
 import type { LoginRequest, LoginResponse } from '@/types/user'
 
 /**

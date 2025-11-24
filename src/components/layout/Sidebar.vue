@@ -45,7 +45,7 @@ import { computed, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 
 import { useMenuStore } from '@/stores/menu'
-import { findMenuByName } from '@/utils/route'
+import { findMenuByName } from '@/router/helper'
 
 const router = useRouter()
 const route = useRoute()

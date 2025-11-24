@@ -1,18 +1,11 @@
-/*
- * @Author: luyu luyu1547@dingtalk.com
- * @Date: 2025-11-21 15:53:23
- * @LastEditors: luyu luyu1547@dingtalk.com
- * @LastEditTime: 2025-11-24 11:29:06
- * @FilePath: \vueMainKiro\src\main.ts
- * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
- */
+
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import App from './App.vue'
-import router from './router'
+import router, { addDynamicRoutes } from './router'
 import i18n from './locales'
 import { setupRouterGuards } from './router/guards'
 import { useAuthStore } from './stores/auth'
@@ -50,7 +43,6 @@ async function initApp() {
 
   // 如果已登录，恢复动态路由
   if (authStore.isAuthenticated && authStore.userInfo) {
-    const { addDynamicRoutes } = await import('./router')
     await addDynamicRoutes(authStore.userInfo.permissions)
   }
 

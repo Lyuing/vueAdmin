@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import type { MenuItem } from '@/types/menu'
 import type { RouteConfig } from '@/types/route'
-import { generateMenus, getBreadcrumb } from '@/utils/route'
+import { generateMenus, getBreadcrumb } from '@/router/helper'
 
 export const useMenuStore = defineStore('menu', () => {
   const menuList = ref<MenuItem[]>([])

@@ -50,6 +50,7 @@ import { useI18n } from 'vue-i18n'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import { useAuthStore } from '@/stores/auth'
 import { storage } from '@/utils/storage'
+import { addDynamicRoutes } from '@/router'
 
 const { t } = useI18n()
 const router = useRouter()
@@ -82,7 +83,6 @@ const handleLogin = async () => {
         const response = await authStore.login(form.username, form.password)
 
         // 动态注册路由
-        const { addDynamicRoutes } = await import('@/router')
         await addDynamicRoutes(response.userInfo.permissions)
 
         // 记住密码
