@@ -29,6 +29,7 @@ const hasSidebar = computed(() => {
   display: flex;
   flex-direction: column;
   height: 100vh;
+  min-width: 1200px;
   overflow: hidden;
 }
 
