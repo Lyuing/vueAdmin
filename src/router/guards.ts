@@ -1,13 +1,14 @@
 import type { Router } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
-import { useMenuStore } from '@/stores/menu'
-import { checkPermission } from '@/utils/permission'
 import { ElMessage } from 'element-plus'
+import { useAuthStore } from '@/stores/auth'
+import { useMenu } from '@/composables/useMenu'
+import { checkPermission } from './permission'
+import { addDynamicRoutes } from '@/router'
 
 export function setupRouterGuards(router: Router) {
   router.beforeEach(async (to, _from, next) => {
     const authStore = useAuthStore()
-    const menuStore = useMenuStore()
+    const { autoExpandMenus } = useMenu()
 
     // 如果是登录页，直接放行
     if (to.path === '/login') {
@@ -29,7 +30,6 @@ export function setupRouterGuards(router: Router) {
         // 已登录用户访问不存在的路由，尝试加载动态路由
         if (authStore.userInfo) {
           try {
-            const { addDynamicRoutes } = await import('@/router')
             await addDynamicRoutes(authStore.userInfo.permissions)
             // 路由已注册，重新导航到目标路由
             next({ ...to, replace: true })
@@ -69,7 +69,7 @@ export function setupRouterGuards(router: Router) {
 
       // 自动展开菜单
       if (to.name) {
-        menuStore.autoExpandMenus(to.name as string)
+        autoExpandMenus(to.name as string)
       }
     }
 

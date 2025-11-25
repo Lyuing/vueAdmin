@@ -40,7 +40,7 @@
         <template #dropdown>
           <el-dropdown-menu>
             <el-dropdown-item
-              v-for="theme in themeStore.themeList"
+              v-for="theme in themeList"
               :key="theme.name"
               :command="theme.name"
             >
@@ -77,30 +77,28 @@ import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 
 import { useAuthStore } from '@/stores/auth'
-import { useMenuStore } from '@/stores/menu'
-import { useThemeStore } from '@/stores/theme'
+import { useMenu } from '@/composables/useMenu'
+import { useTheme } from '@/composables/useTheme'
 import { storage } from '@/utils/storage'
 import type { MenuItem } from '@/types/menu'
 
 const { t, locale } = useI18n()
 const router = useRouter()
 const authStore = useAuthStore()
-const menuStore = useMenuStore()
-const themeStore = useThemeStore()
+const { menuList, activeMenu, setActiveMenu } = useMenu()
+const { themeList, setTheme } = useTheme()
 
 // 获取一级菜单
 const topMenus = computed(() => {
-  return menuStore.menuList.filter(menu => menu.level === 1)
+  return menuList.value.filter(menu => menu.level === 1)
 })
-
-const activeMenu = computed(() => menuStore.activeMenu)
 
 const currentLanguage = computed(() => {
   return locale.value === 'zh-CN' ? '中文' : 'English'
 })
 
 const handleMenuClick = (menu: MenuItem) => {
-  menuStore.setActiveMenu(menu.name)
+  setActiveMenu(menu.name)
   if (menu.path) {
     router.push(menu.path)
   } else if (menu.children && menu.children.length > 0) {
@@ -116,8 +114,8 @@ const handleLanguageChange = (lang: string) => {
   storage.set('locale', lang)
 }
 
-const handleThemeChange = (themeName: string) => {
-  themeStore.setTheme(themeName)
+const handleThemeChange = async (themeName: string) => {
+  await setTheme(themeName)
 }
 
 const handleUserCommand = (command: string) => {

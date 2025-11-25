@@ -14,13 +14,13 @@
 import { computed } from 'vue'
 import TopNav from './TopNav.vue'
 import Sidebar from './Sidebar.vue'
-import { useMenuStore } from '@/stores/menu'
+import { useMenu } from '@/composables/useMenu'
 
-const menuStore = useMenuStore()
+const { getActiveMenuChildren } = useMenu()
 
 // 是否有侧边栏
 const hasSidebar = computed(() => {
-  return menuStore.getActiveMenuChildren().length > 0
+  return getActiveMenuChildren().length > 0
 })
 </script>
 

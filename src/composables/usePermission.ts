@@ -1,6 +1,6 @@
 import { computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
-import { hasPermission as checkHasPermission } from '@/utils/permission'
+import { hasPermission as checkHasPermission } from '@/router/permission'
 
 export function usePermission() {
   const authStore = useAuthStore()

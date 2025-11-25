@@ -74,13 +74,13 @@ import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { User, UserFilled, Key } from '@element-plus/icons-vue'
 import { useAuthStore } from '@/stores/auth'
-import { useThemeStore } from '@/stores/theme'
+import { useTheme } from '@/composables/useTheme'
 import { storage } from '@/utils/storage'
 
 const router = useRouter()
 const { t, locale } = useI18n()
 const authStore = useAuthStore()
-const themeStore = useThemeStore()
+const { currentTheme, setTheme } = useTheme()
 
 const changeLanguage = () => {
   const newLocale = locale.value === 'zh-CN' ? 'en-US' : 'zh-CN'
@@ -88,13 +88,13 @@ const changeLanguage = () => {
   storage.set('locale', newLocale)
 }
 
-const changeTheme = () => {
+const changeTheme = async () => {
   const themes = ['default', 'green', 'purple']
-  const currentIndex = themes.indexOf(themeStore.currentTheme)
+  const currentIndex = themes.indexOf(currentTheme.value)
   const nextIndex = (currentIndex + 1) % themes.length
   const nextTheme = themes[nextIndex]
   if (nextTheme) {
-    themeStore.setTheme(nextTheme)
+    await setTheme(nextTheme)
   }
 }
 

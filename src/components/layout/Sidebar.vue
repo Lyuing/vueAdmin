@@ -1,13 +1,13 @@
 <template>
-  <div v-if="hasSidebarMenus" :class="['sidebar', { collapsed: menuStore.collapsed }]">
-    <div class="collapse-btn" @click="menuStore.toggleCollapse()">
+  <div v-if="hasSidebarMenus" :class="['sidebar', { collapsed }]">
+    <div class="collapse-btn" @click="toggleCollapse()">
       <el-icon>
-        <component :is="menuStore.collapsed ? 'Expand' : 'Fold'" />
+        <component :is="collapsed ? 'Expand' : 'Fold'" />
       </el-icon>
     </div>
     <el-menu
       :default-active="activeMenuName"
-      :collapse="menuStore.collapsed"
+      :collapse="collapsed"
       :unique-opened="false"
       class="sidebar-menu"
       @select="handleMenuSelect"
@@ -44,16 +44,15 @@
 import { computed, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 
-import { useMenuStore } from '@/stores/menu'
-import { findMenuByName } from '@/router/helper'
+import { useMenu, findMenuByName } from '@/composables/useMenu'
 
 const router = useRouter()
 const route = useRoute()
-const menuStore = useMenuStore()
+const { menuList, collapsed, toggleCollapse, getActiveMenuChildren, autoExpandMenus } = useMenu()
 
 // 获取侧边栏菜单（当前激活一级菜单的子菜单）
 const sidebarMenus = computed(() => {
-  return menuStore.getActiveMenuChildren()
+  return getActiveMenuChildren()
 })
 
 // 是否有侧边栏菜单
@@ -67,7 +66,7 @@ const activeMenuName = computed(() => {
 })
 
 const handleMenuSelect = (menuName: string) => {
-  const menu = findMenuByName(menuName, menuStore.menuList)
+  const menu = findMenuByName(menuName, menuList.value)
   if (menu?.path) {
     router.push(menu.path)
   }
@@ -78,7 +77,7 @@ watch(
   () => route.name,
   newName => {
     if (newName) {
-      menuStore.autoExpandMenus(newName as string)
+      autoExpandMenus(newName as string)
     }
   },
   { immediate: true }

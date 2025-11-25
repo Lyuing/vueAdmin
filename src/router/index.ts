@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 import { staticRoutes, routeMap } from './routes'
-import { filterRoutesByPermission } from '@/utils/permission'
-import { useMenuStore } from '@/stores/menu'
+import { filterRoutesByPermission } from './permission'
+import { useMenu } from '@/composables/useMenu'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -34,13 +34,13 @@ export async function addDynamicRoutes(permissions: string[], force = false) {
   dynamicRoutesAdded = true
 
   // 生成菜单 - 展开Layout的children作为顶级菜单
-  const menuStore = useMenuStore()
+  const { setMenus } = useMenu()
   // 如果第一个路由是Layout，展开它的children
   const menuRoutes =
     accessibleRoutes.length > 0 && accessibleRoutes[0]?.name === 'Layout'
       ? accessibleRoutes[0]?.children || []
       : accessibleRoutes
-  menuStore.setMenus(menuRoutes, permissions, menuRoutes)
+  setMenus(menuRoutes, permissions, menuRoutes)
 }
 
 /**

@@ -9,7 +9,7 @@ import router, { addDynamicRoutes } from './router'
 import i18n from './locales'
 import { setupRouterGuards } from './router/guards'
 import { useAuthStore } from './stores/auth'
-import { useThemeStore } from './stores/theme'
+import { useTheme } from './composables/useTheme'
 import './assets/styles/index.scss'
 
 const app = createApp(App)
@@ -47,8 +47,8 @@ async function initApp() {
   }
 
   // 初始化主题
-  const themeStore = useThemeStore()
-  await themeStore.initTheme()
+  const { initTheme } = useTheme()
+  await initTheme()
 
   // 全局错误处理
   app.config.errorHandler = (err, _instance, info) => {
