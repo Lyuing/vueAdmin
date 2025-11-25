@@ -48,7 +48,7 @@ async function initApp() {
 
   // 初始化主题
   const themeStore = useThemeStore()
-  themeStore.initTheme()
+  await themeStore.initTheme()
 
   // 全局错误处理
   app.config.errorHandler = (err, _instance, info) => {

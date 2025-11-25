@@ -29,9 +29,9 @@ export const useThemeStore = defineStore('theme', () => {
   /**
    * 初始化主题
    */
-  function initTheme() {
+  async function initTheme() {
     const savedTheme = storage.get<string>('theme') || 'default'
-    setTheme(savedTheme)
+    await setTheme(savedTheme)
   }
 
   /**
@@ -44,7 +44,10 @@ export const useThemeStore = defineStore('theme', () => {
       return
     }
 
-    if (currentTheme.value === themeName) {
+    // 初始化时也需要加载主题
+    const needLoad = currentTheme.value !== themeName || !document.querySelector('link[data-theme]')
+    
+    if (!needLoad) {
       return
     }
 
