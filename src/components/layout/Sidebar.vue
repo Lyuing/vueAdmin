@@ -88,8 +88,8 @@ watch(
 <style scoped lang="scss">
 .sidebar {
   width: 200px;
-  background-color: #fff;
-  border-right: 1px solid #e8e8e8;
+  background-color: var(--color-bg-base);
+  border-right: 1px solid var(--color-border);
   transition: width 0.3s;
   overflow: hidden;
 
@@ -104,11 +104,13 @@ watch(
   align-items: center;
   height: 48px;
   cursor: pointer;
-  border-bottom: 1px solid #e8e8e8;
+  border-bottom: 1px solid var(--color-border-light);
   transition: all 0.3s;
+  color: var(--color-text-regular);
 
   &:hover {
-    background-color: #f5f5f5;
+    background-color: var(--color-bg-hover);
+    color: var(--color-text-primary);
   }
 }
 
@@ -116,16 +118,29 @@ watch(
   border-right: none;
   height: calc(100% - 48px);
   overflow-y: auto;
+  background-color: var(--color-bg-base);
 
   :deep(.el-menu-item),
   :deep(.el-sub-menu__title) {
     height: 48px;
     line-height: 48px;
+    color: var(--color-text-regular);
+
+    &:hover {
+      background-color: var(--color-bg-hover);
+      color: var(--color-text-primary);
+    }
   }
 
   :deep(.el-menu-item.is-active) {
-    color: var(--color-primary, #409eff);
-    background-color: #ecf5ff;
+    color: var(--color-primary);
+    background-color: var(--color-bg-active);
+  }
+
+  :deep(.el-sub-menu__title) {
+    &:hover {
+      background-color: var(--color-bg-hover);
+    }
   }
 }
 

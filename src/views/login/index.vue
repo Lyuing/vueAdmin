@@ -119,15 +119,16 @@ onMounted(() => {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-info) 100%);
 }
 
 .login-box {
   width: 400px;
   padding: 40px;
-  background: white;
+  background: var(--color-bg-base);
   border-radius: 10px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-dark);
+  border: 1px solid var(--color-border-extra-light);
 }
 
 .login-title {
@@ -135,7 +136,7 @@ onMounted(() => {
   text-align: center;
   font-size: 28px;
   font-weight: 600;
-  color: #333;
+  color: var(--color-text-primary);
 }
 
 .login-form {

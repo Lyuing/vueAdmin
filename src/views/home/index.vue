@@ -112,12 +112,12 @@ const viewDashboard = () => {
 .welcome-card {
   h2 {
     margin: 0 0 10px;
-    color: #333;
+    color: var(--color-text-primary);
   }
 
   p {
     margin: 0;
-    color: #666;
+    color: var(--color-text-secondary);
   }
 }
 
@@ -133,8 +133,15 @@ const viewDashboard = () => {
   align-items: center;
   gap: 15px;
   padding: 15px;
-  background-color: #f5f5f5;
+  background-color: var(--color-fill-light);
   border-radius: 8px;
+  border: 1px solid var(--color-border-lighter);
+  transition: all 0.3s;
+
+  &:hover {
+    background-color: var(--color-fill);
+    box-shadow: var(--shadow-light);
+  }
 }
 
 .info-text {
@@ -143,19 +150,20 @@ const viewDashboard = () => {
 
 .info-label {
   font-size: 12px;
-  color: #999;
+  color: var(--color-text-secondary);
   margin-bottom: 5px;
 }
 
 .info-value {
   font-size: 16px;
   font-weight: 600;
-  color: #333;
+  color: var(--color-text-primary);
 }
 
 .feature-list {
   margin: 0;
   padding-left: 20px;
+  color: var(--color-text-regular);
 
   li {
     margin-bottom: 10px;

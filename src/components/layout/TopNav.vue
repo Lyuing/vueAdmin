@@ -134,8 +134,9 @@ const handleUserCommand = (command: string) => {
   align-items: center;
   height: 60px;
   padding: 0 20px;
-  background-color: #fff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background-color: var(--color-bg-base);
+  box-shadow: var(--shadow-base);
+  border-bottom: 1px solid var(--color-border-lighter);
   z-index: 100;
 }
 
@@ -149,7 +150,7 @@ const handleUserCommand = (command: string) => {
   margin: 0;
   font-size: 20px;
   font-weight: 600;
-  color: var(--color-primary, #409eff);
+  color: var(--color-primary);
 }
 
 .nav-menu {
@@ -165,14 +166,16 @@ const handleUserCommand = (command: string) => {
   cursor: pointer;
   border-radius: 4px;
   transition: all 0.3s;
+  color: var(--color-text-regular);
 
   &:hover {
-    background-color: #f5f5f5;
+    background-color: var(--color-bg-hover);
+    color: var(--color-text-primary);
   }
 
   &.active {
-    color: var(--color-primary, #409eff);
-    background-color: #ecf5ff;
+    color: var(--color-primary);
+    background-color: var(--color-bg-active);
   }
 }
 
@@ -190,14 +193,33 @@ const handleUserCommand = (command: string) => {
   cursor: pointer;
   border-radius: 4px;
   transition: all 0.3s;
+  border: none;
+  outline: none;
+  color: var(--color-text-regular);
 
   &:hover {
-    background-color: #f5f5f5;
+    background-color: var(--color-bg-hover);
+    color: var(--color-text-primary);
+  }
+
+  &:focus {
+    outline: none;
   }
 }
 
 .user-info {
   gap: 10px;
+}
+
+// 移除 Element Plus dropdown 触发器的默认边框
+:deep(.el-dropdown) {
+  outline: none;
+  border: none;
+
+  .el-dropdown-link {
+    outline: none;
+    border: none;
+  }
 }
 
 @media (max-width: 768px) {

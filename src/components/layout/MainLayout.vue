@@ -42,7 +42,7 @@ const hasSidebar = computed(() => {
   flex: 1;
   padding: 20px;
   overflow-y: auto;
-  background-color: #f5f5f5;
+  background-color: var(--color-bg-page);
   transition: all 0.3s;
 
   &.full-width {

@@ -6,9 +6,10 @@ export function useTheme() {
 
   const currentTheme = computed(() => themeStore.currentTheme)
   const themeList = computed(() => themeStore.themeList)
+  const loadingTheme = computed(() => themeStore.loadingTheme)
 
-  const setTheme = (themeName: string) => {
-    themeStore.setTheme(themeName)
+  const setTheme = async (themeName: string) => {
+    await themeStore.setTheme(themeName)
   }
 
   const initTheme = () => {
@@ -22,6 +23,7 @@ export function useTheme() {
   return {
     currentTheme,
     themeList,
+    loadingTheme,
     setTheme,
     initTheme,
     getCurrentTheme

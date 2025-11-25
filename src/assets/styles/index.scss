@@ -1,5 +1,5 @@
 @use './variables.scss';
-@use './theme.scss';
+// 主题样式通过动态加载，不需要在这里引入
 
 // 全局重置样式
 * {
