@@ -68,12 +68,12 @@ export function useMenu() {
     const activeMenuItem = menuList.value.find(item => item.name === activeMenu.value)
     return activeMenuItem?.children || []
   }
-  
+
   // 切换侧边栏折叠状态 -- Sidebar.vue
   function toggleCollapse() {
     menuStore.toggleCollapse()
   }
-  
+
   // 切换侧栏菜单的展开状态 -- 预留功能
   function toggleSubmenu(menuName: string) {
     const index = openedMenus.value.indexOf(menuName)

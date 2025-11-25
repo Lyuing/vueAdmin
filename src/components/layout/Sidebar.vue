@@ -5,13 +5,8 @@
         <component :is="collapsed ? 'Expand' : 'Fold'" />
       </el-icon>
     </div>
-    <el-menu
-      :default-active="activeMenuName"
-      :collapse="collapsed"
-      :unique-opened="false"
-      class="sidebar-menu"
-      @select="handleMenuSelect"
-    >
+    <el-menu :default-active="activeMenuName" :collapse="collapsed" :unique-opened="false" class="sidebar-menu"
+      @select="handleMenuSelect">
       <template v-for="menu in sidebarMenus" :key="menu.id">
         <el-sub-menu v-if="menu.children && menu.children.length > 0" :index="menu.name">
           <template #title>
@@ -86,11 +81,22 @@ watch(
 
 <style scoped lang="scss">
 .sidebar {
+  position: relative;
   width: 200px;
   background-color: var(--color-bg-base);
-  border-right: 1px solid var(--color-border);
   transition: width 0.3s;
-  overflow: hidden;
+  flex-shrink: 0;
+
+  &::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background-color: var(--color-border);
+    z-index: 1;
+  }
 
   &.collapsed {
     width: 64px;
@@ -98,24 +104,33 @@ watch(
 }
 
 .collapse-btn {
+  position: absolute;
+  right: -1px;
+  top: 12px;
+  z-index: 10;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 48px;
+  width: 24px;
+  height: 24px;
   cursor: pointer;
-  border-bottom: 1px solid var(--color-border-light);
+  background-color: var(--color-bg-base);
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
   transition: all 0.3s;
   color: var(--color-text-regular);
+  transform: translateX(50%);
 
   &:hover {
     background-color: var(--color-bg-hover);
     color: var(--color-text-primary);
+    box-shadow: var(--shadow-light);
   }
 }
 
 .sidebar-menu {
   border-right: none;
-  height: calc(100% - 48px);
+  height: 100%;
   overflow-y: auto;
   background-color: var(--color-bg-base);
 

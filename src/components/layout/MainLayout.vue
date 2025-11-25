@@ -37,6 +37,7 @@ const hasSidebar = computed(() => {
   display: flex;
   flex: 1;
   overflow: hidden;
+  position: relative;
 }
 
 .main-content {
