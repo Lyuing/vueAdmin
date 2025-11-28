@@ -25,8 +25,13 @@
         </span>
         <template #dropdown>
           <el-dropdown-menu>
-            <el-dropdown-item command="zh-CN">{{ t('language.zhCN') }}</el-dropdown-item>
-            <el-dropdown-item command="en-US">{{ t('language.enUS') }}</el-dropdown-item>
+            <el-dropdown-item 
+              v-for="lang in languageOptions" 
+              :key="lang.code"
+              :command="lang.code"
+            >
+              {{ lang.label }}
+            </el-dropdown-item>
           </el-dropdown-menu>
         </template>
       </el-dropdown>
@@ -80,6 +85,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useMenu } from '@/composables/useMenu'
 import { useTheme } from '@/composables/useTheme'
 import { storage } from '@/utils/storage'
+import { LANGUAGE_OPTIONS, getLanguageLabel, isValidLanguage } from '@/locales'
 import type { MenuItem } from '@/types/menu'
 
 const { t, locale } = useI18n()
@@ -93,9 +99,13 @@ const topMenus = computed(() => {
   return menuList.value.filter(menu => menu.level === 1)
 })
 
+// 使用配置获取当前语言显示名称
 const currentLanguage = computed(() => {
-  return locale.value === 'zh-CN' ? '中文' : 'English'
+  return getLanguageLabel(locale.value)
 })
+
+// 语言选项配置
+const languageOptions = LANGUAGE_OPTIONS
 
 const handleMenuClick = (menu: MenuItem) => {
   setActiveMenu(menu.name)
@@ -110,8 +120,16 @@ const handleMenuClick = (menu: MenuItem) => {
 }
 
 const handleLanguageChange = (lang: string) => {
-  locale.value = lang
-  storage.set('locale', lang)
+  try {
+    if (isValidLanguage(lang)) {
+      locale.value = lang
+      storage.set('locale', lang)
+    } else {
+      console.warn(`Invalid language code: ${lang}`)
+    }
+  } catch (error) {
+    console.error('Failed to change language:', error)
+  }
 }
 
 const handleThemeChange = async (themeName: string) => {

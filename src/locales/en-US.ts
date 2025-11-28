@@ -50,7 +50,9 @@ export default {
   language: {
     title: 'Language Settings',
     zhCN: '简体中文',
-    enUS: 'English'
+    enUS: 'English',
+    zhTW: '繁體中文',
+    jaJP: '日本語'
   },
   error: {
     403: 'Sorry, you do not have permission to access this page',

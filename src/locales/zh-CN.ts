@@ -50,7 +50,9 @@ export default {
   language: {
     title: '语言设置',
     zhCN: '简体中文',
-    enUS: 'English'
+    enUS: 'English',
+    zhTW: '繁體中文',
+    jaJP: '日本語'
   },
   error: {
     403: '抱歉，您无权访问该页面',
