@@ -45,15 +45,28 @@ export async function addDynamicRoutes(permissions: string[], force = false) {
 
 /**
  * 重置路由
+ * 清除所有动态添加的路由，恢复到初始状态
  */
 export function resetRouter() {
   dynamicRoutesAdded = false
-  // 重新创建router实例来清除动态路由
-  const newRouter = createRouter({
-    history: createWebHistory(import.meta.env.BASE_URL),
-    routes: staticRoutes as RouteRecordRaw[]
+  
+  // 获取所有已注册的路由
+  const routes = router.getRoutes()
+  
+  // 移除所有动态添加的路由（保留静态路由）
+  routes.forEach(route => {
+    // 只移除动态添加的路由，保留静态路由（login, 403, 404）
+    if (route.name && !['Login', 'Forbidden', 'NotFound'].includes(route.name as string)) {
+      router.removeRoute(route.name)
+    }
   })
-  ;(router as any).matcher = (newRouter as any).matcher
+  
+  // 确保404路由被移除（如果存在）
+  try {
+    router.removeRoute('NotFound')
+  } catch {
+    // 忽略错误，路由可能不存在
+  }
 }
 
 export default router

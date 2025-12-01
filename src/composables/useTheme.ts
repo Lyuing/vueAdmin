@@ -58,13 +58,33 @@ export function useTheme() {
         existingLink.remove()
       }
 
+      // 处理路径：开发环境使用原路径，生产环境使用处理后的路径
+      let themePath = cssFile
+      if (import.meta.env.PROD) {
+        // 生产环境：假设主题文件在public/themes/目录
+        const fileName = cssFile.split('/').pop()?.replace('.scss', '.css') || ''
+        themePath = `/themes/${fileName}`
+      } else {
+        // 开发环境：Vite会处理/src路径
+        themePath = cssFile
+      }
+
       const link = document.createElement('link')
       link.rel = 'stylesheet'
-      link.href = cssFile
+      link.href = themePath
       link.setAttribute('data-theme', themeName)
 
       link.onload = () => resolve()
-      link.onerror = () => reject(new Error(`加载主题文件失败: ${cssFile}`))
+      link.onerror = () => {
+        // 如果加载失败，尝试使用原路径（fallback）
+        if (themePath !== cssFile) {
+          link.href = cssFile
+          link.onload = () => resolve()
+          link.onerror = () => reject(new Error(`加载主题文件失败: ${cssFile}`))
+        } else {
+          reject(new Error(`加载主题文件失败: ${cssFile}`))
+        }
+      }
 
       document.head.appendChild(link)
     })

@@ -35,6 +35,7 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
 // 初始化应用
 async function initApp() {
   // 初始化认证状态
+  // 恢复缓存认证
   const authStore = useAuthStore()
   authStore.restoreAuth()
 

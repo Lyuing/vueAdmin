@@ -1,6 +1,7 @@
-import axios, { type AxiosInstance, type AxiosRequestConfig, type AxiosResponse } from 'axios'
+import axios, { type AxiosInstance, type AxiosRequestConfig, type AxiosResponse, type InternalAxiosRequestConfig } from 'axios'
 import type { APIResponse } from '@/types/api'
 import { ElMessage } from 'element-plus'
+import { storage } from '@/utils/storage'
 
 class HTTPClient {
   private instance: AxiosInstance
@@ -20,9 +21,10 @@ class HTTPClient {
   private setupInterceptors() {
     // 请求拦截器
     this.instance.interceptors.request.use(
-      config => {
-        const token = localStorage.getItem('token')
-        if (token) {
+      (config: InternalAxiosRequestConfig) => {
+        // 统一使用storage工具获取token
+        const token = storage.get<string>('token')
+        if (token && config.headers) {
           config.headers.Authorization = `Bearer ${token}`
         }
         return config
@@ -50,9 +52,10 @@ class HTTPClient {
 
           switch (status) {
             case 401:
+              // Token过期，清除认证信息并跳转登录
               ElMessage.error('登录已过期，请重新登录')
-              localStorage.removeItem('token')
-              localStorage.removeItem('userInfo')
+              storage.remove('token')
+              storage.remove('userInfo')
               window.location.href = '/login'
               break
             case 403:
@@ -68,12 +71,24 @@ class HTTPClient {
               ElMessage.error(error.response.data?.message || '请求失败')
           }
         } else {
-          ElMessage.error('网络错误，请检查网络连接')
+          // 网络错误或其他错误
+          if (error.code === 'ECONNABORTED') {
+            ElMessage.error('请求超时，请稍后重试')
+          } else {
+            ElMessage.error('网络错误，请检查网络连接')
+          }
         }
 
         return Promise.reject(error)
       }
     )
+  }
+
+  /**
+   * 创建取消令牌
+   */
+  createCancelToken() {
+    return axios.CancelToken.source()
   }
 
   get<T = any>(url: string, params?: any, config?: AxiosRequestConfig): Promise<T> {
