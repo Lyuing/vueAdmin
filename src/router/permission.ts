@@ -17,7 +17,7 @@ export function hasPermission(
 /**
  * 根据权限过滤路由配置表
  */
-export function filterRoutesByPermission(
+export function filterAccessRoutes(
   routes: RouteConfig[],
   permissions: string[]
 ): RouteConfig[] {
@@ -25,7 +25,7 @@ export function filterRoutesByPermission(
     .filter(route => {
       const hasAuth = hasPermission(route.meta.permissions, permissions)
       if (hasAuth && route.children) {
-        route.children = filterRoutesByPermission(route.children, permissions)
+        route.children = filterAccessRoutes(route.children, permissions)
       }
       return hasAuth
     })

@@ -20,7 +20,7 @@
       <!-- 语言切换 -->
       <el-dropdown @command="handleLanguageChange">
         <span class="nav-item">
-          <el-icon><Globe /></el-icon>
+          <el-icon><Place /></el-icon>
           <span>{{ currentLanguage }}</span>
         </span>
         <template #dropdown>

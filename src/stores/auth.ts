@@ -8,7 +8,9 @@ export const useAuthStore = defineStore('auth', () => {
   const token = ref<string | null>(null)
   const userInfo = ref<UserInfo | null>(null)
 
-  const isAuthenticated = computed(() => !!token.value && !!userInfo.value)
+  // 仅表示是否已登录，即是否存在有效 token。
+  // 权限/角色等细分控制，在其它处进行判断。
+  const isLoggedIn = computed(() => !!token.value)
 
   /**
    * 登录
@@ -64,13 +66,13 @@ export const useAuthStore = defineStore('auth', () => {
    * 检查当前登录状态
    */
   function checkAuth(): boolean {
-    return isAuthenticated.value
+    return isLoggedIn.value
   }
 
   return {
     token,
     userInfo,
-    isAuthenticated,
+    isLoggedIn,
     login,
     logout,
     restoreAuth,

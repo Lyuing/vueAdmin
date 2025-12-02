@@ -1,46 +1,66 @@
-import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
+import { createRouter, createWebHistory, type RouteRecordRaw, type Router } from 'vue-router'
 import { staticRoutes, routeMap } from './routes'
-import { filterRoutesByPermission } from './permission'
+import { setupRouterGuards } from './guards'
+import { filterAccessRoutes } from './permission'
 import { useMenu } from '@/composables/useMenu'
 
-const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
-  routes: staticRoutes as RouteRecordRaw[]
-})
+let router: Router | null = null
 
-// 存储已添加的动态路由
 let dynamicRoutesAdded = false
+
+/**
+ * 初始化路由实例。将路由创建推迟到 main 流程中调用，避免与守卫注册顺序冲突。
+ * 调用后返回 `router` 实例，后续模块可继续使用 `addDynamicRoutes` 等方法。
+ */
+export function initRouter() {
+  if (router) return router
+
+  router = createRouter({
+    history: createWebHistory(import.meta.env.BASE_URL),
+    routes: staticRoutes as RouteRecordRaw[]
+  })
+  // 注册路由守卫
+  setupRouterGuards(router)
+  return router
+}
+
+function ensureRouter(): Router {
+  if (!router) throw new Error('Router not initialized. Call initRouter() before using router.')
+  return router
+}
 
 /**
  * 添加动态路由
  */
 export async function addDynamicRoutes(permissions: string[], force = false) {
+  const r = ensureRouter()
+
   if (dynamicRoutesAdded && !force) return
 
   // 根据权限过滤路由
-  const accessibleRoutes = filterRoutesByPermission(routeMap, permissions)
+  const accessibleRoutes = filterAccessRoutes(routeMap, permissions)
 
-  // 添加路由到router
+  // 添加路由到 router
   accessibleRoutes.forEach(route => {
-    router.addRoute(route as RouteRecordRaw)
+    r.addRoute(route as RouteRecordRaw)
   })
 
   // 添加404路由（必须在最后）
-  router.addRoute({
+  r.addRoute({
     path: '/:pathMatch(.*)*',
-    redirect: '/404'
+    redirect: '/404',
+    name: 'NotFound'
   })
 
   dynamicRoutesAdded = true
 
   // 生成菜单 - 展开Layout的children作为顶级菜单
   const { setMenus } = useMenu()
-  // 如果第一个路由是Layout，展开它的children
   const menuRoutes =
     accessibleRoutes.length > 0 && accessibleRoutes[0]?.name === 'Layout'
       ? accessibleRoutes[0]?.children || []
       : accessibleRoutes
-  setMenus(menuRoutes, permissions, menuRoutes)
+  setMenus(menuRoutes, permissions)
 }
 
 /**
@@ -48,25 +68,35 @@ export async function addDynamicRoutes(permissions: string[], force = false) {
  * 清除所有动态添加的路由，恢复到初始状态
  */
 export function resetRouter() {
+  const r = ensureRouter()
+
   dynamicRoutesAdded = false
-  
+
   // 获取所有已注册的路由
-  const routes = router.getRoutes()
-  
+  const routes = r.getRoutes()
+
   // 移除所有动态添加的路由（保留静态路由）
   routes.forEach(route => {
     // 只移除动态添加的路由，保留静态路由（login, 403, 404）
     if (route.name && !['Login', 'Forbidden', 'NotFound'].includes(route.name as string)) {
-      router.removeRoute(route.name)
+      try {
+        r.removeRoute(route.name)
+      } catch {
+        // 忽略可能的异常
+      }
     }
   })
-  
+
   // 确保404路由被移除（如果存在）
   try {
-    router.removeRoute('NotFound')
+    r.removeRoute('NotFound')
   } catch {
     // 忽略错误，路由可能不存在
   }
 }
 
-export default router
+export function getRouter() {
+  return ensureRouter()
+}
+
+export default initRouter

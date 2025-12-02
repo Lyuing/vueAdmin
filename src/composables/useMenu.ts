@@ -36,20 +36,23 @@ export function useMenu() {
    */
 
   // 路由提取菜单，并暂存store -- router/index.ts
-  function setMenus(routes: RouteConfig[], permissions: string[], allRoutes: RouteConfig[]) {
-    const menus = generateMenus(routes, permissions, allRoutes)
+  function setMenus(routes: RouteConfig[], permissions: string[]) {
+    const menus = _generateMenus(routes, permissions, routes)
     menuStore.setMenuList(menus)
   }
-
   // 设置当前激活的一级菜单 -- TopNav.vue
   function setActiveMenu(menuName: string) {
     menuStore.setActiveMenu(menuName)
   }
+  // 获取当前一级菜单的下级菜单，渲染侧栏 -- Sidebar.vue, MainLayout.vue
+  function getActiveMenuChildren(): MenuItem[] {
+    const activeMenuItem = menuList.value.find(item => item.name === activeMenu.value)
+    return activeMenuItem?.children || []
+  }
 
-
-  // 根据当前路由自动展开侧栏父级菜单 --  Sidebar.vue, router/guards.ts
+  // 根据当前路由自动展开侧栏菜单 --  Sidebar.vue, router/guards.ts
   function autoExpandMenus(routeName: string) {
-    const breadcrumb = getBreadcrumb(routeName, menuList.value)
+    const breadcrumb = _getBreadcrumb(routeName, menuList.value)
     const menuNames = breadcrumb.map(item => item.name)
     menuStore.setOpenedMenus(menuNames)
 
@@ -62,19 +65,11 @@ export function useMenu() {
     }
   }
 
-
-  // 获取当前一级菜单的下级菜单，渲染侧栏 -- Sidebar.vue, MainLayout.vue
-  function getActiveMenuChildren(): MenuItem[] {
-    const activeMenuItem = menuList.value.find(item => item.name === activeMenu.value)
-    return activeMenuItem?.children || []
-  }
-
-  // 切换侧边栏折叠状态 -- Sidebar.vue
+  // 切换侧边栏面板的折叠状态 -- Sidebar.vue
   function toggleCollapse() {
     menuStore.toggleCollapse()
   }
-
-  // 切换侧栏菜单的展开状态 -- 预留功能
+  // 切换侧边栏菜单的展开状态 -- 预留功能
   function toggleSubmenu(menuName: string) {
     const index = openedMenus.value.indexOf(menuName)
     const newOpenedMenus = [...openedMenus.value]
@@ -86,6 +81,11 @@ export function useMenu() {
     }
 
     menuStore.setOpenedMenus(newOpenedMenus)
+  }
+
+  // 根据菜单name查找菜单项
+  function findMenuByName(name: string): MenuItem | null {
+    return _findMenuByName(name, menuList.value)
   }
 
   return {
@@ -100,7 +100,8 @@ export function useMenu() {
     toggleSubmenu,
     autoExpandMenus,
     toggleCollapse,
-    getActiveMenuChildren
+    getActiveMenuChildren,
+    findMenuByName,
   }
 }
 
@@ -108,59 +109,14 @@ export function useMenu() {
 // 导出的辅助函数
 // ============================================
 
-/**
- * 根据菜单name查找菜单项
- * @使用位置 Sidebar.vue
- */
-export function findMenuByName(name: string, menus: MenuItem[]): MenuItem | null {
-  for (const menu of menus) {
-    if (menu.name === name) {
-      return menu
-    }
-    if (menu.children) {
-      const found = findMenuByName(name, menu.children)
-      if (found) return found
-    }
-  }
-  return null
-}
+
 
 // ============================================
 // 内部辅助函数
 // ============================================
 
-/**
- * 根据路由name查找路由配置
- */
-function findRouteByName(name: string, routes: RouteConfig[]): RouteConfig | null {
-  for (const route of routes) {
-    if (route.name === name) {
-      return route
-    }
-    if (route.children) {
-      const found = findRouteByName(name, route.children)
-      if (found) return found
-    }
-  }
-  return null
-}
-
-/**
- * 计算菜单层级
- */
-function calculateLevel(route: RouteConfig, allRoutes: RouteConfig[]): number {
-  if (!route.meta.parent) return 1 // 顶部导航
-
-  const parent = findRouteByName(route.meta.parent, allRoutes)
-  if (!parent?.meta.parent) return 2 // 侧边栏一级
-
-  return 3 // 侧边栏二级或更深
-}
-
-/**
- * 从路由配置生成菜单数据
- */
-function generateMenus(
+// 根据路由配置生成菜单
+function _generateMenus(
   routes: RouteConfig[],
   permissions: string[],
   allRoutes: RouteConfig[]
@@ -172,7 +128,7 @@ function generateMenus(
     if (route.meta?.hidden) {
       // 但是要处理它的children
       if (route.children) {
-        menus.push(...generateMenus(route.children, permissions, allRoutes))
+        menus.push(..._generateMenus(route.children, permissions, allRoutes))
       }
       continue
     }
@@ -189,7 +145,7 @@ function generateMenus(
       icon: route.meta.icon,
       path: route.path,
       parent: route.meta.parent,
-      level: calculateLevel(route, allRoutes),
+      level: _calculateLevel(route, allRoutes),
       order: route.meta.order || 0,
       permissions: route.meta.permissions,
       hidden: route.meta.hidden
@@ -197,7 +153,7 @@ function generateMenus(
 
     // 处理子菜单
     if (route.children) {
-      menuItem.children = generateMenus(route.children, permissions, allRoutes)
+      menuItem.children = _generateMenus(route.children, permissions, allRoutes)
     }
 
     menus.push(menuItem)
@@ -209,18 +165,54 @@ function generateMenus(
 /**
  * 根据当前路由获取面包屑路径
  */
-function getBreadcrumb(routeName: string, menuList: MenuItem[]): MenuItem[] {
+function _getBreadcrumb(routeName: string, menuList: MenuItem[]): MenuItem[] {
   const breadcrumb: MenuItem[] = []
-  let current = findMenuByName(routeName, menuList)
+  let current = _findMenuByName(routeName, menuList)
 
   while (current) {
     breadcrumb.unshift(current)
     if (current.parent) {
-      current = findMenuByName(current.parent, menuList)
+      current = _findMenuByName(current.parent, menuList)
     } else {
       break
     }
   }
 
   return breadcrumb
+}
+
+// 计算菜单层级
+function _calculateLevel(route: RouteConfig, allRoutes: RouteConfig[]): number {
+  if (!route.meta.parent) return 1 // 顶部导航
+
+  const parent = _findRouteByName(route.meta.parent, allRoutes)
+  if (!parent?.meta.parent) return 2 // 侧边栏一级
+
+  return 3 // 侧边栏二级或更深
+}
+// 根据路由name查找路由配置
+function _findRouteByName(name: string, routes: RouteConfig[]): RouteConfig | null {
+  for (const route of routes) {
+    if (route.name === name) {
+      return route
+    }
+    if (route.children) {
+      const found = _findRouteByName(name, route.children)
+      if (found) return found
+    }
+  }
+  return null
+}
+// 根据菜单name查找菜单项
+function _findMenuByName(name: string, menus: MenuItem[]): MenuItem | null {
+  for (const menu of menus) {
+    if (menu.name === name) {
+      return menu
+    }
+    if (menu.children) {
+      const found = _findMenuByName(name, menu.children)
+      if (found) return found
+    }
+  }
+  return null
 }

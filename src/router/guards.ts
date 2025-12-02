@@ -3,16 +3,16 @@ import { ElMessage } from 'element-plus'
 import { useAuthStore } from '@/stores/auth'
 import { useMenu } from '@/composables/useMenu'
 import { checkPermission } from './permission'
-import { addDynamicRoutes } from '@/router'
+import { addDynamicRoutes } from './index'
 
 export function setupRouterGuards(router: Router) {
+  const authStore = useAuthStore()
+  const { autoExpandMenus } = useMenu()
   router.beforeEach(async (to, _from, next) => {
-    const authStore = useAuthStore()
-    const { autoExpandMenus } = useMenu()
-
+    // console.log('路由拦截:', to, to.matched, router.getRoutes())
     // 如果是登录页，直接放行
     if (to.path === '/login') {
-      if (authStore.isAuthenticated) {
+      if (authStore.isLoggedIn) {
         next('/home')
       } else {
         next()
@@ -22,7 +22,7 @@ export function setupRouterGuards(router: Router) {
 
     // 如果路由不存在（404），检查是否需要动态加载路由
     if (to.matched.length === 0) {
-      if (!authStore.isAuthenticated) {
+      if (!authStore.isLoggedIn) {
         // 未登录用户访问不存在的路由，跳转到登录页
         next('/login')
         return
@@ -45,10 +45,9 @@ export function setupRouterGuards(router: Router) {
     }
 
     // 常规页面访问
-    // 检查是否需要认证
     if (to.meta.requiresAuth) {
-      // 检查是否已登录
-      if (!authStore.isAuthenticated) {
+      // 检查登录
+      if (!authStore.isLoggedIn) {
         ElMessage.warning('请先登录')
         next('/login')
         return
@@ -66,13 +65,12 @@ export function setupRouterGuards(router: Router) {
           return
         }
       }
-
-      // 自动展开菜单
-      if (to.name) {
-        autoExpandMenus(to.name as string)
-      }
     }
-
+    // 自动展开菜单
+    if (to.name) {
+      autoExpandMenus(to.name as string)
+    }
+    // 放行
     next()
   })
 

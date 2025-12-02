@@ -1,16 +1,17 @@
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
+
 import ElementPlus from 'element-plus'
-import 'element-plus/dist/index.css'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
+import 'element-plus/dist/index.css'
+import './assets/styles/index.scss'
+
 import App from './App.vue'
-import router, { addDynamicRoutes } from './router'
 import i18n from './locales'
-import { setupRouterGuards } from './router/guards'
+import initRouter, { addDynamicRoutes } from './router'
 import { useAuthStore } from './stores/auth'
 import { useTheme } from './composables/useTheme'
-import './assets/styles/index.scss'
 
 const app = createApp(App)
 const pinia = createPinia()
@@ -18,6 +19,8 @@ const pinia = createPinia()
 // 注册Pinia
 app.use(pinia)
 
+// 初始化Router
+const router = initRouter()
 // 注册Router
 app.use(router)
 
@@ -39,11 +42,8 @@ async function initApp() {
   const authStore = useAuthStore()
   authStore.restoreAuth()
 
-  // 设置路由守卫（必须在路由注册前设置，这样守卫可以处理动态路由加载）
-  setupRouterGuards(router)
-
   // 如果已登录，恢复动态路由
-  if (authStore.isAuthenticated && authStore.userInfo) {
+  if (authStore.isLoggedIn && authStore.userInfo) {
     await addDynamicRoutes(authStore.userInfo.permissions)
   }
 

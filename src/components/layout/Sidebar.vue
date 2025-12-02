@@ -5,8 +5,13 @@
         <component :is="collapsed ? 'Expand' : 'Fold'" />
       </el-icon>
     </div>
-    <el-menu :default-active="activeMenuName" :collapse="collapsed" :unique-opened="false" class="sidebar-menu"
-      @select="handleMenuSelect">
+    <el-menu
+      :default-active="activeMenuName"
+      :collapse="collapsed"
+      :unique-opened="false"
+      class="sidebar-menu"
+      @select="handleMenuSelect"
+    >
       <template v-for="menu in sidebarMenus" :key="menu.id">
         <el-sub-menu v-if="menu.children && menu.children.length > 0" :index="menu.name">
           <template #title>
@@ -39,11 +44,11 @@
 import { computed, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 
-import { useMenu, findMenuByName } from '@/composables/useMenu'
+import { useMenu } from '@/composables/useMenu'
 
 const router = useRouter()
 const route = useRoute()
-const { menuList, collapsed, toggleCollapse, getActiveMenuChildren, autoExpandMenus } = useMenu()
+const { collapsed, toggleCollapse, getActiveMenuChildren, autoExpandMenus, findMenuByName } = useMenu()
 
 // 获取侧边栏菜单（当前激活一级菜单的子菜单）
 const sidebarMenus = computed(() => {
@@ -60,8 +65,9 @@ const activeMenuName = computed(() => {
   return route.name as string
 })
 
+// 菜单选择事件
 const handleMenuSelect = (menuName: string) => {
-  const menu = findMenuByName(menuName, menuList.value)
+  const menu = findMenuByName(menuName)
   if (menu?.path) {
     router.push(menu.path)
   }
