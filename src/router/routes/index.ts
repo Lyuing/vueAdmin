@@ -85,7 +85,8 @@ export const routeMap: RouteConfig[] = [
           icon: 'Setting',
           requiresAuth: true,
           permissions: ['system:view'],
-          order: 3
+          order: 3,
+          hideInTopNav: true
         },
         children: [
           {

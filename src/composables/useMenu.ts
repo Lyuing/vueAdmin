@@ -148,7 +148,8 @@ function _generateMenus(
       level: _calculateLevel(route, allRoutes),
       order: route.meta.order || 0,
       permissions: route.meta.permissions,
-      hidden: route.meta.hidden
+      hidden: route.meta.hidden,
+      hideInTopNav: route.meta.hideInTopNav
     }
 
     // 处理子菜单

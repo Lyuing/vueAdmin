@@ -12,6 +12,7 @@ export interface RouteMeta extends Record<string | symbol, any> {
   order?: number
   affix?: boolean
   breadcrumb?: boolean
+  hideInTopNav?: boolean
 }
 
 export interface RouteConfig {

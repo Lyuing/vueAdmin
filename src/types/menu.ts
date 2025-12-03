@@ -10,6 +10,7 @@ export interface MenuItem {
   hidden?: boolean
   order?: number
   level: number
+  hideInTopNav?: boolean
 }
 
 export interface SidebarState {

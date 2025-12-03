@@ -66,13 +66,49 @@
         </el-card>
       </el-col>
     </el-row>
+
+    <el-row :gutter="20" style="margin-top: 20px">
+      <el-col :span="24">
+        <el-card>
+          <template #header>
+            <span>系统管理</span>
+          </template>
+          <div class="system-actions">
+            <el-button 
+              v-if="hasPermission('system:user:view')"
+              type="primary" 
+              :icon="User"
+              @click="navigateTo('/system/user')"
+            >
+              用户管理
+            </el-button>
+            <el-button 
+              v-if="hasPermission('system:role:view')"
+              type="success" 
+              :icon="UserFilled"
+              @click="navigateTo('/system/role')"
+            >
+              角色管理
+            </el-button>
+            <el-button 
+              v-if="hasPermission('system:menu:view')"
+              type="warning" 
+              :icon="Menu"
+              @click="navigateTo('/system/menu')"
+            >
+              菜单管理
+            </el-button>
+          </div>
+        </el-card>
+      </el-col>
+    </el-row>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { User, UserFilled, Key } from '@element-plus/icons-vue'
+import { User, UserFilled, Key, Menu } from '@element-plus/icons-vue'
 import { useAuthStore } from '@/stores/auth'
 import { useTheme } from '@/composables/useTheme'
 import { storage } from '@/utils/storage'
@@ -100,6 +136,14 @@ const changeTheme = async () => {
 
 const viewDashboard = () => {
   router.push('/dashboard')
+}
+
+const navigateTo = (path: string) => {
+  router.push(path)
+}
+
+const hasPermission = (permission: string): boolean => {
+  return authStore.userInfo?.permissions.includes(permission) || false
 }
 </script>
 
@@ -180,5 +224,11 @@ const viewDashboard = () => {
     width: 100%;
     margin: 0;
   }
+}
+
+.system-actions {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
 }
 </style>

@@ -96,7 +96,7 @@ const { themeList, setTheme } = useTheme()
 
 // 获取一级菜单
 const topMenus = computed(() => {
-  return menuList.value.filter(menu => menu.level === 1)
+  return menuList.value.filter(menu => menu.level === 1 && !menu.hideInTopNav)
 })
 
 // 使用配置获取当前语言显示名称
