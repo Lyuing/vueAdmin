@@ -44,7 +44,7 @@
 
 
     - 实现hasPermission函数，检查用户是否拥有指定权限
-    - 实现filterRoutesByPermission函数，根据权限过滤路由配置表
+    - 实现filterAccessRoutes函数，根据权限过滤路由配置表
     - 实现checkPermission函数，用于路由守卫权限检查
     - _需求: 3.1, 3.2, 3.3, 5.5_
   - [x] 3.4 实现路由工具函数（utils/route.ts）
@@ -61,7 +61,7 @@
   - [x] 4.1 实现认证状态管理（stores/auth.ts）
 
 
-    - 定义AuthState接口，包含token、userInfo、isAuthenticated
+    - 定义AuthState接口，包含token、userInfo、isLoggedIn
     - 实现login方法：调用登录API，保存token和用户信息到localStorage
     - 实现logout方法：清除token和用户信息，跳转登录页
     - 实现restoreAuth方法：从localStorage恢复登录状态

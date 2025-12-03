@@ -165,7 +165,7 @@ class HTTPClient {
 interface AuthState {
   token: string | null;
   userInfo: UserInfo | null;
-  isAuthenticated: boolean;
+  isLoggedIn: boolean;
 }
 
 interface UserInfo {
@@ -185,7 +185,7 @@ interface AuthStore {
   // 状态
   token: string | null
   userInfo: UserInfo | null
-  isAuthenticated: boolean
+  isLoggedIn: boolean
   
   // 方法
   login(username: string, password: string): Promise<void>
@@ -332,7 +332,7 @@ router.beforeEach((to, from, next) => {
   // 1. 检查是否需要认证
   if (to.meta.requiresAuth) {
     // 2. 检查是否已登录
-    if (!authStore.isAuthenticated) {
+    if (!authStore.isLoggedIn) {
       next('/login')
       return
     }
