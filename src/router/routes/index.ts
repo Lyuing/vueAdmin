@@ -59,7 +59,7 @@ export const routeMap: RouteConfig[] = [
         meta: {
           title: '首页',
           requiresAuth: true,
-          permissionCode: 'home:view'
+          permissionCode: 'home'
         }
       },
       {
@@ -69,7 +69,7 @@ export const routeMap: RouteConfig[] = [
         meta: {
           title: '工作台',
           requiresAuth: true,
-          permissionCode: 'dashboard:view'
+          permissionCode: 'dashboard'
         }
       },
       {
@@ -79,7 +79,7 @@ export const routeMap: RouteConfig[] = [
         meta: {
           title: '用户管理',
           requiresAuth: true,
-          permissionCode: 'system:user:view'
+          permissionCode: 'system:user'
         }
       },
       {
@@ -89,7 +89,7 @@ export const routeMap: RouteConfig[] = [
         meta: {
           title: '角色管理',
           requiresAuth: true,
-          permissionCode: 'system:role:view'
+          permissionCode: 'system:role'
         }
       },
       {
@@ -99,7 +99,7 @@ export const routeMap: RouteConfig[] = [
         meta: {
           title: '菜单管理',
           requiresAuth: true,
-          permissionCode: 'system:menu:view'
+          permissionCode: 'system:menu'
         }
       }
     ]

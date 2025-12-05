@@ -52,13 +52,24 @@ export const useAuthStore = defineStore('auth', () => {
   /**
    * 从本地存储恢复登录状态
    */
-  function restoreAuth() {
+  async function restoreAuth() {
     const savedToken = storage.get<string>('token')
     const savedUserInfo = storage.get<UserInfo>('userInfo')
 
     if (savedToken && savedUserInfo) {
       token.value = savedToken
       userInfo.value = savedUserInfo
+
+      // 异步获取最新的用户信息（包含最新权限）
+      try {
+        const { getCurrentUser } = await import('@/api/user')
+        const response = await getCurrentUser()
+        userInfo.value = response.data as UserInfo
+        storage.set('userInfo', response.data)
+      } catch (error) {
+        console.error('Failed to refresh user info:', error)
+        // 如果获取失败，继续使用缓存的用户信息
+      }
     }
   }
 

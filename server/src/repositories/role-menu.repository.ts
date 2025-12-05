@@ -12,15 +12,20 @@ export class RoleMenuRepository extends BaseRepository<RoleMenuConfigWithId> {
     return this.data.find(rm => rm.roleId === roleId) || null
   }
 
-  async saveRoleMenus(roleId: string, roleName: string, menuIds: string[]): Promise<RoleMenuConfig> {
+  async saveRoleMenus(roleId: string, roleName: string, permissionCodes: string[]): Promise<RoleMenuConfig> {
     const existing = await this.findByRoleId(roleId)
-    
+
+    console.log('Repository - saveRoleMenus:', { roleId, roleName, permissionCodes, existing })
+
     if (existing) {
-      const updated = await this.update(roleId, { menuIds })
+      const updated = await this.update(roleId, { permissionCodes })
+      console.log('Repository - 更新后的数据:', updated)
       return updated!
     } else {
-      const newRoleMenu: RoleMenuConfigWithId = { id: roleId, roleId, roleName, menuIds }
-      return await this.create(newRoleMenu)
+      const newRoleMenu: RoleMenuConfigWithId = { id: roleId, roleId, roleName, permissionCodes }
+      const created = await this.create(newRoleMenu)
+      console.log('Repository - 创建的数据:', created)
+      return created
     }
   }
 }

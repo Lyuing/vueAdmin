@@ -12,7 +12,4 @@ router.delete('/:id', auth, requireAdmin, ctx => menuController.deleteMenu(ctx))
 router.post('/batch', auth, requireAdmin, ctx => menuController.saveAllMenus(ctx))
 router.get('/permission-codes', ctx => menuController.getPermissionCodes(ctx))
 
-const roleRouter = new Router({ prefix: '/api/role' })
-roleRouter.post('/:roleId/menus', auth, requireAdmin, ctx => menuController.saveRoleMenus(ctx))
-
-export { router as default, roleRouter }
+export default router

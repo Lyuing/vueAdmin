@@ -85,10 +85,6 @@ export class MenuService {
     // 直接替换整个菜单数据
     await menuRepository.saveAll(menus)
   }
-
-  async saveRoleMenus(roleId: string, menuIds: string[]): Promise<void> {
-    await roleMenuRepository.saveRoleMenus(roleId, roleId, menuIds)
-  }
 }
 
 export const menuService = new MenuService()

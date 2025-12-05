@@ -12,5 +12,5 @@ export interface MenuConfig {
 export interface RoleMenuConfig {
   roleId: string
   roleName: string
-  menuIds: string[]
+  permissionCodes: string[]
 }

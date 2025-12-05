@@ -1,16 +1,51 @@
 import http from './http'
-import type { UserInfo } from '@/types/user'
 
-/**
- * 获取用户信息
- */
-export function getUserInfo(): Promise<UserInfo> {
-  return http.get<UserInfo>('/user/info')
+export interface User {
+  id: string
+  username: string
+  password?: string
+  nickname: string
+  avatar?: string
+  email?: string
+  phone?: string
+  roles: string[]
+  permissions: string[]
+  status?: 'active' | 'disabled'
+  createdAt: string
+  updatedAt: string
 }
 
 /**
- * 更新用户信息
+ * 获取所有用户（管理员）
  */
-export function updateUserInfo(data: Partial<UserInfo>): Promise<UserInfo> {
-  return http.put<UserInfo>('/user/info', data)
+export function getAllUsers(): Promise<{ data: User[] }> {
+  return http.get('/user/all')
+}
+
+/**
+ * 创建用户（管理员）
+ */
+export function createUser(user: Partial<User>): Promise<{ data: User }> {
+  return http.post('/user', user)
+}
+
+/**
+ * 更新用户（管理员）
+ */
+export function updateUser(id: string, user: Partial<User>): Promise<{ data: User }> {
+  return http.put(`/user/${id}`, user)
+}
+
+/**
+ * 删除用户（管理员）
+ */
+export function deleteUser(id: string): Promise<void> {
+  return http.delete(`/user/${id}`)
+}
+
+/**
+ * 获取当前用户信息（包含最新权限）
+ */
+export function getCurrentUser(): Promise<{ data: User }> {
+  return http.get('/user/info')
 }

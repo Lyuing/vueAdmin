@@ -9,6 +9,7 @@ import { logger } from './middlewares/logger.middleware.js'
 import { registerRoutes } from './routes/index.js'
 import { userRepository } from './repositories/user.repository.js'
 import { menuRepository } from './repositories/menu.repository.js'
+import { roleRepository } from './repositories/role.repository.js'
 import { roleMenuRepository } from './repositories/role-menu.repository.js'
 
 const app = new Koa()
@@ -47,6 +48,7 @@ async function start() {
 async function loadData() {
   await userRepository.init()
   await menuRepository.init()
+  await roleRepository.init()
   await roleMenuRepository.init()
 }
 

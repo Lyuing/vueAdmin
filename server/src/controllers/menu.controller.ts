@@ -44,13 +44,6 @@ export class MenuController {
     await menuService.saveAllMenus(menus)
     success(ctx, null, '保存成功')
   }
-
-  async saveRoleMenus(ctx: Context): Promise<void> {
-    const { roleId } = ctx.params
-    const { menuIds } = ctx.request.body as { menuIds: string[] }
-    await menuService.saveRoleMenus(roleId, menuIds)
-    success(ctx, null, '保存成功')
-  }
 }
 
 export const menuController = new MenuController()

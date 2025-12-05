@@ -7,16 +7,34 @@
     "avatar": "",
     "email": "admin@example.com",
     "phone": "13800138000",
-    "roles": ["admin"],
+    "roles": [
+      "admin"
+    ],
     "permissions": [
-      "home:view",
-      "dashboard:view",
-      "system:view",
-      "system:user:view",
-      "system:role:view",
-      "system:menu:view"
+      "dashboard",
+      "home",
+      "system:menu",
+      "system:role",
+      "system:user"
     ],
     "createdAt": "2024-01-01T00:00:00.000Z",
     "updatedAt": "2024-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "1764920748165",
+    "username": "test1",
+    "password": "test123",
+    "nickname": "test1",
+    "roles": [
+      "test"
+    ],
+    "permissions": [
+      "home",
+      "system:menu",
+      "system:role",
+      "system:user"
+    ],
+    "createdAt": "2025-12-05T07:45:48.165Z",
+    "updatedAt": "2025-12-05T08:14:22.089Z"
   }
 ]

@@ -3,6 +3,33 @@
     "id": "admin",
     "roleId": "admin",
     "roleName": "管理员",
-    "menuIds": ["1", "2", "3", "3-1", "3-2", "3-3"]
+    "permissionCodes": [
+      "home",
+      "dashboard",
+      "system:user",
+      "system:role",
+      "system:menu"
+    ]
+  },
+  {
+    "id": "user",
+    "roleId": "user",
+    "roleName": "普通用户",
+    "permissionCodes": [
+      "home",
+      "dashboard"
+    ]
+  },
+  {
+    "id": "test",
+    "roleId": "test",
+    "roleName": "test",
+    "permissionCodes": [
+      "home",
+      "system:user",
+      "system:role",
+      "system:menu",
+      "system:user"
+    ]
   }
 ]

@@ -33,13 +33,6 @@ export function deleteMenu(menuId: string): Promise<void> {
 }
 
 /**
- * 保存角色菜单配置
- */
-export function saveRoleMenus(roleId: string, menuIds: string[]): Promise<void> {
-    return http.post(`/role/${roleId}/menus`, { menuIds })
-}
-
-/**
  * 批量保存所有菜单（保存整个菜单树）
  */
 export function saveAllMenus(menus: MenuConfig[]): Promise<void> {

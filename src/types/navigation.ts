@@ -94,6 +94,6 @@ export interface RoleMenuConfig {
   roleId: string
   /** 角色名称 */
   roleName: string
-  /** 该角色可访问的菜单ID列表 */
-  menuIds: string[]
+  /** 该角色可访问的权限码列表 */
+  permissionCodes: string[]
 }

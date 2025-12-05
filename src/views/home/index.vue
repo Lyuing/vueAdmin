@@ -2,7 +2,7 @@
   <div class="home-page">
     <el-card class="welcome-card">
       <h2>{{ t('menu.home') }}</h2>
-      <p>欢迎使用Vue3+TypeScript中台管理系统</p>
+      <p>管理系统</p>
       <el-divider />
       <div class="info-grid">
         <div class="info-item">
@@ -36,14 +36,11 @@
             <span>功能特性</span>
           </template>
           <ul class="feature-list">
-            <li>✅ Vue3 + TypeScript + Vite</li>
-            <li>✅ Pinia 状态管理</li>
-            <li>✅ Vue Router 动态路由</li>
-            <li>✅ Element Plus UI组件库</li>
-            <li>✅ 用户认证与权限控制</li>
-            <li>✅ 国际化多语言支持</li>
-            <li>✅ 主题切换功能</li>
-            <li>✅ 响应式布局设计</li>
+            <li> Vue3 + TypeScript + Vite</li>
+            <li> Element Plus UI组件库</li>
+            <li> 用户认证与权限控制</li>
+            <li> 国际化多语言支持</li>
+            <li> 主题切换功能</li>
           </ul>
         </el-card>
       </el-col>
@@ -75,7 +72,7 @@
           </template>
           <div class="system-actions">
             <el-button 
-              v-if="hasPermission('system:user:view')"
+              v-if="hasPermission('system:user')"
               type="primary" 
               :icon="User"
               @click="navigateTo('/system/user')"
@@ -83,7 +80,7 @@
               用户管理
             </el-button>
             <el-button 
-              v-if="hasPermission('system:role:view')"
+              v-if="hasPermission('system:role')"
               type="success" 
               :icon="UserFilled"
               @click="navigateTo('/system/role')"
@@ -91,7 +88,7 @@
               角色管理
             </el-button>
             <el-button 
-              v-if="hasPermission('system:menu:view')"
+              v-if="hasPermission('system:menu')"
               type="warning" 
               :icon="Menu"
               @click="navigateTo('/system/menu')"
