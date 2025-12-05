@@ -6,7 +6,7 @@
         <div
           v-for="menu in topMenus"
           :key="menu.id"
-          :class="['menu-item', { active: activeMenu === menu.name }]"
+          :class="['menu-item', { active: isMenuActive(menu) }]"
           @click="handleMenuClick(menu)"
         >
           <el-icon v-if="menu.icon">
@@ -78,26 +78,23 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import { useRouter, useRoute } from 'vue-router'
 
 import { useAuthStore } from '@/stores/auth'
-import { useMenu } from '@/composables/useMenu'
+import { useNavigation } from '@/composables/useNavigation'
 import { useTheme } from '@/composables/useTheme'
 import { storage } from '@/utils/storage'
 import { LANGUAGE_OPTIONS, getLanguageLabel, isValidLanguage } from '@/locales'
-import type { MenuItem } from '@/types/menu'
+import type { MenuItem } from '@/types/navigation'
 
-const { t, locale } = useI18n()
+
 const router = useRouter()
+const route = useRoute()
+const { t, locale } = useI18n()
 const authStore = useAuthStore()
-const { menuList, activeMenu, setActiveMenu } = useMenu()
+const { topMenus } = useNavigation()
 const { themeList, setTheme } = useTheme()
-
-// 获取一级菜单
-const topMenus = computed(() => {
-  return menuList.value.filter(menu => menu.level === 1 && !menu.hideInTopNav)
-})
 
 // 使用配置获取当前语言显示名称
 const currentLanguage = computed(() => {
@@ -107,16 +104,15 @@ const currentLanguage = computed(() => {
 // 语言选项配置
 const languageOptions = LANGUAGE_OPTIONS
 
+// 判断菜单是否激活
+const isMenuActive = (menu: MenuItem) => {
+  if (!menu.path) return false
+  // 检查当前路由是否以菜单路径开头（支持子路由）
+  return route.path === menu.path || route.path.startsWith(menu.path + '/')
+}
+
 const handleMenuClick = (menu: MenuItem) => {
-  setActiveMenu(menu.name)
-  if (menu.path) {
-    router.push(menu.path)
-  } else if (menu.children && menu.children.length > 0) {
-    const firstChild = menu.children[0]
-    if (firstChild?.path) {
-      router.push(firstChild.path)
-    }
-  }
+  menu.path && router.push(menu.path)
 }
 
 const handleLanguageChange = (lang: string) => {
@@ -124,8 +120,6 @@ const handleLanguageChange = (lang: string) => {
     if (isValidLanguage(lang)) {
       locale.value = lang
       storage.set('locale', lang)
-    } else {
-      console.warn(`Invalid language code: ${lang}`)
     }
   } catch (error) {
     console.error('Failed to change language:', error)

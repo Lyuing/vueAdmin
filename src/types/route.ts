@@ -4,6 +4,7 @@ export interface RouteMeta extends Record<string | symbol, any> {
   title: string
   icon?: string
   requiresAuth: boolean
+  permissionCode?: string
   permissions?: string[]
   roles?: string[]
   hidden?: boolean

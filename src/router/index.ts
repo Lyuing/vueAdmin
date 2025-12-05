@@ -2,7 +2,6 @@ import { createRouter, createWebHistory, type RouteRecordRaw, type Router } from
 import { staticRoutes, routeMap } from './routes'
 import { setupRouterGuards } from './guards'
 import { filterAccessRoutes } from './permission'
-import { useMenu } from '@/composables/useMenu'
 
 let router: Router | null = null
 
@@ -53,14 +52,6 @@ export async function addDynamicRoutes(permissions: string[], force = false) {
   })
 
   dynamicRoutesAdded = true
-
-  // 生成菜单 - 展开Layout的children作为顶级菜单
-  const { setMenus } = useMenu()
-  const menuRoutes =
-    accessibleRoutes.length > 0 && accessibleRoutes[0]?.name === 'Layout'
-      ? accessibleRoutes[0]?.children || []
-      : accessibleRoutes
-  setMenus(menuRoutes, permissions)
 }
 
 /**

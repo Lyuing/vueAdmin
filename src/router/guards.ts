@@ -1,15 +1,14 @@
 import type { Router } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { useAuthStore } from '@/stores/auth'
-import { useMenu } from '@/composables/useMenu'
-import { checkPermission } from './permission'
+import { usePermission } from '@/composables/usePermission'
+import { useNavigation } from '@/composables/useNavigation'
 import { addDynamicRoutes } from './index'
 
 export function setupRouterGuards(router: Router) {
   const authStore = useAuthStore()
-  const { autoExpandMenus } = useMenu()
+
   router.beforeEach(async (to, _from, next) => {
-    // console.log('路由拦截:', to, to.matched, router.getRoutes())
     // 如果是登录页，直接放行
     if (to.path === '/login') {
       if (authStore.isLoggedIn) {
@@ -21,6 +20,7 @@ export function setupRouterGuards(router: Router) {
     }
 
     // 如果路由不存在（404），检查是否需要动态加载路由
+    // 应对页面原地刷新的状态
     if (to.matched.length === 0) {
       if (!authStore.isLoggedIn) {
         // 未登录用户访问不存在的路由，跳转到登录页
@@ -53,23 +53,15 @@ export function setupRouterGuards(router: Router) {
         return
       }
 
-      // 检查权限
-      if (to.meta.permissions && authStore.userInfo) {
-        const hasAuth = checkPermission(
-          to.meta.permissions as string[],
-          authStore.userInfo.permissions
-        )
-        if (!hasAuth) {
-          ElMessage.error('无权限访问')
-          next('/403')
-          return
-        }
+      // 使用usePermission检查路由权限
+      const { checkRoutePermission } = usePermission()
+      if (!checkRoutePermission(to)) {
+        ElMessage.error('无权限访问')
+        next('/403')
+        return
       }
     }
-    // 自动展开菜单
-    if (to.name) {
-      autoExpandMenus(to.name as string)
-    }
+
     // 放行
     next()
   })
@@ -77,6 +69,10 @@ export function setupRouterGuards(router: Router) {
   router.afterEach(to => {
     // 设置页面标题
     document.title = to.meta.title ? `${to.meta.title} - 中台管理系统` : '中台管理系统'
+
+    // 同步菜单与路由状态
+    const { syncMenuWithRoute } = useNavigation()
+    syncMenuWithRoute()
   })
 
   router.onError(error => {

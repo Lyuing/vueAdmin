@@ -1,19 +1,14 @@
 <template>
-  <div v-if="hasSidebarMenus" :class="['sidebar', { collapsed }]">
-    <div class="collapse-btn" @click="toggleCollapse()">
+  <div v-if="hasSidebarMenus" :class="['sidebar', { collapsed: sidebarCollapsed }]">
+    <div class="collapse-btn" @click="toggleSidebar()">
       <el-icon>
-        <component :is="collapsed ? 'Expand' : 'Fold'" />
+        <component :is="sidebarCollapsed ? 'Expand' : 'Fold'" />
       </el-icon>
     </div>
-    <el-menu
-      :default-active="activeMenuName"
-      :collapse="collapsed"
-      :unique-opened="false"
-      class="sidebar-menu"
-      @select="handleMenuSelect"
-    >
+    <el-menu :default-active="activeMenuPath" :collapse="sidebarCollapsed" :unique-opened="false" router
+      class="sidebar-menu">
       <template v-for="menu in sidebarMenus" :key="menu.id">
-        <el-sub-menu v-if="menu.children && menu.children.length > 0" :index="menu.name">
+        <el-sub-menu v-if="menu.children && menu.children.length > 0" :index="menu.path || menu.id">
           <template #title>
             <el-icon v-if="menu.icon">
               <component :is="menu.icon" />
@@ -21,7 +16,7 @@
             <span>{{ menu.title }}</span>
           </template>
           <template v-for="child in menu.children" :key="child.id">
-            <el-menu-item :index="child.name">
+            <el-menu-item :index="child.path || child.id">
               <el-icon v-if="child.icon">
                 <component :is="child.icon" />
               </el-icon>
@@ -29,7 +24,7 @@
             </el-menu-item>
           </template>
         </el-sub-menu>
-        <el-menu-item v-else :index="menu.name">
+        <el-menu-item v-else :index="menu.path || menu.id">
           <el-icon v-if="menu.icon">
             <component :is="menu.icon" />
           </el-icon>
@@ -41,48 +36,27 @@
 </template>
 
 <script setup lang="ts">
-import { computed, watch } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
+import { useNavigation } from '@/composables/useNavigation'
 
-import { useMenu } from '@/composables/useMenu'
-
-const router = useRouter()
 const route = useRoute()
-const { collapsed, toggleCollapse, getActiveMenuChildren, autoExpandMenus, findMenuByName } = useMenu()
 
-// 获取侧边栏菜单（当前激活一级菜单的子菜单）
-const sidebarMenus = computed(() => {
-  return getActiveMenuChildren()
-})
+const {
+  sidebarMenus,
+  sidebarCollapsed,
+  toggleSidebar
+} = useNavigation()
 
 // 是否有侧边栏菜单
 const hasSidebarMenus = computed(() => {
   return sidebarMenus.value.length > 0
 })
 
-// 当前激活的菜单
-const activeMenuName = computed(() => {
-  return route.name as string
+// 当前激活的菜单路径（用于 el-menu 的 router 模式）
+const activeMenuPath = computed(() => {
+  return route.path
 })
-
-// 菜单选择事件
-const handleMenuSelect = (menuName: string) => {
-  const menu = findMenuByName(menuName)
-  if (menu?.path) {
-    router.push(menu.path)
-  }
-}
-
-// 监听路由变化，自动展开菜单
-watch(
-  () => route.name,
-  newName => {
-    if (newName) {
-      autoExpandMenus(newName as string)
-    }
-  },
-  { immediate: true }
-)
 </script>
 
 <style scoped lang="scss">

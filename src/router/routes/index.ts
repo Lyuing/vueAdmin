@@ -38,6 +38,7 @@ export const staticRoutes: RouteConfig[] = [
 
 /**
  * 完整路由配置表 - 根据权限动态加载
+ * 路由仅包含路由相关属性，UI展示由菜单配置控制
  */
 export const routeMap: RouteConfig[] = [
   {
@@ -57,10 +58,8 @@ export const routeMap: RouteConfig[] = [
         component: () => import('@/views/home/index.vue'),
         meta: {
           title: '首页',
-          icon: 'HomeFilled',
           requiresAuth: true,
-          permissions: ['home:view'],
-          order: 1
+          permissionCode: 'home:view'
         }
       },
       {
@@ -69,66 +68,39 @@ export const routeMap: RouteConfig[] = [
         component: () => import('@/views/dashboard/index.vue'),
         meta: {
           title: '工作台',
-          icon: 'DataLine',
           requiresAuth: true,
-          permissions: ['dashboard:view'],
-          order: 2
+          permissionCode: 'dashboard:view'
         }
       },
       {
-        path: '/system',
-        name: 'System',
-        component: () => import('@/components/common/RouterView.vue'),
-        redirect: '/system/user',
+        path: '/system/user',
+        name: 'SystemUser',
+        component: () => import('@/views/system/user/index.vue'),
         meta: {
-          title: '系统管理',
-          icon: 'Setting',
+          title: '用户管理',
           requiresAuth: true,
-          permissions: ['system:view'],
-          order: 3,
-          hideInTopNav: true
-        },
-        children: [
-          {
-            path: 'user',
-            name: 'SystemUser',
-            component: () => import('@/views/system/user/index.vue'),
-            meta: {
-              title: '用户管理',
-              icon: 'User',
-              requiresAuth: true,
-              permissions: ['system:user:view'],
-              parent: 'System',
-              order: 1
-            }
-          },
-          {
-            path: 'role',
-            name: 'SystemRole',
-            component: () => import('@/views/system/role/index.vue'),
-            meta: {
-              title: '角色管理',
-              icon: 'UserFilled',
-              requiresAuth: true,
-              permissions: ['system:role:view'],
-              parent: 'System',
-              order: 2
-            }
-          },
-          {
-            path: 'menu',
-            name: 'SystemMenu',
-            component: () => import('@/views/system/menu/index.vue'),
-            meta: {
-              title: '菜单管理',
-              icon: 'Menu',
-              requiresAuth: true,
-              permissions: ['system:menu:view'],
-              parent: 'System',
-              order: 3
-            }
-          }
-        ]
+          permissionCode: 'system:user:view'
+        }
+      },
+      {
+        path: '/system/role',
+        name: 'SystemRole',
+        component: () => import('@/views/system/role/index.vue'),
+        meta: {
+          title: '角色管理',
+          requiresAuth: true,
+          permissionCode: 'system:role:view'
+        }
+      },
+      {
+        path: '/system/menu',
+        name: 'SystemMenu',
+        component: () => import('@/views/system/menu/index.vue'),
+        meta: {
+          title: '菜单管理',
+          requiresAuth: true,
+          permissionCode: 'system:menu:view'
+        }
       }
     ]
   }
