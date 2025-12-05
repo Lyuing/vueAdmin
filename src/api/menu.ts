@@ -40,6 +40,13 @@ export function saveRoleMenus(roleId: string, menuIds: string[]): Promise<void> 
 }
 
 /**
+ * 批量保存所有菜单（保存整个菜单树）
+ */
+export function saveAllMenus(menus: MenuConfig[]): Promise<void> {
+    return http.post('/menu/batch', menus)
+}
+
+/**
  * 获取权限码列表
  */
 export function getPermissionCodes(): Promise<{ data: string[] }> {

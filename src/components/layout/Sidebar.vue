@@ -16,14 +16,14 @@
         <el-sub-menu v-if="menu.children && menu.children.length > 0" :index="menu.path || menu.id">
           <template #title>
             <el-icon v-if="menu.icon">
-              <component :is="menu.icon" />
+              <component :is="getIcon(menu.icon)" />
             </el-icon>
             <span>{{ menu.title }}</span>
           </template>
           <template v-for="child in menu.children" :key="child.id">
             <el-menu-item :index="child.path || child.id">
               <el-icon v-if="child.icon">
-                <component :is="child.icon" />
+                <component :is="getIcon(child.icon)" />
               </el-icon>
               <span>{{ child.title }}</span>
             </el-menu-item>
@@ -31,7 +31,7 @@
         </el-sub-menu>
         <el-menu-item v-else :index="menu.path || menu.id">
           <el-icon v-if="menu.icon">
-            <component :is="menu.icon" />
+            <component :is="getIcon(menu.icon)" />
           </el-icon>
           <span>{{ menu.title }}</span>
         </el-menu-item>
@@ -44,6 +44,7 @@
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useNavigation } from '@/composables/useNavigation'
+import { getIconComponent } from '@/utils/icon'
 
 const route = useRoute()
 
@@ -58,6 +59,11 @@ const hasSidebarMenus = computed(() => {
 const activeMenuPath = computed(() => {
   return route.path
 })
+
+// 获取图标组件
+const getIcon = (iconName?: string) => {
+  return getIconComponent(iconName)
+}
 </script>
 
 <style scoped lang="scss">

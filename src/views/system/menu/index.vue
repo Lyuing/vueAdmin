@@ -4,110 +4,208 @@
     <el-card>
       <template #header>
         <div class="card-header">
-          <span>菜单列表</span>
-          <el-button type="primary" size="small">新增菜单</el-button>
+          <span>{{ t('menu.list') }}</span>
+          <el-button type="primary" size="small" @click="handleCreate">
+            {{ t('menu.add') }}
+          </el-button>
         </div>
       </template>
-      <el-table :data="tableData" style="width: 100%" row-key="id" default-expand-all>
-        <el-table-column prop="title" label="菜单名称" width="200" />
-        <el-table-column prop="path" label="路由路径" width="200" />
-        <el-table-column prop="icon" label="图标" width="120">
-          <template #default="{ row }">
-            <el-icon v-if="row.icon">
-              <component :is="row.icon" />
-            </el-icon>
-          </template>
-        </el-table-column>
-        <el-table-column prop="permission" label="权限标识" />
-        <el-table-column prop="order" label="排序" width="80" />
-        <el-table-column prop="status" label="状态" width="100">
-          <template #default="{ row }">
-            <el-tag :type="row.status === '显示' ? 'success' : 'info'">
-              {{ row.status }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column label="操作" width="200">
-          <template #default>
-            <el-button size="small" type="primary">编辑</el-button>
-            <el-button size="small" type="danger">删除</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
+      
+      <MenuTable
+        :data="menuList"
+        :loading="loading"
+        @edit="handleEdit"
+        @delete="handleDelete"
+      />
     </el-card>
+
+    <MenuDialog
+      v-model:visible="dialogVisible"
+      :mode="dialogMode"
+      :menu-data="currentMenu"
+      :all-menus="menuList"
+      @save="handleSave"
+      @cancel="handleCancel"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import type { MenuConfig } from '@/types/navigation'
+import { getAllMenus, saveAllMenus, deleteMenu } from '@/api/menu'
+import MenuTable from '@/components/menu/MenuTable.vue'
+import MenuDialog from '@/components/menu/MenuDialog.vue'
 
 const { t } = useI18n()
 
-const tableData = ref([
-  {
-    id: 1,
-    title: '首页',
-    path: '/home',
-    icon: 'HomeFilled',
-    permission: 'home:view',
-    order: 1,
-    status: '显示'
-  },
-  {
-    id: 2,
-    title: '工作台',
-    path: '/dashboard',
-    icon: 'DataLine',
-    permission: 'dashboard:view',
-    order: 2,
-    status: '显示'
-  },
-  {
-    id: 3,
-    title: '系统管理',
-    path: '/system',
-    icon: 'Setting',
-    permission: 'system:view',
-    order: 3,
-    status: '显示',
-    children: [
-      {
-        id: 31,
-        title: '用户管理',
-        path: '/system/user',
-        icon: 'User',
-        permission: 'system:user:view',
-        order: 1,
-        status: '显示'
-      },
-      {
-        id: 32,
-        title: '角色管理',
-        path: '/system/role',
-        icon: 'UserFilled',
-        permission: 'system:role:view',
-        order: 2,
-        status: '显示'
-      },
-      {
-        id: 33,
-        title: '菜单管理',
-        path: '/system/menu',
-        icon: 'Menu',
-        permission: 'system:menu:view',
-        order: 3,
-        status: '显示'
-      }
-    ]
+// 状态管理
+const menuList = ref<MenuConfig[]>([])
+const loading = ref(false)
+const dialogVisible = ref(false)
+const dialogMode = ref<'create' | 'edit'>('create')
+const currentMenu = ref<MenuConfig | null>(null)
+
+// 加载菜单列表
+async function loadMenuList() {
+  try {
+    loading.value = true
+    const response = await getAllMenus()
+    menuList.value = response.data
+  } catch (error) {
+    console.error('加载菜单列表失败:', error)
+    ElMessage.error(t('menu.message.loadFailed'))
+  } finally {
+    loading.value = false
   }
-])
+}
+
+// 创建菜单
+function handleCreate() {
+  dialogMode.value = 'create'
+  currentMenu.value = null
+  dialogVisible.value = true
+}
+
+// 编辑菜单
+function handleEdit(menu: MenuConfig) {
+  dialogMode.value = 'edit'
+  currentMenu.value = menu
+  dialogVisible.value = true
+}
+
+// 删除菜单
+async function handleDelete(menu: MenuConfig) {
+  try {
+    await ElMessageBox.confirm(
+      t('menu.deleteConfirm'),
+      t('menu.delete'),
+      {
+        confirmButtonText: t('common.confirm'),
+        cancelButtonText: t('common.cancel'),
+        type: 'warning'
+      }
+    )
+    
+    await deleteMenu(menu.id)
+    ElMessage.success(t('menu.message.deleteSuccess'))
+    await loadMenuList()
+  } catch (error) {
+    if (error !== 'cancel') {
+      console.error('删除菜单失败:', error)
+      ElMessage.error(t('common.deleteFailed'))
+    }
+  }
+}
+
+// 保存菜单
+async function handleSave(menuData: MenuConfig & { parentId?: string }) {
+  try {
+    loading.value = true
+    
+    // 处理树形结构
+    const { parentId, ...menuToSave } = menuData
+    
+    let updatedMenuList: MenuConfig[]
+    
+    if (dialogMode.value === 'create') {
+      // 创建模式：根据 parentId 决定插入位置
+      if (parentId) {
+        // 有父级菜单，插入到父级的 children 中
+        updatedMenuList = insertMenuToParent(menuList.value, parentId, menuToSave)
+      } else {
+        // 没有父级菜单，作为顶级菜单添加
+        updatedMenuList = [...menuList.value, menuToSave]
+      }
+    } else {
+      // 编辑模式：先移除旧位置，再插入新位置
+      const removedMenus = removeMenuFromTree(menuList.value, menuToSave.id)
+      
+      if (parentId) {
+        // 有父级菜单，插入到父级的 children 中
+        updatedMenuList = insertMenuToParent(removedMenus, parentId, menuToSave)
+      } else {
+        // 没有父级菜单，作为顶级菜单
+        updatedMenuList = [...removedMenus, menuToSave]
+      }
+    }
+    
+    // 保存整个菜单树到后端
+    await saveAllMenus(updatedMenuList)
+    
+    ElMessage.success(
+      dialogMode.value === 'create' 
+        ? t('menu.message.createSuccess') 
+        : t('menu.message.updateSuccess')
+    )
+    dialogVisible.value = false
+    
+    // 重新获取完整菜单结构
+    await loadMenuList()
+  } catch (error) {
+    console.error('保存菜单失败:', error)
+    ElMessage.error(t('common.saveFailed'))
+  } finally {
+    loading.value = false
+  }
+}
+
+// 将菜单插入到父级菜单的 children 中
+function insertMenuToParent(menus: MenuConfig[], parentId: string, newMenu: MenuConfig): MenuConfig[] {
+  return menus.map(menu => {
+    if (menu.id === parentId) {
+      return {
+        ...menu,
+        children: [...(menu.children || []), newMenu]
+      }
+    }
+    if (menu.children && menu.children.length > 0) {
+      return {
+        ...menu,
+        children: insertMenuToParent(menu.children, parentId, newMenu)
+      }
+    }
+    return menu
+  })
+}
+
+// 从树中移除菜单
+function removeMenuFromTree(menus: MenuConfig[], menuId: string): MenuConfig[] {
+  return menus
+    .filter(menu => menu.id !== menuId)
+    .map(menu => ({
+      ...menu,
+      children: menu.children ? removeMenuFromTree(menu.children, menuId) : []
+    }))
+}
+
+// 取消
+function handleCancel() {
+  dialogVisible.value = false
+}
+
+// 页面加载时获取菜单列表
+onMounted(() => {
+  loadMenuList()
+})
 </script>
 
 <style scoped lang="scss">
 .menu-page {
+  padding: 20px;
+
   h2 {
     margin: 0 0 20px;
+    font-size: 24px;
+    font-weight: 500;
+    color: var(--el-text-color-primary);
+  }
+
+  :deep(.el-card) {
+    border-radius: 8px;
+    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
   }
 }
 
@@ -115,5 +213,29 @@ const tableData = ref([
   display: flex;
   justify-content: space-between;
   align-items: center;
+  
+  span {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--el-text-color-primary);
+  }
+}
+
+// 响应式布局
+@media (max-width: 768px) {
+  .menu-page {
+    padding: 10px;
+
+    h2 {
+      font-size: 20px;
+      margin-bottom: 15px;
+    }
+  }
+
+  .card-header {
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+  }
 }
 </style>

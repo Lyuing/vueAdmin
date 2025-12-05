@@ -9,6 +9,7 @@ router.get('/all', auth, requireAdmin, ctx => menuController.getAllMenus(ctx))
 router.post('/', auth, requireAdmin, ctx => menuController.createMenu(ctx))
 router.put('/:id', auth, requireAdmin, ctx => menuController.updateMenu(ctx))
 router.delete('/:id', auth, requireAdmin, ctx => menuController.deleteMenu(ctx))
+router.post('/batch', auth, requireAdmin, ctx => menuController.saveAllMenus(ctx))
 router.get('/permission-codes', ctx => menuController.getPermissionCodes(ctx))
 
 const roleRouter = new Router({ prefix: '/api/role' })

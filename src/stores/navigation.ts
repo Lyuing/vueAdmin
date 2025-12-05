@@ -25,7 +25,7 @@ export const useNavigationStore = defineStore('navigation', () => {
 
   // ========== 核心方法 ==========
 
-  // 构建映射   权限码code - 路由信息(path + name)
+  // 构建映射   路由权限code - 路由信息(path + name)
   function buildPermissionRouteMap(routes: RouteConfig[]): void {
     const map = new Map<string, { path: string; name: string }>()
 
@@ -194,11 +194,61 @@ export const useNavigationStore = defineStore('navigation', () => {
 
   /**
    * 获取侧边栏菜单
+   * 根据当前路由找到对应的顶部导航，返回其子菜单
    */
-  function getSidebarMenus(): MenuItem[] {
-    return menuTree.value
-      .filter(item => item.position === 'sidebar' && !item.hidden)
-      .sort((a, b) => a.order - b.order)
+  function getSidebarMenus(currentPath?: string): MenuItem[] {
+    // 如果没有提供路径，返回空数组
+    if (!currentPath) {
+      return []
+    }
+
+    // 查找当前路由属于哪个顶部导航
+    let activeTopMenu: MenuItem | null = null
+
+    for (const topMenu of menuTree.value) {
+      if (topMenu.position !== 'top') continue
+
+      // 检查当前路径是否匹配顶部菜单本身
+      if (topMenu.path && currentPath === topMenu.path) {
+        activeTopMenu = topMenu
+        break
+      }
+
+      // 检查当前路径是否属于该顶部菜单的子菜单
+      if (topMenu.children && topMenu.children.length > 0) {
+        const hasMatchingChild = checkPathInChildren(topMenu.children, currentPath)
+        if (hasMatchingChild) {
+          activeTopMenu = topMenu
+          break
+        }
+      }
+    }
+
+    // 如果找到了对应的顶部菜单，返回其子菜单
+    if (activeTopMenu && activeTopMenu.children) {
+      return activeTopMenu.children
+        .filter(item => !item.hidden)
+        .sort((a, b) => a.order - b.order)
+    }
+
+    return []
+  }
+
+  /**
+   * 递归检查路径是否在子菜单中
+   */
+  function checkPathInChildren(children: MenuItem[], targetPath: string): boolean {
+    for (const child of children) {
+      if (child.path && targetPath.startsWith(child.path)) {
+        return true
+      }
+      if (child.children && child.children.length > 0) {
+        if (checkPathInChildren(child.children, targetPath)) {
+          return true
+        }
+      }
+    }
+    return false
   }
 
 

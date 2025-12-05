@@ -10,7 +10,7 @@
           @click="handleMenuClick(menu)"
         >
           <el-icon v-if="menu.icon">
-            <component :is="menu.icon" />
+            <component :is="getIcon(menu.icon)" />
           </el-icon>
           <span>{{ menu.title }}</span>
         </div>
@@ -86,6 +86,7 @@ import { useNavigation } from '@/composables/useNavigation'
 import { useTheme } from '@/composables/useTheme'
 import { storage } from '@/utils/storage'
 import { LANGUAGE_OPTIONS, getLanguageLabel, isValidLanguage } from '@/locales'
+import { getIconComponent } from '@/utils/icon'
 import type { MenuItem } from '@/types/navigation'
 
 
@@ -134,6 +135,11 @@ const handleUserCommand = (command: string) => {
   if (command === 'logout') {
     authStore.logout()
   }
+}
+
+// 获取图标组件
+const getIcon = (iconName?: string) => {
+  return getIconComponent(iconName)
 }
 </script>
 

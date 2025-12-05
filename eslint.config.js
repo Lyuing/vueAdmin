@@ -19,7 +19,7 @@ export default [
     },
     rules: {
       'vue/multi-word-component-names': 'off',
-      'vue/no-v-html': 'off',
+      'vue/no-v-html': 'warn',
       // Vue 模板属性换行规则：3个或更少属性可以在一行，超过3个则每行1个
       'vue/max-attributes-per-line': [
         'warn',
@@ -56,7 +56,7 @@ export default [
   configPrettier,
   {
     rules: {
-      'no-console': 'warn',
+      'no-console': 'off',
       'no-debugger': 'warn'
     }
   }

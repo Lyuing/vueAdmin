@@ -15,7 +15,12 @@ export default {
     close: 'Close',
     refresh: 'Refresh',
     export: 'Export',
-    import: 'Import'
+    import: 'Import',
+    show: 'Show',
+    hide: 'Hide',
+    actions: 'Actions',
+    saveFailed: 'Save failed, please try again',
+    deleteFailed: 'Delete failed, please try again'
   },
   menu: {
     home: 'Home',
@@ -23,7 +28,45 @@ export default {
     system: 'System',
     user: 'User Management',
     role: 'Role Management',
-    menu: 'Menu Management'
+    menu: 'Menu Management',
+    management: 'Menu Management',
+    list: 'Menu List',
+    add: 'Add Menu',
+    edit: 'Edit Menu',
+    delete: 'Delete Menu',
+    deleteConfirm: 'Are you sure to delete this menu and all its submenus?',
+    form: {
+      id: 'Menu ID',
+      title: 'Title',
+      icon: 'Icon',
+      permissionCode: 'Permission Code',
+      parentMenu: 'Parent Menu',
+      position: 'Position',
+      order: 'Order',
+      hidden: 'Hidden',
+      topNav: 'Top Navigation',
+      sidebar: 'Sidebar',
+      selectIcon: 'Select Icon',
+      searchIcon: 'Search icons...',
+      noIconFound: 'No matching icons found'
+    },
+    message: {
+      createSuccess: 'Created successfully',
+      updateSuccess: 'Updated successfully',
+      deleteSuccess: 'Deleted successfully',
+      loadFailed: 'Failed to load menu list'
+    },
+    validation: {
+      idRequired: 'Please enter menu ID',
+      idFormat: 'ID can only contain letters, numbers and hyphens',
+      titleRequired: 'Please enter menu title',
+      titleLength: 'Title length should be between 1-50 characters',
+      permissionCodeFormat: 'Permission code format: module:action or module:submodule:action',
+      positionRequired: 'Please select menu position',
+      parentRequired: 'Please select parent menu',
+      orderRequired: 'Please enter order value',
+      orderRange: 'Order value range: 0-9999'
+    }
   },
   validation: {
     required: 'This field is required',

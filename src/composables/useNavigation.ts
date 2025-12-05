@@ -15,8 +15,8 @@ export function useNavigation() {
   // 获取顶部菜单
   const topMenus = computed(() => navigationStore.getTopMenus())
 
-  // 获取侧边栏菜单
-  const sidebarMenus = computed(() => navigationStore.getSidebarMenus())
+  // 获取侧边栏菜单（根据当前路由）
+  const sidebarMenus = computed(() => navigationStore.getSidebarMenus(route.path))
 
   // 面包屑：根据路由响应式计算
   const breadcrumbs = computed<BreadcrumbItem[]>(() => {

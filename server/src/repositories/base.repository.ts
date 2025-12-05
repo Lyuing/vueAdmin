@@ -63,4 +63,9 @@ export class BaseRepository<T extends { id: string }> {
     await this.save()
     return true
   }
+
+  async saveAll(data: T[]): Promise<void> {
+    this.data = data
+    await this.save()
+  }
 }

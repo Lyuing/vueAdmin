@@ -14,7 +14,7 @@
     "title": "仪表盘",
     "icon": "DataLine",
     "permissionCode": "dashboard:view",
-    "position": "sidebar",
+    "position": "top",
     "order": 1,
     "hidden": false,
     "children": []
@@ -22,22 +22,12 @@
   {
     "id": "3",
     "title": "系统管理",
-    "icon": "Setting",
-    "permissionCode": "system:view",
-    "position": "sidebar",
+    "icon": "SetUp",
+    "permissionCode": "system:user:view",
+    "position": "top",
     "order": 2,
     "hidden": false,
     "children": [
-      {
-        "id": "3-1",
-        "title": "用户管理",
-        "icon": "User",
-        "permissionCode": "system:user:view",
-        "position": "sidebar",
-        "order": 1,
-        "hidden": false,
-        "children": []
-      },
       {
         "id": "3-2",
         "title": "角色管理",
@@ -55,6 +45,16 @@
         "permissionCode": "system:menu:view",
         "position": "sidebar",
         "order": 3,
+        "hidden": false,
+        "children": []
+      },
+      {
+        "id": "3-1",
+        "title": "用户管理",
+        "icon": "User",
+        "permissionCode": "system:user:view",
+        "position": "sidebar",
+        "order": 1,
         "hidden": false,
         "children": []
       }

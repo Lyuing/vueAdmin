@@ -15,7 +15,12 @@ export default {
     close: '关闭',
     refresh: '刷新',
     export: '导出',
-    import: '导入'
+    import: '导入',
+    show: '显示',
+    hide: '隐藏',
+    actions: '操作',
+    saveFailed: '保存失败，请重试',
+    deleteFailed: '删除失败，请重试'
   },
   menu: {
     home: '首页',
@@ -23,7 +28,45 @@ export default {
     system: '系统管理',
     user: '用户管理',
     role: '角色管理',
-    menu: '菜单管理'
+    menu: '菜单管理',
+    management: '菜单管理',
+    list: '菜单列表',
+    add: '添加菜单',
+    edit: '编辑菜单',
+    delete: '删除菜单',
+    deleteConfirm: '确定删除该菜单及其所有子菜单吗？',
+    form: {
+      id: '菜单ID',
+      title: '菜单标题',
+      icon: '图标',
+      permissionCode: '权限码',
+      parentMenu: '父级菜单',
+      position: '显示位置',
+      order: '排序',
+      hidden: '是否隐藏',
+      topNav: '顶部导航',
+      sidebar: '侧边栏',
+      selectIcon: '选择图标',
+      searchIcon: '搜索图标...',
+      noIconFound: '未找到匹配的图标'
+    },
+    message: {
+      createSuccess: '创建成功',
+      updateSuccess: '更新成功',
+      deleteSuccess: '删除成功',
+      loadFailed: '加载菜单列表失败'
+    },
+    validation: {
+      idRequired: '请输入菜单ID',
+      idFormat: 'ID只能包含字母、数字和中划线',
+      titleRequired: '请输入菜单标题',
+      titleLength: '标题长度在1-50个字符之间',
+      permissionCodeFormat: '权限码格式: module:action 或 module:submodule:action',
+      positionRequired: '请选择菜单位置',
+      parentRequired: '请选择父级菜单',
+      orderRequired: '请输入排序值',
+      orderRange: '排序值范围: 0-9999'
+    }
   },
   validation: {
     required: '此项为必填项',
