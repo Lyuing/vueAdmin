@@ -22,17 +22,10 @@ import { useNavigation } from '@/composables/useNavigation'
 
 const { sidebarMenus, initMenus } = useNavigation()
 
-/**
- * 判断是否显示侧边栏
- * 当有侧边栏菜单时，显示侧边栏
- */
 const hasSidebar = computed(() => {
   return sidebarMenus.value.length > 0
 })
 
-/**
- * 组件挂载时初始化菜单
- */
 onMounted(async () => {
   await initMenus()
 })
@@ -74,7 +67,7 @@ onMounted(async () => {
 
 .content-wrapper {
   flex: 1;
-  padding: 8px 20px 20px;
+  padding: 2px 20px 20px;
   overflow-y: auto;
 }
 

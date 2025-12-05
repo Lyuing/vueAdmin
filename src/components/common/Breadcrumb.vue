@@ -25,7 +25,7 @@ const { breadcrumbs } = useNavigation()
   font-size: 14px;
   line-height: 28px;
   margin-left: 8px;
-  padding: 8px 28px;
+  padding: 8px 20px 0;
 
   .breadcrumb-icon {
     margin-right: 4px;

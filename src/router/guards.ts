@@ -2,7 +2,6 @@ import type { Router } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { useAuthStore } from '@/stores/auth'
 import { usePermission } from '@/composables/usePermission'
-import { useNavigation } from '@/composables/useNavigation'
 import { addDynamicRoutes } from './index'
 
 export function setupRouterGuards(router: Router) {
@@ -69,10 +68,6 @@ export function setupRouterGuards(router: Router) {
   router.afterEach(to => {
     // 设置页面标题
     document.title = to.meta.title ? `${to.meta.title} - 中台管理系统` : '中台管理系统'
-
-    // 同步菜单与路由状态
-    const { syncMenuWithRoute } = useNavigation()
-    syncMenuWithRoute()
   })
 
   router.onError(error => {

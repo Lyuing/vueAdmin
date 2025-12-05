@@ -23,9 +23,6 @@ export const useNavigationStore = defineStore('navigation', () => {
   /** 侧边栏折叠状态 */
   const sidebarCollapsed = ref<boolean>(false)
 
-  /** 面包屑 */
-  const breadcrumbs = ref<BreadcrumbItem[]>([])
-
   // ========== 核心方法 ==========
 
   // 构建映射   权限码code - 路由信息(path + name)
@@ -176,16 +173,6 @@ export const useNavigationStore = defineStore('navigation', () => {
   // ========== 状态管理方法 ==========
 
   /**
-   * 根据菜单ID 更新面包屑
-   */
-  function updateBreadcrumbs(menuId: string) {
-    const menu = menuMap.value.get(menuId)
-    if (menu) {
-      breadcrumbs.value = menu.breadcrumbPath
-    }
-  }
-
-  /**
    * 切换侧边栏折叠状态
    */
   function toggleSidebar() {
@@ -223,7 +210,6 @@ export const useNavigationStore = defineStore('navigation', () => {
     routeNameMenuMap,
     permissionRouteMap,
     sidebarCollapsed,
-    breadcrumbs,
 
     // 核心方法
     buildPermissionRouteMap,
@@ -231,7 +217,6 @@ export const useNavigationStore = defineStore('navigation', () => {
     loadMenus,
 
     // 状态管理
-    updateBreadcrumbs,
     toggleSidebar,
 
     // 查询方法
