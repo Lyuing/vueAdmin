@@ -1,0 +1,63 @@
+[
+  {
+    "id": "1",
+    "title": "首页",
+    "icon": "HomeFilled",
+    "permissionCode": "home:view",
+    "position": "top",
+    "order": 1,
+    "hidden": false,
+    "children": []
+  },
+  {
+    "id": "2",
+    "title": "仪表盘",
+    "icon": "DataLine",
+    "permissionCode": "dashboard:view",
+    "position": "sidebar",
+    "order": 1,
+    "hidden": false,
+    "children": []
+  },
+  {
+    "id": "3",
+    "title": "系统管理",
+    "icon": "Setting",
+    "permissionCode": "system:view",
+    "position": "sidebar",
+    "order": 2,
+    "hidden": false,
+    "children": [
+      {
+        "id": "3-1",
+        "title": "用户管理",
+        "icon": "User",
+        "permissionCode": "system:user:view",
+        "position": "sidebar",
+        "order": 1,
+        "hidden": false,
+        "children": []
+      },
+      {
+        "id": "3-2",
+        "title": "角色管理",
+        "icon": "UserFilled",
+        "permissionCode": "system:role:view",
+        "position": "sidebar",
+        "order": 2,
+        "hidden": false,
+        "children": []
+      },
+      {
+        "id": "3-3",
+        "title": "菜单管理",
+        "icon": "Menu",
+        "permissionCode": "system:menu:view",
+        "position": "sidebar",
+        "order": 3,
+        "hidden": false,
+        "children": []
+      }
+    ]
+  }
+]
