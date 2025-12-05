@@ -5,8 +5,13 @@
         <component :is="sidebarCollapsed ? 'Expand' : 'Fold'" />
       </el-icon>
     </div>
-    <el-menu :default-active="activeMenuPath" :collapse="sidebarCollapsed" :unique-opened="false" router
-      class="sidebar-menu">
+    <el-menu 
+      :default-active="activeMenuPath"
+      :collapse="sidebarCollapsed"
+      :unique-opened="false"
+      router
+      class="sidebar-menu"
+    >
       <template v-for="menu in sidebarMenus" :key="menu.id">
         <el-sub-menu v-if="menu.children && menu.children.length > 0" :index="menu.path || menu.id">
           <template #title>
@@ -42,11 +47,7 @@ import { useNavigation } from '@/composables/useNavigation'
 
 const route = useRoute()
 
-const {
-  sidebarMenus,
-  sidebarCollapsed,
-  toggleSidebar
-} = useNavigation()
+const { sidebarMenus, sidebarCollapsed, toggleSidebar } = useNavigation()
 
 // 是否有侧边栏菜单
 const hasSidebarMenus = computed(() => {

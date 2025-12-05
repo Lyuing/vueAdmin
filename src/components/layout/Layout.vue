@@ -1,5 +1,5 @@
 <template>
-  <div class="main-layout">
+  <div class="layout">
     <TopNav />
     <div class="layout-content">
       <Sidebar />
@@ -32,7 +32,7 @@ onMounted(async () => {
 </script>
 
 <style scoped lang="scss">
-.main-layout {
+.layout {
   display: flex;
   flex-direction: column;
   height: 100vh;
@@ -59,11 +59,6 @@ onMounted(async () => {
     width: 100%;
   }
 }
-
-// .breadcrumb-container {
-//   padding: 4px 20px;
-//   margin: 8px 0;
-// }
 
 .content-wrapper {
   flex: 1;

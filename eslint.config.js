@@ -1,36 +1,40 @@
-import js from '@eslint/js'
 import pluginVue from 'eslint-plugin-vue'
-import * as parserVue from 'vue-eslint-parser'
-import configPrettier from 'eslint-config-prettier'
-import pluginPrettier from 'eslint-plugin-prettier/recommended'
-import { defineFlatConfig } from 'eslint-define-config'
-import * as parserTypeScript from '@typescript-eslint/parser'
 import pluginTypeScript from '@typescript-eslint/eslint-plugin'
+import parserTypeScript from '@typescript-eslint/parser'
+import configPrettier from 'eslint-config-prettier'
 
-export default defineFlatConfig([
+export default [
   {
-    ...js.configs.recommended,
-    ignores: ['node_modules', 'dist', 'public'],
-    languageOptions: {
-      globals: {
-        console: 'readonly',
-        process: 'readonly'
-      }
-    }
+    ignores: ['node_modules', 'dist', 'public']
   },
+  ...pluginVue.configs['flat/recommended'],
   {
     files: ['**/*.vue'],
     languageOptions: {
-      parser: parserVue,
       parserOptions: {
-        ecmaVersion: 'latest',
-        sourceType: 'module',
         parser: parserTypeScript,
-        jsxPragma: 'React',
-        ecmaFeatures: {
-          jsx: true
-        }
+        ecmaVersion: 'latest',
+        sourceType: 'module'
       }
+    },
+    rules: {
+      'vue/multi-word-component-names': 'off',
+      'vue/no-v-html': 'off',
+      // Vue 模板属性换行规则：3个或更少属性可以在一行，超过3个则每行1个
+      'vue/max-attributes-per-line': [
+        'warn',
+        {
+          singleline: 3, // 单行最多3个属性
+          multiline: 1   // 多行时每行1个属性
+        }
+      ],
+      'vue/first-attribute-linebreak': [
+        'warn',
+        {
+          singleline: 'ignore',
+          multiline: 'below'
+        }
+      ]
     }
   },
   {
@@ -45,20 +49,15 @@ export default defineFlatConfig([
       '@typescript-eslint': pluginTypeScript
     },
     rules: {
-      ...pluginTypeScript.configs.recommended.rules,
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-unused-vars': 'warn'
     }
   },
-  ...pluginVue.configs['flat/recommended'],
   configPrettier,
-  pluginPrettier,
   {
     rules: {
-      'vue/multi-word-component-names': 'off',
-      'vue/no-v-html': 'off',
       'no-console': 'warn',
       'no-debugger': 'warn'
     }
   }
-])
+]

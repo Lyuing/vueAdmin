@@ -44,7 +44,7 @@ export const routeMap: RouteConfig[] = [
   {
     path: '/',
     name: 'Layout',
-    component: () => import('@/components/layout/MainLayout.vue'),
+    component: () => import('@/components/layout/Layout.vue'),
     redirect: '/home',
     meta: {
       title: '主页',
