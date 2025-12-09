@@ -10,13 +10,25 @@
     <div v-loading="loading" class="menu-tree-container">
       <el-tree
         ref="treeRef"
-        :data="menuTreeData"
+        :data="treeData"
         :props="treeProps"
         node-key="id"
         show-checkbox
         default-expand-all
-        :check-strictly="false"
-      />
+        :check-strictly="true"
+      >
+        <template #default="{ node, data }">
+          <span class="tree-node-label">
+            <el-icon v-if="data.isButton" class="button-icon">
+              <Operation />
+            </el-icon>
+            <span>{{ node.label }}</span>
+            <el-tag v-if="data.permissionCode" size="small" type="info" class="permission-tag">
+              {{ data.permissionCode }}
+            </el-tag>
+          </span>
+        </template>
+      </el-tree>
     </div>
 
     <template #footer>
@@ -32,9 +44,10 @@
 import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ElMessage, ElTree } from 'element-plus'
+import { Operation } from '@element-plus/icons-vue'
 import { getAllMenus } from '@/api/menu'
 import { getRoleMenus, saveRoleMenus } from '@/api/role'
-import type { MenuConfig } from '@/types/navigation'
+import type { MenuConfig, TreeNode } from '@/types/navigation'
 
 const { t } = useI18n()
 
@@ -54,14 +67,45 @@ const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
 const treeRef = ref<InstanceType<typeof ElTree>>()
-const menuTreeData = ref<MenuConfig[]>([])
+const treeData = ref<TreeNode[]>([])
 const loading = ref(false)
 const saving = ref(false)
 
 // 树形组件配置
 const treeProps = {
   children: 'children',
-  label: 'title'
+  label: 'label'
+}
+
+// 将菜单数据转换为树形结构（包含按钮权限点）
+function transformMenusToTree(menus: MenuConfig[]): TreeNode[] {
+  return menus.map(menu => {
+    const node: TreeNode = {
+      id: menu.id,
+      label: menu.title,
+      permissionCode: menu.permissionCode,
+      children: []
+    }
+    
+    // 添加按钮权限点作为子节点
+    if (menu.buttonPermissions && menu.buttonPermissions.length > 0) {
+      const buttonNodes = menu.buttonPermissions.map(btn => ({
+        id: btn.code,
+        label: btn.name,
+        permissionCode: btn.code,
+        isButton: true
+      }))
+      node.children = buttonNodes
+    }
+    
+    // 递归处理子菜单
+    if (menu.children && menu.children.length > 0) {
+      const childMenuNodes = transformMenusToTree(menu.children)
+      node.children = [...(node.children || []), ...childMenuNodes]
+    }
+    
+    return node
+  })
 }
 
 // 监听对话框打开，加载数据
@@ -81,21 +125,23 @@ async function loadData() {
       getRoleMenus(props.roleId)
     ])
 
-    menuTreeData.value = menusResponse.data
+    // 转换为树形结构
+    treeData.value = transformMenusToTree(menusResponse.data)
     
     console.log('角色权限数据:', roleMenusResponse.data)
+    console.log('树形数据:', treeData.value)
     
-    // 设置选中的菜单节点（根据权限码）
+    // 设置选中的节点（根据权限码）
     if (roleMenusResponse.data.permissionCodes && roleMenusResponse.data.permissionCodes.length > 0) {
       // 使用 nextTick 确保树已渲染
       await new Promise(resolve => setTimeout(resolve, 0))
-      // 根据权限码找到对应的菜单ID，只设置叶子节点为选中状态
-      const menuIds = getMenuIdsByPermissionCodes(menuTreeData.value, roleMenusResponse.data.permissionCodes)
-      console.log('权限码:', roleMenusResponse.data.permissionCodes)
-      console.log('转换后的菜单ID:', menuIds)
-      const leafMenuIds = getLeafMenuIds(menuTreeData.value, menuIds)
-      console.log('叶子节点ID:', leafMenuIds)
-      treeRef.value?.setCheckedKeys(leafMenuIds, false)
+      
+      // 收集所有需要选中的节点ID（包括页面和按钮权限点）
+      const nodesToCheck = collectNodesToCheck(treeData.value, roleMenusResponse.data.permissionCodes)
+      console.log('需要选中的节点:', nodesToCheck)
+      
+      // 父子节点独立，直接设置所有匹配的节点
+      treeRef.value?.setCheckedKeys(nodesToCheck, false)
     }
   } catch (error) {
     console.error('加载菜单权限失败:', error)
@@ -105,47 +151,23 @@ async function loadData() {
   }
 }
 
-// 根据权限码获取菜单ID列表
-function getMenuIdsByPermissionCodes(menus: MenuConfig[], permissionCodes: string[]): string[] {
-  const menuIds: string[] = []
+// 收集需要选中的节点ID
+function collectNodesToCheck(nodes: TreeNode[], permissionCodes: string[]): string[] {
+  const nodeIds: string[] = []
   
-  function traverse(items: MenuConfig[]) {
+  function traverse(items: TreeNode[]) {
     for (const item of items) {
       if (item.permissionCode && permissionCodes.includes(item.permissionCode)) {
-        menuIds.push(item.id)
+        nodeIds.push(item.id)
       }
-      // 递归处理子节点
       if (item.children && item.children.length > 0) {
         traverse(item.children)
       }
     }
   }
   
-  traverse(menus)
-  return menuIds
-}
-
-// 获取叶子节点的菜单ID
-function getLeafMenuIds(menus: MenuConfig[], checkedIds: string[]): string[] {
-  const leafIds: string[] = []
-  
-  function traverse(items: MenuConfig[]) {
-    for (const item of items) {
-      if (checkedIds.includes(item.id)) {
-        // 如果没有子节点或子节点为空，则为叶子节点
-        if (!item.children || item.children.length === 0) {
-          leafIds.push(item.id)
-        }
-      }
-      // 递归处理子节点
-      if (item.children && item.children.length > 0) {
-        traverse(item.children)
-      }
-    }
-  }
-  
-  traverse(menus)
-  return leafIds
+  traverse(nodes)
+  return nodeIds
 }
 
 // 更新显示状态
@@ -157,7 +179,7 @@ function handleUpdateVisible(value: boolean) {
 function handleClose() {
   // 清空选中状态
   treeRef.value?.setCheckedKeys([], false)
-  menuTreeData.value = []
+  treeData.value = []
 }
 
 // 取消
@@ -172,19 +194,17 @@ async function handleSubmit() {
 
   saving.value = true
   try {
-    // 获取所有选中的节点（包括半选中的父节点）
+    // 获取所有选中的节点（父子节点独立，不需要获取半选中）
     const checkedKeys = treeRef.value.getCheckedKeys() as string[]
-    const halfCheckedKeys = treeRef.value.getHalfCheckedKeys() as string[]
-    const allSelectedMenuIds = [...checkedKeys, ...halfCheckedKeys]
 
-    console.log('选中的菜单ID:', allSelectedMenuIds)
+    console.log('选中的节点ID:', checkedKeys)
 
-    // 将菜单ID转换为权限码
-    const permissionCodes = getPermissionCodesByMenuIds(menuTreeData.value, allSelectedMenuIds)
+    // 提取权限码（包括页面权限点和按钮权限点）
+    const permissionCodes = extractPermissionCodes(treeData.value, checkedKeys)
     
     console.log('转换后的权限码:', permissionCodes)
 
-    // 保存角色菜单权限（传递权限码）
+    // 保存角色菜单权限
     await saveRoleMenus(props.roleId, permissionCodes)
     
     ElMessage.success(t('role.message.permissionSaveSuccess'))
@@ -198,23 +218,22 @@ async function handleSubmit() {
   }
 }
 
-// 根据菜单ID获取权限码列表
-function getPermissionCodesByMenuIds(menus: MenuConfig[], menuIds: string[]): string[] {
+// 提取权限码
+function extractPermissionCodes(nodes: TreeNode[], selectedIds: string[]): string[] {
   const permissionCodes: string[] = []
   
-  function traverse(items: MenuConfig[]) {
+  function traverse(items: TreeNode[]) {
     for (const item of items) {
-      if (menuIds.includes(item.id) && item.permissionCode) {
+      if (selectedIds.includes(item.id) && item.permissionCode) {
         permissionCodes.push(item.permissionCode)
       }
-      // 递归处理子节点
       if (item.children && item.children.length > 0) {
         traverse(item.children)
       }
     }
   }
   
-  traverse(menus)
+  traverse(nodes)
   return permissionCodes
 }
 </script>
@@ -239,6 +258,21 @@ function getPermissionCodesByMenuIds(menus: MenuConfig[], menuIds: string[]): st
   }
 }
 
+.tree-node-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.button-icon {
+  color: var(--el-color-success);
+}
+
+.permission-tag {
+  margin-left: auto;
+}
+
 :deep(.el-tree) {
   background-color: transparent;
 
@@ -257,6 +291,7 @@ function getPermissionCodesByMenuIds(menus: MenuConfig[], menuIds: string[]): st
 
   .el-tree-node__label {
     font-size: 14px;
+    flex: 1;
   }
 }
 

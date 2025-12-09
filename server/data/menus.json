@@ -4,8 +4,24 @@
     "title": "首页",
     "icon": "HomeFilled",
     "permissionCode": "home",
+    "buttonPermissions": [
+      {
+        "code": "home:to_system_user",
+        "name": "跳转：系统管理-用户管理",
+        "description": "首页跳转到系统管理菜单的按钮权限"
+      },
+      {
+        "code": "home:to_system_role",
+        "name": "跳转：系统管理-角色管理",
+        "description": "首页跳转到系统管理菜单的按钮权限"
+      },
+      {
+        "code": "home:to_system_menu",
+        "name": "跳转：系统管理-菜单管理",
+        "description": "首页跳转到系统管理菜单的按钮权限"
+      }
+    ],
     "position": "top",
-    "order": 1,
     "hidden": false,
     "children": []
   },
@@ -15,7 +31,6 @@
     "icon": "DataLine",
     "permissionCode": "dashboard",
     "position": "top",
-    "order": 1,
     "hidden": false,
     "children": []
   },
@@ -23,18 +38,25 @@
     "id": "3",
     "title": "系统管理",
     "icon": "SetUp",
-    "permissionCode": "system:user",
+    "permissionCode": "system_user",
     "position": "top",
-    "order": 2,
-    "hidden": true,
+    "hidden": false,
     "children": [
+      {
+        "id": "3-2",
+        "title": "角色管理",
+        "icon": "UserFilled",
+        "permissionCode": "system_role",
+        "position": "sidebar_nav",
+        "hidden": false,
+        "children": []
+      },
       {
         "id": "3-3",
         "title": "菜单管理",
         "icon": "Menu",
-        "permissionCode": "system:menu",
-        "position": "sidebar",
-        "order": 3,
+        "permissionCode": "system_menu",
+        "position": "sidebar_nav",
         "hidden": false,
         "children": []
       },
@@ -42,19 +64,8 @@
         "id": "3-1",
         "title": "用户管理",
         "icon": "User",
-        "permissionCode": "system:user",
-        "position": "sidebar",
-        "order": 1,
-        "hidden": false,
-        "children": []
-      },
-      {
-        "id": "3-2",
-        "title": "角色管理",
-        "icon": "UserFilled",
-        "permissionCode": "system:role",
-        "position": "sidebar",
-        "order": 2,
+        "permissionCode": "system_user",
+        "position": "sidebar_nav",
         "hidden": false,
         "children": []
       }

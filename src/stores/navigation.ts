@@ -74,7 +74,7 @@ export const useNavigationStore = defineStore('navigation', () => {
         console.error('Invalid menu config: missing required fields', config)
         return false
       }
-      if (config.position !== 'top' && config.position !== 'sidebar') {
+      if (config.position !== 'top' && config.position !== 'sidebar_nav' && config.position !== 'sidebar_directory') {
         console.error('Invalid menu position:', config.position)
         return false
       }
@@ -124,7 +124,6 @@ export const useNavigationStore = defineStore('navigation', () => {
         path: routeInfo?.path,
         routeName: routeInfo?.name,
         position: config.position,
-        order: config.order,
         hidden: config.hidden,
         level,
         breadcrumbPath
@@ -189,7 +188,6 @@ export const useNavigationStore = defineStore('navigation', () => {
   function getTopMenus(): MenuItem[] {
     return menuTree.value
       .filter(item => item.position === 'top' && !item.hidden)
-      .sort((a, b) => a.order - b.order)
   }
 
   /**
@@ -228,7 +226,6 @@ export const useNavigationStore = defineStore('navigation', () => {
     if (activeTopMenu && activeTopMenu.children) {
       return activeTopMenu.children
         .filter(item => !item.hidden)
-        .sort((a, b) => a.order - b.order)
     }
 
     return []

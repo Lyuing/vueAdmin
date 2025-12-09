@@ -10,7 +10,6 @@ export interface RouteMeta extends Record<string | symbol, any> {
   hidden?: boolean
   keepAlive?: boolean
   parent?: string
-  order?: number
   affix?: boolean
   breadcrumb?: boolean
   hideInTopNav?: boolean

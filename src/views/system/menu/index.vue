@@ -10,23 +10,12 @@
           </el-button>
         </div>
       </template>
-      
-      <MenuTable
-        :data="menuList"
-        :loading="loading"
-        @edit="handleEdit"
-        @delete="handleDelete"
-      />
+
+      <MenuTable :data="menuList" :loading="loading" @edit="handleEdit" @delete="handleDelete" @update="handleMenuUpdate" />
     </el-card>
 
-    <MenuDialog
-      v-model:visible="dialogVisible"
-      :mode="dialogMode"
-      :menu-data="currentMenu"
-      :all-menus="menuList"
-      @save="handleSave"
-      @cancel="handleCancel"
-    />
+    <MenuDialog v-model:visible="dialogVisible" :mode="dialogMode" :menu-data="currentMenu" :all-menus="menuList"
+      @save="handleSave" @cancel="handleCancel" />
   </div>
 </template>
 
@@ -88,7 +77,7 @@ async function handleDelete(menu: MenuConfig) {
         type: 'warning'
       }
     )
-    
+
     await deleteMenu(menu.id)
     ElMessage.success(t('menu.message.deleteSuccess'))
     await loadMenuList()
@@ -104,12 +93,12 @@ async function handleDelete(menu: MenuConfig) {
 async function handleSave(menuData: MenuConfig & { parentId?: string }) {
   try {
     loading.value = true
-    
+
     // 处理树形结构
     const { parentId, ...menuToSave } = menuData
-    
+
     let updatedMenuList: MenuConfig[]
-    
+
     if (dialogMode.value === 'create') {
       // 创建模式：根据 parentId 决定插入位置
       if (parentId) {
@@ -122,7 +111,7 @@ async function handleSave(menuData: MenuConfig & { parentId?: string }) {
     } else {
       // 编辑模式：先移除旧位置，再插入新位置
       const removedMenus = removeMenuFromTree(menuList.value, menuToSave.id)
-      
+
       if (parentId) {
         // 有父级菜单，插入到父级的 children 中
         updatedMenuList = insertMenuToParent(removedMenus, parentId, menuToSave)
@@ -131,17 +120,17 @@ async function handleSave(menuData: MenuConfig & { parentId?: string }) {
         updatedMenuList = [...removedMenus, menuToSave]
       }
     }
-    
+
     // 保存整个菜单树到后端
     await saveAllMenus(updatedMenuList)
-    
+
     ElMessage.success(
-      dialogMode.value === 'create' 
-        ? t('menu.message.createSuccess') 
+      dialogMode.value === 'create'
+        ? t('menu.message.createSuccess')
         : t('menu.message.updateSuccess')
     )
     dialogVisible.value = false
-    
+
     // 重新获取完整菜单结构
     await loadMenuList()
   } catch (error) {
@@ -181,6 +170,25 @@ function removeMenuFromTree(menus: MenuConfig[], menuId: string): MenuConfig[] {
     }))
 }
 
+/**
+ * 处理菜单更新（移动后）
+ */
+async function handleMenuUpdate(updatedMenus: MenuConfig[]) {
+  try {
+    loading.value = true
+    await saveAllMenus(updatedMenus)
+    menuList.value = updatedMenus
+    ElMessage.success(t('menu.message.orderUpdateSuccess'))
+  } catch (error) {
+    console.error('保存菜单顺序失败:', error)
+    ElMessage.error(t('common.saveFailed'))
+    // 保存失败时重新加载
+    await loadMenuList()
+  } finally {
+    loading.value = false
+  }
+}
+
 // 取消
 function handleCancel() {
   dialogVisible.value = false
@@ -213,7 +221,7 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  
+
   span {
     font-size: 16px;
     font-weight: 500;

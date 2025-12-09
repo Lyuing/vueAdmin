@@ -72,7 +72,7 @@
           </template>
           <div class="system-actions">
             <el-button 
-              v-if="hasPermission('system:user')"
+              v-if="hasPermission('home:to_system_user')"
               type="primary" 
               :icon="User"
               @click="navigateTo('/system/user')"
@@ -80,7 +80,7 @@
               用户管理
             </el-button>
             <el-button 
-              v-if="hasPermission('system:role')"
+              v-if="hasPermission('home:to_system_role')"
               type="success" 
               :icon="UserFilled"
               @click="navigateTo('/system/role')"
@@ -88,7 +88,7 @@
               角色管理
             </el-button>
             <el-button 
-              v-if="hasPermission('system:menu')"
+              v-if="hasPermission('home:to_system_menu')"
               type="warning" 
               :icon="Menu"
               @click="navigateTo('/system/menu')"

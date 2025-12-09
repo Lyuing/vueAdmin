@@ -26,8 +26,22 @@ export class MenuService {
       throw new BusinessError('用户不存在', 'NOT_FOUND', 404)
     }
 
+    // 动态计算用户权限
+    const permissionSet = new Set<string>()
+    for (const roleId of user.roles) {
+      try {
+        const roleMenus = await roleMenuRepository.findByRoleId(roleId)
+        if (roleMenus && roleMenus.permissionCodes) {
+          roleMenus.permissionCodes.forEach(code => permissionSet.add(code))
+        }
+      } catch (error) {
+        console.error(`获取角色 ${roleId} 权限失败:`, error)
+      }
+    }
+    const permissions = Array.from(permissionSet)
+
     const allMenus = await menuRepository.findAll()
-    return this.filterMenusByPermissions(allMenus, user.permissions)
+    return this.filterMenusByPermissions(allMenus, permissions)
   }
 
   async getAllMenus(): Promise<MenuConfig[]> {
@@ -44,8 +58,8 @@ export class MenuService {
       title: menu.title,
       icon: menu.icon,
       permissionCode: menu.permissionCode,
+      buttonPermissions: menu.buttonPermissions,
       position: menu.position || 'sidebar',
-      order: menu.order || 0,
       hidden: menu.hidden || false,
       children: menu.children || []
     }

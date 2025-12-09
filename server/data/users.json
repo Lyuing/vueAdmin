@@ -10,13 +10,6 @@
     "roles": [
       "admin"
     ],
-    "permissions": [
-      "dashboard",
-      "home",
-      "system:menu",
-      "system:role",
-      "system:user"
-    ],
     "createdAt": "2024-01-01T00:00:00.000Z",
     "updatedAt": "2024-01-01T00:00:00.000Z"
   },
@@ -28,13 +21,18 @@
     "roles": [
       "test"
     ],
-    "permissions": [
-      "home",
-      "system:menu",
-      "system:role",
-      "system:user"
-    ],
     "createdAt": "2025-12-05T07:45:48.165Z",
-    "updatedAt": "2025-12-05T08:14:22.089Z"
+    "updatedAt": "2025-12-09T06:33:57.699Z"
+  },
+  {
+    "id": "1765261005333",
+    "username": "test2",
+    "password": "test123",
+    "nickname": "test2",
+    "roles": [
+      "user"
+    ],
+    "createdAt": "2025-12-09T06:16:45.333Z",
+    "updatedAt": "2025-12-09T06:16:45.333Z"
   }
 ]

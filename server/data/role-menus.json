@@ -5,10 +5,12 @@
     "roleName": "管理员",
     "permissionCodes": [
       "home",
+      "home:to_system_user",
       "dashboard",
-      "system:user",
-      "system:role",
-      "system:menu"
+      "system_user",
+      "system_user",
+      "system_role",
+      "system_menu"
     ]
   },
   {
@@ -17,6 +19,7 @@
     "roleName": "普通用户",
     "permissionCodes": [
       "home",
+      "home:to_system_user",
       "dashboard"
     ]
   },
@@ -26,10 +29,12 @@
     "roleName": "test",
     "permissionCodes": [
       "home",
-      "system:user",
-      "system:role",
-      "system:menu",
-      "system:user"
+      "home:to_system_user",
+      "home:to_system_role",
+      "system_user",
+      "system_user",
+      "system_role",
+      "system_menu"
     ]
   }
 ]

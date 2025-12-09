@@ -79,7 +79,7 @@ export const routeMap: RouteConfig[] = [
         meta: {
           title: '用户管理',
           requiresAuth: true,
-          permissionCode: 'system:user'
+          permissionCode: 'system_user'
         }
       },
       {
@@ -89,7 +89,7 @@ export const routeMap: RouteConfig[] = [
         meta: {
           title: '角色管理',
           requiresAuth: true,
-          permissionCode: 'system:role'
+          permissionCode: 'system_role'
         }
       },
       {
@@ -99,7 +99,7 @@ export const routeMap: RouteConfig[] = [
         meta: {
           title: '菜单管理',
           requiresAuth: true,
-          permissionCode: 'system:menu'
+          permissionCode: 'system_menu'
         }
       }
     ]

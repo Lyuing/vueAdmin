@@ -98,17 +98,20 @@ export default {
     edit: '编辑菜单',
     delete: '删除菜单',
     deleteConfirm: '确定删除该菜单及其所有子菜单吗？',
+    moveUp: '上移',
+    moveDown: '下移',
     form: {
       id: '菜单ID',
       title: '菜单标题',
       icon: '图标',
       permissionCode: '权限码',
+      permissions: '权限点',
       parentMenu: '父级菜单',
       position: '显示位置',
-      order: '排序',
       hidden: '是否隐藏',
       topNav: '顶部导航',
-      sidebar: '侧边栏',
+      sidebarNav: '侧栏导航',
+      sidebarDirectory: '侧栏目录',
       selectIcon: '选择图标',
       searchIcon: '搜索图标...',
       noIconFound: '未找到匹配的图标'
@@ -117,18 +120,17 @@ export default {
       createSuccess: '创建成功',
       updateSuccess: '更新成功',
       deleteSuccess: '删除成功',
-      loadFailed: '加载菜单列表失败'
+      loadFailed: '加载菜单列表失败',
+      orderUpdateSuccess: '菜单顺序更新成功'
     },
     validation: {
       idRequired: '请输入菜单ID',
       idFormat: 'ID只能包含字母、数字和中划线',
       titleRequired: '请输入菜单标题',
       titleLength: '标题长度在1-50个字符之间',
-      permissionCodeFormat: '权限码格式: module:action 或 module:submodule:action',
+      permissionCodeFormat: '权限码格式: module:action',
       positionRequired: '请选择菜单位置',
-      parentRequired: '请选择父级菜单',
-      orderRequired: '请输入排序值',
-      orderRange: '排序值范围: 0-9999'
+      parentRequired: '请选择父级菜单'
     }
   },
   validation: {

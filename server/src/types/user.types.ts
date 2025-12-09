@@ -7,9 +7,14 @@ export interface UserInfo {
   email?: string
   phone?: string
   roles: string[]
-  permissions: string[]
+  // 移除 permissions 字段，权限通过角色动态计算
   createdAt: string
   updatedAt: string
+}
+
+// 用户信息响应类型，包含动态计算的权限
+export interface UserInfoResponse extends Omit<UserInfo, 'password'> {
+  permissions: string[]
 }
 
 export interface LoginRequest {
@@ -20,5 +25,5 @@ export interface LoginRequest {
 export interface LoginResponse {
   token: string
   expiresIn: number
-  userInfo: Omit<UserInfo, 'password'>
+  userInfo: UserInfoResponse
 }

@@ -15,24 +15,21 @@
       </el-form-item>
 
       <el-form-item :label="t('menu.form.permissionCode')" prop="permissionCode">
-        <el-input v-model="formData.permissionCode" placeholder="system:menu:view" />
+        <el-input v-model="formData.permissionCode" placeholder="system_menu:view" disabled />
       </el-form-item>
 
       <el-form-item :label="t('menu.form.position')" prop="position">
         <el-radio-group v-model="formData.position">
           <el-radio value="top">{{ t('menu.form.topNav') }}</el-radio>
-          <el-radio value="sidebar">{{ t('menu.form.sidebar') }}</el-radio>
+          <el-radio value="sidebar_nav">{{ t('menu.form.sidebarNav') }}</el-radio>
+          <el-radio value="sidebar_directory">{{ t('menu.form.sidebarDirectory') }}</el-radio>
         </el-radio-group>
       </el-form-item>
 
-      <el-form-item v-if="formData.position === 'sidebar'" :label="t('menu.form.parentMenu')" prop="parentId">
+      <el-form-item v-if="formData.position !== 'top'" :label="t('menu.form.parentMenu')" prop="parentId">
         <el-tree-select v-model="formData.parentId" :data="parentMenuOptions" :placeholder="t('menu.form.parentMenu')"
           clearable check-strictly :render-after-expand="false" node-key="id"
           :props="{ label: 'title', children: 'children' }" />
-      </el-form-item>
-
-      <el-form-item :label="t('menu.form.order')" prop="order">
-        <el-input-number v-model="formData.order" :min="0" :max="9999" controls-position="right" />
       </el-form-item>
 
       <el-form-item :label="t('menu.form.hidden')" prop="hidden">
@@ -83,8 +80,7 @@ const formData = ref<MenuFormData>({
   icon: undefined,
   permissionCode: undefined,
   parentId: undefined,
-  position: 'sidebar',
-  order: 0,
+  position: 'sidebar_nav',
   hidden: false,
   children: []
 })
@@ -106,22 +102,18 @@ const rules = computed<FormRules>(() => {
     ],
     permissionCode: [
       {
-        pattern: /^[a-z]+:[a-z]+(:[a-z]+)?$/,
+        pattern: /^[a-z0-9_:]+$/,
         message: t('menu.validation.permissionCodeFormat'),
         trigger: 'blur'
       }
     ],
     position: [
       { required: true, message: t('menu.validation.positionRequired'), trigger: 'change' }
-    ],
-    order: [
-      { required: true, message: t('menu.validation.orderRequired'), trigger: 'blur' },
-      { type: 'number', min: 0, max: 9999, message: t('menu.validation.orderRange'), trigger: 'blur' }
     ]
   }
 
-  // 如果是侧边栏菜单，父级菜单为必填
-  if (formData.value.position === 'sidebar') {
+  // 如果不是顶部导航，父级菜单为必填
+  if (formData.value.position !== 'top') {
     baseRules.parentId = [
       { required: true, message: t('menu.validation.parentRequired'), trigger: 'change' }
     ]
@@ -144,7 +136,8 @@ function getDescendantIds(menu: MenuConfig): string[] {
 // 父级菜单选项
 // 规则：
 // - 顶部导航菜单：不能选择父级（是顶级菜单）
-// - 侧边栏菜单：必须选择父级，只显示顶部导航及其下级菜单（不显示孤立的侧边栏菜单）
+// - 侧栏导航：可选父级为顶部导航或侧栏目录
+// - 侧栏目录：可选父级为顶部导航或侧栏目录
 const parentMenuOptions = computed(() => {
   // 如果当前菜单是顶部导航，则不显示父级选项（返回空数组）
   if (formData.value.position === 'top') {
@@ -156,16 +149,17 @@ const parentMenuOptions = computed(() => {
     ? getDescendantIds(props.menuData)
     : []
 
-  // 如果是侧边栏菜单，构建可选的父级菜单树
-  // 只包含顶部导航及其下级菜单，排除孤立的侧边栏菜单
+  // 侧栏导航和侧栏目录：可选父级为顶部导航或侧栏目录
+  const allowedParentPositions = ['top', 'sidebar_directory']
+
+  // 构建可选的父级菜单树
   function buildParentOptions(menus: MenuConfig[]): MenuConfig[] {
     return menus
       .filter(menu => {
-        // 只保留顶部导航作为根节点
-        if (menu.position !== 'top') return false
-        // 排除自身（如果自身是顶部导航）
+        // 排除自身及其后代
         if (excludeIds.includes(menu.id)) return false
-        return true
+        // 只保留允许的位置类型
+        return allowedParentPositions.includes(menu.position)
       })
       .map(menu => {
         // 递归处理子菜单
@@ -177,10 +171,13 @@ const parentMenuOptions = computed(() => {
       })
   }
 
-  // 过滤子菜单，排除自身及其后代
+  // 过滤子菜单，排除自身及其后代，保留允许的位置类型
   function filterChildren(children: MenuConfig[]): MenuConfig[] {
     return children
-      .filter(child => !excludeIds.includes(child.id))
+      .filter(child => {
+        if (excludeIds.includes(child.id)) return false
+        return allowedParentPositions.includes(child.position)
+      })
       .map(child => ({
         ...child,
         children: child.children ? filterChildren(child.children) : []
@@ -229,7 +226,6 @@ watch(() => props.visible, (newVal) => {
         permissionCode: props.menuData.permissionCode,
         parentId: parentId,
         position: props.menuData.position,
-        order: props.menuData.order,
         hidden: props.menuData.hidden,
         children: props.menuData.children || []
       }
@@ -241,8 +237,7 @@ watch(() => props.visible, (newVal) => {
         icon: undefined,
         permissionCode: undefined,
         parentId: undefined,
-        position: 'sidebar',
-        order: 0,
+        position: 'sidebar_nav',
         hidden: false,
         children: []
       }

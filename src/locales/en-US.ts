@@ -98,17 +98,20 @@ export default {
     edit: 'Edit Menu',
     delete: 'Delete Menu',
     deleteConfirm: 'Are you sure to delete this menu and all its submenus?',
+    moveUp: 'Move Up',
+    moveDown: 'Move Down',
     form: {
       id: 'Menu ID',
       title: 'Title',
       icon: 'Icon',
       permissionCode: 'Permission Code',
+      permissions: 'Permissions',
       parentMenu: 'Parent Menu',
       position: 'Position',
-      order: 'Order',
       hidden: 'Hidden',
       topNav: 'Top Navigation',
-      sidebar: 'Sidebar',
+      sidebarNav: 'Sidebar Navigation',
+      sidebarDirectory: 'Sidebar Directory',
       selectIcon: 'Select Icon',
       searchIcon: 'Search icons...',
       noIconFound: 'No matching icons found'
@@ -117,18 +120,17 @@ export default {
       createSuccess: 'Created successfully',
       updateSuccess: 'Updated successfully',
       deleteSuccess: 'Deleted successfully',
-      loadFailed: 'Failed to load menu list'
+      loadFailed: 'Failed to load menu list',
+      orderUpdateSuccess: 'Menu order updated successfully'
     },
     validation: {
       idRequired: 'Please enter menu ID',
       idFormat: 'ID can only contain letters, numbers and hyphens',
       titleRequired: 'Please enter menu title',
       titleLength: 'Title length should be between 1-50 characters',
-      permissionCodeFormat: 'Permission code format: module:action or module:submodule:action',
+      permissionCodeFormat: 'Permission code format: module:action',
       positionRequired: 'Please select menu position',
-      parentRequired: 'Please select parent menu',
-      orderRequired: 'Please enter order value',
-      orderRange: 'Order value range: 0-9999'
+      parentRequired: 'Please select parent menu'
     }
   },
   validation: {
