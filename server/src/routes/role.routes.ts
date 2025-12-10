@@ -4,12 +4,12 @@ import { auth, requireAdmin } from '../middlewares/auth.middleware.js'
 
 const router = new Router({ prefix: '/api/role' })
 
-router.get('/all', auth, requireAdmin, ctx => roleController.getAllRoles(ctx))
-router.get('/:id', auth, requireAdmin, ctx => roleController.getRoleById(ctx))
-router.post('/', auth, requireAdmin, ctx => roleController.createRole(ctx))
-router.put('/:id', auth, requireAdmin, ctx => roleController.updateRole(ctx))
-router.delete('/:id', auth, requireAdmin, ctx => roleController.deleteRole(ctx))
-router.get('/:id/menus', auth, requireAdmin, ctx => roleController.getRoleMenus(ctx))
-router.post('/:id/menus', auth, requireAdmin, ctx => roleController.saveRoleMenus(ctx))
+router.get('/allRole', auth, requireAdmin, ctx => roleController.getAllRoles(ctx))
+router.post('/detail', auth, requireAdmin, ctx => roleController.getRoleById(ctx))
+router.post('/create', auth, requireAdmin, ctx => roleController.createRole(ctx))
+router.post('/update', auth, requireAdmin, ctx => roleController.updateRole(ctx))
+router.post('/delete', auth, requireAdmin, ctx => roleController.deleteRole(ctx))
+router.post('/roleMenus', auth, requireAdmin, ctx => roleController.getRoleMenus(ctx))
+router.post('/saveRoleMenus', auth, requireAdmin, ctx => roleController.saveRoleMenus(ctx))
 
 export default router

@@ -12,7 +12,7 @@ export function getUserMenus(): Promise<{ data: MenuConfig[]; version?: string }
  * 获取所有菜单配置（用于菜单管理和角色管理）
  */
 export function getAllMenus(): Promise<{ data: MenuConfig[] }> {
-    return http.get('/menu/all')
+    return http.get('/menu/allMenu')
 }
 
 /**
@@ -20,16 +20,16 @@ export function getAllMenus(): Promise<{ data: MenuConfig[] }> {
  */
 export function saveMenu(menu: Partial<MenuConfig>): Promise<{ data: MenuConfig }> {
     if (menu.id) {
-        return http.put(`/menu/${menu.id}`, menu)
+        return http.post('/menu/update', menu)
     }
-    return http.post('/menu', menu)
+    return http.post('/menu/create', menu)
 }
 
 /**
  * 删除菜单
  */
 export function deleteMenu(menuId: string): Promise<void> {
-    return http.delete(`/menu/${menuId}`)
+    return http.post('/menu/delete', { id: menuId })
 }
 
 /**
@@ -43,5 +43,5 @@ export function saveAllMenus(menus: MenuConfig[]): Promise<void> {
  * 获取权限码列表
  */
 export function getPermissionCodes(): Promise<{ data: string[] }> {
-    return http.get('/menu/permission-codes')
+    return http.get('/menu/permissionCodes')
 }

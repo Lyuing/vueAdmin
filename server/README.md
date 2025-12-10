@@ -50,17 +50,17 @@ pnpm start
 
 ### 用户
 
-- `GET /api/user/info` - 获取当前用户信息（需要认证）
-- `PUT /api/user/info` - 更新当前用户信息（需要认证）
+- `GET /api/user/userInfo` - 获取当前用户信息（需要认证）
+- `PUT /api/user/userInfo` - 更新当前用户信息（需要认证）
 
 ### 菜单
 
 - `GET /api/menu/user` - 获取当前用户的菜单（需要认证）
-- `GET /api/menu/all` - 获取所有菜单（需要管理员权限）
+- `GET /api/menu/allMenu` - 获取所有菜单（需要管理员权限）
 - `POST /api/menu` - 创建菜单（需要管理员权限）
 - `PUT /api/menu/:id` - 更新菜单（需要管理员权限）
 - `DELETE /api/menu/:id` - 删除菜单（需要管理员权限）
-- `GET /api/menu/permission-codes` - 获取所有权限码
+- `GET /api/menu/permissionCodes` - 获取所有权限码
 - `POST /api/role/:roleId/menus` - 保存角色菜单配置（需要管理员权限）
 
 ## 默认账号

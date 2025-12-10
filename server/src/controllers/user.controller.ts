@@ -36,15 +36,14 @@ export class UserController {
 
   // 管理员：更新用户
   async updateUser(ctx: Context): Promise<void> {
-    const { id } = ctx.params
-    const userData = ctx.request.body as Partial<UserInfo>
+    const { id, ...userData } = ctx.request.body as Partial<UserInfo> & { id: string }
     const user = await userService.updateUser(id, userData)
     success(ctx, { data: user })
   }
 
   // 管理员：删除用户
   async deleteUser(ctx: Context): Promise<void> {
-    const { id } = ctx.params
+    const { id } = ctx.request.body as { id: string }
     await userService.deleteUser(id)
     success(ctx, null, '删除成功')
   }

@@ -10,7 +10,7 @@ export class RoleController {
   }
 
   async getRoleById(ctx: Context): Promise<void> {
-    const { id } = ctx.params
+    const { id } = ctx.request.body as { id: string }
     const role = await roleService.getRoleById(id)
     success(ctx, { data: role })
   }
@@ -22,38 +22,26 @@ export class RoleController {
   }
 
   async updateRole(ctx: Context): Promise<void> {
-    const { id } = ctx.params
-    const role = ctx.request.body as Partial<Role>
+    const { id, ...role } = ctx.request.body as Partial<Role> & { id: string }
     const updated = await roleService.updateRole(id, role)
     success(ctx, { data: updated })
   }
 
   async deleteRole(ctx: Context): Promise<void> {
-    const { id } = ctx.params
+    const { id } = ctx.request.body as { id: string }
     await roleService.deleteRole(id)
     success(ctx, null, '删除成功')
   }
 
   async getRoleMenus(ctx: Context): Promise<void> {
-    const { id } = ctx.params
-    const roleMenus = await roleService.getRoleMenus(id)
+    const { roleId } = ctx.request.body as { roleId: string }
+    const roleMenus = await roleService.getRoleMenus(roleId)
     success(ctx, { data: roleMenus })
   }
 
   async saveRoleMenus(ctx: Context): Promise<void> {
-    const { id } = ctx.params
-    console.log('Controller - 接收到的请求体:', JSON.stringify(ctx.request.body))
-    console.log('Controller - body 类型:', typeof ctx.request.body)
-    console.log('Controller - body 的 keys:', Object.keys(ctx.request.body || {}))
-    
-    const body = ctx.request.body as any
-    const permissionCodes = body.permissionCodes || body['permissionCodes']
-    
-    console.log('Controller - 提取的 permissionCodes:', permissionCodes)
-    console.log('Controller - permissionCodes 类型:', typeof permissionCodes)
-    console.log('Controller - permissionCodes 是数组吗:', Array.isArray(permissionCodes))
-    
-    await roleService.saveRoleMenus(id, permissionCodes)
+    const { roleId, permissionCodes } = ctx.request.body as { roleId: string, permissionCodes: string[] }
+    await roleService.saveRoleMenus(roleId, permissionCodes)
     success(ctx, null, '保存成功')
   }
 }

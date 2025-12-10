@@ -22,14 +22,13 @@ export class MenuController {
   }
 
   async updateMenu(ctx: Context): Promise<void> {
-    const { id } = ctx.params
     const menu = ctx.request.body as Partial<MenuConfig>
-    const updated = await menuService.updateMenu(id, menu)
+    const updated = await menuService.updateMenu(menu.id!, menu)
     success(ctx, { data: updated })
   }
 
   async deleteMenu(ctx: Context): Promise<void> {
-    const { id } = ctx.params
+    const { id } = ctx.request.body as { id: string }
     await menuService.deleteMenu(id)
     success(ctx, null, '删除成功')
   }

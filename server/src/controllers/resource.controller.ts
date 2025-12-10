@@ -1,6 +1,7 @@
 import type { Context } from 'koa'
 import { resourceService } from '../services/resource.service.js'
 import { success } from '../utils/response.util.js'
+import { BusinessError } from '../types/common.types.js'
 import type { Resource } from '../types/resource.types.js'
 
 export class ResourceController {
@@ -10,7 +11,12 @@ export class ResourceController {
   }
 
   async getResourceById(ctx: Context): Promise<void> {
-    const { id } = ctx.params
+    const { id } = ctx.request.body as { id: string }
+    
+    if (!id) {
+      throw new BusinessError('资源ID不能为空', 'VALIDATION_ERROR', 400)
+    }
+    
     const resource = await resourceService.getResourceById(id)
     success(ctx, { data: resource })
   }
@@ -22,14 +28,23 @@ export class ResourceController {
   }
 
   async updateResource(ctx: Context): Promise<void> {
-    const { id } = ctx.params
-    const updates = ctx.request.body as Partial<Resource>
+    const { id, ...updates } = ctx.request.body as Partial<Resource> & { id: string }
+    
+    if (!id) {
+      throw new BusinessError('资源ID不能为空', 'VALIDATION_ERROR', 400)
+    }
+    
     const updated = await resourceService.updateResource(id, updates)
     success(ctx, { data: updated }, '更新成功')
   }
 
   async deleteResource(ctx: Context): Promise<void> {
-    const { id } = ctx.params
+    const { id } = ctx.request.body as { id: string }
+    
+    if (!id) {
+      throw new BusinessError('资源ID不能为空', 'VALIDATION_ERROR', 400)
+    }
+    
     await resourceService.deleteResource(id)
     success(ctx, null, '删除成功')
   }
