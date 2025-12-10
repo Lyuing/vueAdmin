@@ -6,11 +6,16 @@
     "permissionCodes": [
       "home",
       "home:to_system_user",
+      "home:to_system_role",
+      "home:to_system_menu",
       "dashboard",
       "system_user",
       "system_user",
       "system_role",
-      "system_menu"
+      "system_menu",
+      "system_resource",
+      "system_resource_detail",
+      "system_resource_edit"
     ]
   },
   {

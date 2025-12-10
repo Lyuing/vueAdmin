@@ -133,6 +133,26 @@ export default {
       parentRequired: 'Please select parent menu'
     }
   },
+  resource: {
+    management: 'Resource Management',
+    list: 'Resource List',
+    detail: 'Resource Detail',
+    edit: 'Edit Resource',
+    name: 'Resource Name',
+    type: 'Resource Type',
+    description: 'Description',
+    status: 'Status',
+    createdBy: 'Created By',
+    metadata: 'Metadata',
+    viewDetail: 'View Detail',
+    backToList: 'Back to List',
+    message: {
+      loadFailed: 'Failed to load resource list',
+      loadDetailFailed: 'Failed to load resource detail',
+      updateSuccess: 'Update successful',
+      updateFailed: 'Update failed'
+    }
+  },
   validation: {
     required: 'This field is required',
     email: 'Please enter a valid email address',

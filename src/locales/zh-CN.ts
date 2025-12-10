@@ -133,6 +133,26 @@ export default {
       parentRequired: '请选择父级菜单'
     }
   },
+  resource: {
+    management: '资源管理',
+    list: '资源列表',
+    detail: '资源详情',
+    edit: '编辑资源',
+    name: '资源名称',
+    type: '资源类型',
+    description: '资源描述',
+    status: '状态',
+    createdBy: '创建人',
+    metadata: '元数据',
+    viewDetail: '查看详情',
+    backToList: '返回列表',
+    message: {
+      loadFailed: '加载资源列表失败',
+      loadDetailFailed: '加载资源详情失败',
+      updateSuccess: '更新成功',
+      updateFailed: '更新失败'
+    }
+  },
   validation: {
     required: '此项为必填项',
     email: '请输入正确的邮箱地址',

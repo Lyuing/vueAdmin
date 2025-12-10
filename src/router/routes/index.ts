@@ -101,6 +101,36 @@ export const routeMap: RouteConfig[] = [
           requiresAuth: true,
           permissionCode: 'system_menu'
         }
+      },
+      {
+        path: '/system/resource',
+        name: 'SystemResource',
+        component: () => import('@/views/system/resource/index.vue'),
+        meta: {
+          title: '资源管理',
+          requiresAuth: true,
+          permissionCode: 'system_resource'
+        }
+      },
+      {
+        path: '/system/resource/:id',
+        name: 'SystemResourceDetail',
+        component: () => import('@/views/system/resource/detail.vue'),
+        meta: {
+          title: '资源详情',
+          requiresAuth: true,
+          permissionCode: 'system_resource_detail'
+        }
+      },
+      {
+        path: '/system/resource/:id/edit',
+        name: 'SystemResourceEdit',
+        component: () => import('@/views/system/resource/edit.vue'),
+        meta: {
+          title: '编辑资源',
+          requiresAuth: true,
+          permissionCode: 'system_resource_edit'
+        }
       }
     ]
   }

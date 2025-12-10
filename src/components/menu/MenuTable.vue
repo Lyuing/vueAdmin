@@ -1,7 +1,7 @@
 <template>
   <el-table :data="data" style="width: 100%" row-key="id"
     :tree-props="{ children: 'children', hasChildren: 'hasChildren' }" v-loading="loading" default-expand-all>
-    <el-table-column prop="title" :label="t('menu.form.title')" width="180" />
+    <el-table-column prop="title" :label="t('menu.form.title')" width="160" />
 
     <el-table-column :label="t('menu.form.icon')" width="100" align="center">
       <template #default="{ row }">
@@ -12,7 +12,7 @@
       </template>
     </el-table-column>
 
-    <el-table-column prop="permissionCode" :label="t('menu.form.permissionCode')" width="150">
+    <el-table-column prop="permissionCode" :label="t('menu.form.permissionCode')" width="170">
       <template #default="{ row }">
         <span>{{ row.permissionCode || '-' }}</span>
       </template>

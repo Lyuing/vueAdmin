@@ -11,6 +11,7 @@ import { userRepository } from './repositories/user.repository.js'
 import { menuRepository } from './repositories/menu.repository.js'
 import { roleRepository } from './repositories/role.repository.js'
 import { roleMenuRepository } from './repositories/role-menu.repository.js'
+import { resourceRepository } from './repositories/resource.repository.js'
 
 const app = new Koa()
 
@@ -50,5 +51,6 @@ async function loadData() {
   await menuRepository.init()
   await roleRepository.init()
   await roleMenuRepository.init()
+  await resourceRepository.init()
 }
 

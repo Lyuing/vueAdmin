@@ -1,0 +1,44 @@
+[
+  {
+    "id": "res_001",
+    "name": "示例资源 1",
+    "type": "document",
+    "description": "这是一个文档类型的示例资源",
+    "status": "active",
+    "createdAt": "2024-01-15T08:30:00.000Z",
+    "updatedAt": "2024-01-15T08:30:00.000Z",
+    "createdBy": "admin",
+    "metadata": {
+      "category": "系统文档",
+      "tags": ["重要", "公开"]
+    }
+  },
+  {
+    "id": "res_002",
+    "name": "示例资源 2",
+    "type": "image",
+    "description": "这是一个图片类型的示例资源",
+    "status": "active",
+    "createdAt": "2024-02-10T14:20:00.000Z",
+    "updatedAt": "2024-02-10T14:20:00.000Z",
+    "createdBy": "admin",
+    "metadata": {
+      "format": "PNG",
+      "size": "1024x768"
+    }
+  },
+  {
+    "id": "res_003",
+    "name": "示例资源 3",
+    "type": "video",
+    "description": "这是一个视频类型的示例资源",
+    "status": "inactive",
+    "createdAt": "2024-03-05T10:15:00.000Z",
+    "updatedAt": "2024-03-05T10:15:00.000Z",
+    "createdBy": "user001",
+    "metadata": {
+      "duration": "00:05:30",
+      "resolution": "1920x1080"
+    }
+  }
+]

@@ -15,7 +15,7 @@
       </el-form-item>
 
       <el-form-item :label="t('menu.form.permissionCode')" prop="permissionCode">
-        <el-input v-model="formData.permissionCode" placeholder="system_menu:view" disabled />
+        <el-input v-model="formData.permissionCode" placeholder="system_menu:view" />
       </el-form-item>
 
       <el-form-item :label="t('menu.form.position')" prop="position">

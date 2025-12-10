@@ -43,6 +43,15 @@
     "hidden": false,
     "children": [
       {
+        "id": "3-1",
+        "title": "用户管理",
+        "icon": "User",
+        "permissionCode": "system_user",
+        "position": "sidebar_nav",
+        "hidden": false,
+        "children": []
+      },
+      {
         "id": "3-2",
         "title": "角色管理",
         "icon": "UserFilled",
@@ -61,13 +70,41 @@
         "children": []
       },
       {
-        "id": "3-1",
-        "title": "用户管理",
-        "icon": "User",
-        "permissionCode": "system_user",
-        "position": "sidebar_nav",
+        "id": "4",
+        "title": "资源管理",
+        "icon": "ScaleToOriginal",
+        "permissionCode": "system_resource",
+        "position": "sidebar_directory",
         "hidden": false,
-        "children": []
+        "children": [
+          {
+            "id": "4-1",
+            "title": "资源管理",
+            "icon": "Box",
+            "permissionCode": "system_resource",
+            "position": "sidebar_nav",
+            "hidden": false,
+            "children": []
+          },
+          {
+            "id": "4-2",
+            "title": "资源详情",
+            "icon": "DataLine",
+            "permissionCode": "system_resource_detail",
+            "position": "sidebar_nav",
+            "hidden": false,
+            "children": []
+          },
+          {
+            "id": "4-3",
+            "title": "资源编辑",
+            "icon": "DataAnalysis",
+            "permissionCode": "system_resource_edit",
+            "position": "sidebar_nav",
+            "hidden": false,
+            "children": []
+          }
+        ]
       }
     ]
   }
