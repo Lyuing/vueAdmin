@@ -11,7 +11,9 @@ import App from './App.vue'
 import i18n from './locales'
 import initRouter, { addDynamicRoutes } from './router'
 import { useAuthStore } from './stores/auth'
+import { useNavigationStore } from './stores/navigation'
 import { useTheme } from './composables/useTheme'
+import { routeMap } from './router/routes'
 
 const app = createApp(App)
 const pinia = createPinia()
@@ -37,6 +39,10 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
 
 // 初始化应用
 async function initApp() {
+  // 初始化导航权限映射
+  const navigationStore = useNavigationStore()
+  navigationStore.buildPermissionRouteMap(routeMap)
+
   // 初始化认证状态
   // 恢复缓存认证
   const authStore = useAuthStore()

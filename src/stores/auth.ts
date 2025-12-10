@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import type { UserInfo } from '@/types/user'
 import { storage } from '@/utils/storage'
 import { login as loginApi, logout as logoutApi } from '@/api/auth'
+import { useNavigationStore } from '@/stores/navigation'
 
 export const useAuthStore = defineStore('auth', () => {
   const token = ref<string | null>(null)
@@ -23,6 +24,12 @@ export const useAuthStore = defineStore('auth', () => {
 
       storage.set('token', response.token)
       storage.set('userInfo', response.userInfo)
+
+      // 设置菜单
+      if (response.userInfo.menus) {
+        const navigationStore = useNavigationStore()
+        navigationStore.loadMenusFromUserInfo(response.userInfo.menus)
+      }
 
       return response
     } catch (error) {
@@ -60,12 +67,24 @@ export const useAuthStore = defineStore('auth', () => {
       token.value = savedToken
       userInfo.value = savedUserInfo
 
-      // 异步获取最新的用户信息（包含最新权限）
+      const navigationStore = useNavigationStore()
+
+      // 如果缓存的用户信息包含菜单，先设置菜单
+      if (savedUserInfo.menus) {
+        navigationStore.loadMenusFromUserInfo(savedUserInfo.menus)
+      }
+
+      // 异步获取最新的用户信息（包含最新权限和菜单）
       try {
         const { getCurrentUser } = await import('@/api/user')
         const response = await getCurrentUser()
         userInfo.value = response.data as UserInfo
         storage.set('userInfo', response.data)
+        
+        // 更新菜单
+        if (response.data.menus) {
+          navigationStore.loadMenusFromUserInfo(response.data.menus)
+        }
       } catch (error) {
         console.error('Failed to refresh user info:', error)
         // 如果获取失败，继续使用缓存的用户信息

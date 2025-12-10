@@ -7,6 +7,7 @@ export interface UserInfo {
   phone?: string
   roles: string[]
   permissions: string[]
+  menus?: any[] // 用户菜单配置
   createdAt: string
   updatedAt: string
 }

@@ -2,8 +2,7 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import type { MenuItem, MenuConfig, BreadcrumbItem } from '@/types/navigation'
 import type { RouteConfig } from '@/types/route'
-import { getUserMenus } from '@/api/menu'
-import { ElMessage } from 'element-plus'
+// 移除了 getUserMenus 导入，因为菜单现在从用户信息中获取
 
 export const useNavigationStore = defineStore('navigation', () => {
   // ========== 状态定义 ==========
@@ -52,17 +51,14 @@ export const useNavigationStore = defineStore('navigation', () => {
     permissionRouteMap.value = map
   }
 
-  // API 加载菜单
-  async function loadMenus() {
-    try {
-      const response = await getUserMenus()
-      setMenus(response.data)
-    } catch (error) {
+  // 从用户信息中加载菜单
+  function loadMenusFromUserInfo(menus: any[]) {
+    if (menus && menus.length > 0) {
+      setMenus(menus)
+    } else {
       menuTree.value = []
       menuMap.value = new Map()
-
-      console.error('菜单加载失败:', error)
-      ElMessage.error('菜单加载失败，请刷新页面重试')
+      routeNameMenuMap.value = new Map()
     }
   }
 
@@ -261,7 +257,7 @@ export const useNavigationStore = defineStore('navigation', () => {
     // 核心方法
     buildPermissionRouteMap,
     setMenus,
-    loadMenus,
+    loadMenusFromUserInfo,
 
     // 状态管理
     toggleSidebar,

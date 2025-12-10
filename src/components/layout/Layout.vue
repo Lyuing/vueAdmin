@@ -14,20 +14,16 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { computed } from 'vue'
 import TopNav from './TopNav.vue'
 import Sidebar from './Sidebar.vue'
 import Breadcrumb from '@/components/common/Breadcrumb.vue'
 import { useNavigation } from '@/composables/useNavigation'
 
-const { sidebarMenus, initMenus } = useNavigation()
+const { sidebarMenus } = useNavigation()
 
 const hasSidebar = computed(() => {
   return sidebarMenus.value.length > 0
-})
-
-onMounted(async () => {
-  await initMenus()
 })
 </script>
 

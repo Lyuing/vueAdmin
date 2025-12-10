@@ -1,6 +1,7 @@
 import { userRepository } from '../repositories/user.repository.js'
 import { roleRepository } from '../repositories/role.repository.js'
 import { roleMenuRepository } from '../repositories/role-menu.repository.js'
+import { menuService } from './menu.service.js'
 import { BusinessError } from '../types/common.types.js'
 import type { UserInfo, UserInfoResponse } from '../types/user.types.js'
 
@@ -41,7 +42,7 @@ export class UserService {
     }
   }
 
-  // 获取当前用户信息（包含最新的权限）
+  // 获取当前用户信息（包含最新的权限和菜单）
   async getCurrentUser(userId: string): Promise<UserInfoResponse> {
     const user = await userRepository.findById(userId)
     
@@ -51,11 +52,15 @@ export class UserService {
 
     // 动态计算权限，确保获取最新的权限
     const permissions = await this.calculatePermissions(user.roles)
+    
+    // 获取用户菜单
+    const menus = await menuService.getUserMenus(userId)
 
     const { password, ...userInfo } = user
     return {
       ...userInfo,
-      permissions
+      permissions,
+      menus
     }
   }
 

@@ -12,9 +12,10 @@ export interface UserInfo {
   updatedAt: string
 }
 
-// 用户信息响应类型，包含动态计算的权限
+// 用户信息响应类型，包含动态计算的权限和菜单
 export interface UserInfoResponse extends Omit<UserInfo, 'password'> {
   permissions: string[]
+  menus?: any[] // 用户菜单配置
 }
 
 export interface LoginRequest {

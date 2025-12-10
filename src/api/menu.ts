@@ -2,7 +2,7 @@ import http from './http'
 import type { MenuConfig } from '@/types/navigation'
 
 /**
- * 获取用户菜单配置
+ * 获取用户菜单配置（仅用于管理功能，普通用户菜单现在从 userInfo 中获取）
  */
 export function getUserMenus(): Promise<{ data: MenuConfig[]; version?: string }> {
     return http.get('/menu/user')

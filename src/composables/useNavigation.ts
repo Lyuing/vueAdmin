@@ -36,15 +36,12 @@ export function useNavigation() {
   })
 
   /**
-   * 初始化菜单
+   * 初始化路由权限映射
    */
-  async function initMenus() {
+  function initRoutePermissionMap() {
     // 映射 permissionCode -> {path, name}
     navigationStore.buildPermissionRouteMap(routeMap)
-    // API 加载菜单
-    await navigationStore.loadMenus()
   }
-
 
   return {
     // 状态
@@ -54,7 +51,7 @@ export function useNavigation() {
     sidebarCollapsed,
 
     // 方法
-    initMenus,
+    initRoutePermissionMap,
 
     // Store方法
     toggleSidebar: navigationStore.toggleSidebar

@@ -1,5 +1,6 @@
 import { userRepository } from '../repositories/user.repository.js'
 import { roleMenuRepository } from '../repositories/role-menu.repository.js'
+import { menuService } from './menu.service.js'
 import { generateToken, removeToken } from '../utils/token.util.js'
 import { BusinessError } from '../types/common.types.js'
 import type { LoginResponse } from '../types/user.types.js'
@@ -34,6 +35,9 @@ export class AuthService {
 
     // 动态计算权限
     const permissions = await this.calculatePermissions(user.roles)
+    
+    // 获取用户菜单
+    const menus = await menuService.getUserMenus(user.id)
 
     const { password: _, ...userInfo } = user
 
@@ -42,7 +46,8 @@ export class AuthService {
       expiresIn: 7200,
       userInfo: {
         ...userInfo,
-        permissions
+        permissions,
+        menus
       }
     }
   }
