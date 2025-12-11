@@ -82,12 +82,12 @@ function formatDate(dateString: string): string {
 
 // 查看详情
 function handleViewDetail(resource: Resource) {
-  router.push(`/system/resource/${resource.id}`)
+  router.push(`/system/resource/detail/${resource.id}`)
 }
 
 // 编辑资源
 function handleEdit(resource: Resource) {
-  router.push(`/system/resource/${resource.id}/edit`)
+  router.push(`/system/resource/edit/${resource.id}`)
 }
 
 // 页面加载时获取资源列表

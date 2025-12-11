@@ -6,35 +6,15 @@
       </el-icon>
     </div>
     <el-menu 
-      :default-active="activeMenuPath"
+      :default-active="activeMenuId"
+      :default-openeds="openedMenuIds"
       :collapse="sidebarCollapsed"
       :unique-opened="false"
-      router
       class="sidebar-menu"
+      @select="handleMenuSelect"
     >
       <template v-for="menu in sidebarMenus" :key="menu.id">
-        <el-sub-menu v-if="menu.children && menu.children.length > 0" :index="menu.path || menu.id">
-          <template #title>
-            <el-icon v-if="menu.icon">
-              <component :is="getIcon(menu.icon)" />
-            </el-icon>
-            <span>{{ menu.title }}</span>
-          </template>
-          <template v-for="child in menu.children" :key="child.id">
-            <el-menu-item :index="child.path || child.id">
-              <el-icon v-if="child.icon">
-                <component :is="getIcon(child.icon)" />
-              </el-icon>
-              <span>{{ child.title }}</span>
-            </el-menu-item>
-          </template>
-        </el-sub-menu>
-        <el-menu-item v-else :index="menu.path || menu.id">
-          <el-icon v-if="menu.icon">
-            <component :is="getIcon(menu.icon)" />
-          </el-icon>
-          <span>{{ menu.title }}</span>
-        </el-menu-item>
+        <menu-item-renderer :menu="menu" />
       </template>
     </el-menu>
   </div>
@@ -42,27 +22,40 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRouter } from 'vue-router'
 import { useNavigation } from '@/composables/useNavigation'
-import { getIconComponent } from '@/utils/icon'
+import { useNavigationStore } from '@/stores/navigation'
+import MenuItemRenderer from './MenuItemRenderer.vue'
 
-const route = useRoute()
+const router = useRouter()
+const navigationStore = useNavigationStore()
 
-const { sidebarMenus, sidebarCollapsed, toggleSidebar } = useNavigation()
+const { sidebarMenus, sidebarCollapsed, toggleSidebar, activeMenuIds } = useNavigation()
 
 // 是否有侧边栏菜单
 const hasSidebarMenus = computed(() => {
   return sidebarMenus.value.length > 0
 })
 
-// 当前激活的菜单路径（用于 el-menu 的 router 模式）
-const activeMenuPath = computed(() => {
-  return route.path
+// 当前激活的菜单ID（最后一个，即当前菜单）
+const activeMenuId = computed(() => {
+  const ids = activeMenuIds.value
+  return ids.length > 0 ? ids[ids.length - 1] : ''
 })
 
-// 获取图标组件
-const getIcon = (iconName?: string) => {
-  return getIconComponent(iconName)
+// 需要展开的菜单ID列表（除了最后一个）
+const openedMenuIds = computed(() => {
+  const ids = activeMenuIds.value
+  return ids.length > 1 ? ids.slice(0, -1) : []
+})
+
+// 处理菜单选择
+const handleMenuSelect = (menuId: string) => {
+  // 通过菜单ID查找菜单项，然后跳转到对应的路由
+  const menu = navigationStore.menuMap.get(menuId)
+  if (!menu) return
+  const path = navigationStore.resolveMenuPath(menu) || menu.path
+  if (path) router.push(path)
 }
 </script>
 

@@ -21,7 +21,7 @@
         "description": "首页跳转到系统管理菜单的按钮权限"
       }
     ],
-    "position": "top",
+    "menuType": "top",
     "hidden": false,
     "children": []
   },
@@ -30,7 +30,7 @@
     "title": "工作台",
     "icon": "DataLine",
     "permissionCode": "dashboard",
-    "position": "top",
+    "menuType": "top",
     "hidden": false,
     "children": []
   },
@@ -39,7 +39,7 @@
     "title": "系统管理",
     "icon": "SetUp",
     "permissionCode": "system_user",
-    "position": "top",
+    "menuType": "top",
     "hidden": false,
     "children": [
       {
@@ -47,7 +47,7 @@
         "title": "用户管理",
         "icon": "User",
         "permissionCode": "system_user",
-        "position": "sidebar_nav",
+        "menuType": "sidebar_nav",
         "hidden": false,
         "children": []
       },
@@ -56,7 +56,7 @@
         "title": "角色管理",
         "icon": "UserFilled",
         "permissionCode": "system_role",
-        "position": "sidebar_nav",
+        "menuType": "sidebar_nav",
         "hidden": false,
         "children": []
       },
@@ -65,7 +65,7 @@
         "title": "菜单管理",
         "icon": "Menu",
         "permissionCode": "system_menu",
-        "position": "sidebar_nav",
+        "menuType": "sidebar_nav",
         "hidden": false,
         "children": []
       },
@@ -73,17 +73,17 @@
         "id": "4",
         "title": "资源管理",
         "icon": "ScaleToOriginal",
-        "permissionCode": "system_resource",
-        "position": "sidebar_directory",
+        "permissionCode": "",
+        "menuType": "sidebar_directory",
         "hidden": false,
         "children": [
           {
-            "id": "4-1",
-            "title": "资源管理",
-            "icon": "Box",
-            "permissionCode": "system_resource",
-            "position": "sidebar_nav",
-            "hidden": false,
+            "id": "4-3",
+            "title": "资源编辑",
+            "icon": "DataAnalysis",
+            "permissionCode": "system_resource_edit",
+            "menuType": "sidebar_nav",
+            "hidden": true,
             "children": []
           },
           {
@@ -91,16 +91,17 @@
             "title": "资源详情",
             "icon": "DataLine",
             "permissionCode": "system_resource_detail",
-            "position": "sidebar_nav",
-            "hidden": false,
+            "parentMenuCode": "system_resource",
+            "menuType": "sidebar_nav",
+            "hidden": true,
             "children": []
           },
           {
-            "id": "4-3",
-            "title": "资源编辑",
-            "icon": "DataAnalysis",
-            "permissionCode": "system_resource_edit",
-            "position": "sidebar_nav",
+            "id": "4-1",
+            "title": "资源列表",
+            "icon": "Box",
+            "permissionCode": "system_resource",
+            "menuType": "sidebar_nav",
             "hidden": false,
             "children": []
           }

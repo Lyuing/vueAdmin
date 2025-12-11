@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import type { UserInfo } from '@/types/user'
-import { getUserInfo as getUserInfoApi, updateUserInfo as updateUserInfoApi } from '@/api/user'
+import { getCurrentUser as getUserInfoApi, updateUser as updateUserInfoApi } from '@/api/user'
 
 export const useUserStore = defineStore('user', () => {
   const userInfo = ref<UserInfo | null>(null)
@@ -11,9 +11,10 @@ export const useUserStore = defineStore('user', () => {
    */
   async function getUserInfo() {
     try {
-      const data = await getUserInfoApi()
-      userInfo.value = data
-      return data
+      const response = await getUserInfoApi()
+      // API 返回 { data: User }
+      userInfo.value = response.data as UserInfo
+      return response.data
     } catch (error) {
       throw error
     }
@@ -24,9 +25,11 @@ export const useUserStore = defineStore('user', () => {
    */
   async function updateUserInfo(data: Partial<UserInfo>) {
     try {
-      const updated = await updateUserInfoApi(data)
-      userInfo.value = updated
-      return updated
+      const userId = userInfo.value?.id
+      if (!userId) throw new Error('No current user id')
+      const response = await updateUserInfoApi(userId, data as any)
+      userInfo.value = response.data as UserInfo
+      return response.data
     } catch (error) {
       throw error
     }

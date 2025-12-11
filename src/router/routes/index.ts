@@ -113,7 +113,7 @@ export const routeMap: RouteConfig[] = [
         }
       },
       {
-        path: '/system/resource/:id',
+        path: '/system/resource/detail/:id',
         name: 'SystemResourceDetail',
         component: () => import('@/views/system/resource/detail.vue'),
         meta: {
@@ -123,7 +123,7 @@ export const routeMap: RouteConfig[] = [
         }
       },
       {
-        path: '/system/resource/:id/edit',
+        path: '/system/resource/edit/:id',
         name: 'SystemResourceEdit',
         component: () => import('@/views/system/resource/edit.vue'),
         meta: {

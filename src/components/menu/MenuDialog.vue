@@ -18,15 +18,15 @@
         <el-input v-model="formData.permissionCode" placeholder="system_menu:view" />
       </el-form-item>
 
-      <el-form-item :label="t('menu.form.position')" prop="position">
-        <el-radio-group v-model="formData.position">
+      <el-form-item :label="t('menu.form.menuType')" prop="menuType">
+        <el-radio-group v-model="formData.menuType">
           <el-radio value="top">{{ t('menu.form.topNav') }}</el-radio>
           <el-radio value="sidebar_nav">{{ t('menu.form.sidebarNav') }}</el-radio>
           <el-radio value="sidebar_directory">{{ t('menu.form.sidebarDirectory') }}</el-radio>
         </el-radio-group>
       </el-form-item>
 
-      <el-form-item v-if="formData.position !== 'top'" :label="t('menu.form.parentMenu')" prop="parentId">
+      <el-form-item v-if="formData.menuType !== 'top'" :label="t('menu.form.parentMenu')" prop="parentId">
         <el-tree-select v-model="formData.parentId" :data="parentMenuOptions" :placeholder="t('menu.form.parentMenu')"
           clearable check-strictly :render-after-expand="false" node-key="id"
           :props="{ label: 'title', children: 'children' }" />
@@ -34,6 +34,19 @@
 
       <el-form-item :label="t('menu.form.hidden')" prop="hidden">
         <el-switch v-model="formData.hidden" />
+        <div v-if="formData.hidden" style="margin-top: 8px; font-size: 12px; color: var(--el-color-info);">
+          {{ t('menu.form.hiddenMenu') }}
+        </div>
+      </el-form-item>
+
+      <!-- 挂载导航选择器 - 仅在隐藏菜单时显示 -->
+      <el-form-item v-if="formData.hidden" :label="t('menu.form.parentNavigation')" prop="parentMenuCode">
+        <el-tree-select v-model="formData.parentMenuCode" :data="parentNavigationOptions"
+          :placeholder="t('menu.form.parentNavigationPlaceholder')" clearable check-strictly
+          :render-after-expand="false" node-key="value" :props="{ label: 'label', children: 'children' }" />
+        <div style="margin-top: 4px; font-size: 12px; color: var(--el-color-info);">
+          选择隐藏菜单应该关联的父级菜单，用于面包屑导航和菜单激活
+        </div>
       </el-form-item>
     </el-form>
 
@@ -48,10 +61,41 @@
 import { ref, watch, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { FormInstance, FormRules } from 'element-plus'
+import { ElMessage } from 'element-plus'
 import type { MenuConfig } from '@/types/navigation'
+import { validateMenuMounting, isCircularReference, findMenuByPermissionCode } from '@/utils/menu-utils'
 import IconPicker from './IconPicker.vue'
 
 const { t } = useI18n()
+
+// 自定义验证器：验证挂载导航选择
+const validateParentMenuCode = (_rule: any, value: string, callback: any) => {
+  if (!value || !formData.value.hidden) {
+    callback()
+    return
+  }
+
+  // 检查父级菜单是否存在
+  const parentMenu = findMenuByPermissionCode(value, props.allMenus)
+  if (!parentMenu) {
+    callback(new Error(t('menu.validation.parentNavigationInvalid')))
+    return
+  }
+
+  // 检查是否形成循环引用
+  if (formData.value.permissionCode && isCircularReference(formData.value.permissionCode, value, props.allMenus)) {
+    callback(new Error(t('menu.validation.circularReference')))
+    return
+  }
+
+  // 检查父级菜单是否隐藏
+  if (parentMenu.hidden) {
+    callback(new Error(t('menu.validation.parentMenuHidden')))
+    return
+  }
+
+  callback()
+}
 
 interface Props {
   visible: boolean
@@ -71,6 +115,7 @@ const emit = defineEmits<Emits>()
 
 interface MenuFormData extends Partial<MenuConfig> {
   parentId?: string
+  parentMenuCode?: string
 }
 
 const formRef = ref<FormInstance>()
@@ -80,7 +125,8 @@ const formData = ref<MenuFormData>({
   icon: undefined,
   permissionCode: undefined,
   parentId: undefined,
-  position: 'sidebar_nav',
+  parentMenuCode: undefined,
+  menuType: 'sidebar_nav',
   hidden: false,
   children: []
 })
@@ -107,15 +153,23 @@ const rules = computed<FormRules>(() => {
         trigger: 'blur'
       }
     ],
-    position: [
-      { required: true, message: t('menu.validation.positionRequired'), trigger: 'change' }
+    menuType: [
+      { required: true, message: t('menu.validation.menuTypeRequired'), trigger: 'change' }
     ]
   }
 
   // 如果不是顶部导航，父级菜单为必填
-  if (formData.value.position !== 'top') {
+  if (formData.value.menuType !== 'top') {
     baseRules.parentId = [
       { required: true, message: t('menu.validation.parentRequired'), trigger: 'change' }
+    ]
+  }
+
+  // 如果是隐藏菜单，挂载导航为必填
+  if (formData.value.hidden) {
+    baseRules.parentMenuCode = [
+      { required: true, message: t('menu.validation.parentNavigationRequired'), trigger: 'change' },
+      { validator: validateParentMenuCode, trigger: 'change' }
     ]
   }
 
@@ -140,7 +194,7 @@ function getDescendantIds(menu: MenuConfig): string[] {
 // - 侧栏目录：可选父级为顶部导航或侧栏目录
 const parentMenuOptions = computed(() => {
   // 如果当前菜单是顶部导航，则不显示父级选项（返回空数组）
-  if (formData.value.position === 'top') {
+  if (formData.value.menuType === 'top') {
     return []
   }
 
@@ -159,7 +213,7 @@ const parentMenuOptions = computed(() => {
         // 排除自身及其后代
         if (excludeIds.includes(menu.id)) return false
         // 只保留允许的位置类型
-        return allowedParentPositions.includes(menu.position)
+        return allowedParentPositions.includes(menu.menuType)
       })
       .map(menu => {
         // 递归处理子菜单
@@ -176,7 +230,7 @@ const parentMenuOptions = computed(() => {
     return children
       .filter(child => {
         if (excludeIds.includes(child.id)) return false
-        return allowedParentPositions.includes(child.position)
+        return allowedParentPositions.includes(child.menuType)
       })
       .map(child => ({
         ...child,
@@ -187,11 +241,68 @@ const parentMenuOptions = computed(() => {
   return buildParentOptions(props.allMenus)
 })
 
-// 监听位置变化，清空父级菜单选择
-watch(() => formData.value.position, (newPosition) => {
+// 挂载导航选项 - 用于隐藏菜单选择挂载的父级菜单
+const parentNavigationOptions = computed(() => {
+  if (!formData.value.hidden) {
+    return []
+  }
+
+  // 获取需要排除的菜单ID列表（自身及其后代）
+  const excludeIds = props.mode === 'edit' && props.menuData
+    ? getDescendantIds(props.menuData)
+    : []
+
+  // 构建可选的挂载导航树（只包含有权限码的可见菜单）
+  function buildNavigationOptions(menus: MenuConfig[]): any[] {
+    return menus
+      .filter(menu => {
+        // 排除自身及其后代
+        if (excludeIds.includes(menu.id)) return false
+        // 排除隐藏菜单
+        if (menu.hidden) return false
+        // 必须有权限码才能作为挂载目标
+        return !!menu.permissionCode
+      })
+      .map(menu => {
+        const option = {
+          value: menu.permissionCode,
+          label: menu.title,
+          children: menu.children ? buildNavigationOptions(menu.children) : undefined
+        }
+        // 如果没有子选项，删除children属性
+        if (!option.children || option.children.length === 0) {
+          delete option.children
+        }
+        return option
+      })
+  }
+
+  return buildNavigationOptions(props.allMenus)
+})
+
+// 监听菜单类型变化，清空父级菜单选择
+watch(() => formData.value.menuType, (newMenuType) => {
   // 如果切换到顶部导航，清空父级菜单
-  if (newPosition === 'top') {
+  if (newMenuType === 'top') {
     formData.value.parentId = undefined
+  }
+})
+
+// 监听隐藏状态变化，清空挂载导航选择
+watch(() => formData.value.hidden, (newHidden) => {
+  // 如果取消隐藏，清空挂载导航
+  if (!newHidden) {
+    formData.value.parentMenuCode = undefined
+  }
+})
+
+// 监听挂载导航选择变化，进行实时验证
+watch(() => formData.value.parentMenuCode, (newParentCode) => {
+  if (newParentCode && formData.value.hidden) {
+    // 延迟验证，避免在用户输入过程中频繁提示
+    setTimeout(() => {
+      formRef.value?.validateField('parentMenuCode')
+    }, 300)
   }
 })
 
@@ -225,7 +336,8 @@ watch(() => props.visible, (newVal) => {
         icon: props.menuData.icon,
         permissionCode: props.menuData.permissionCode,
         parentId: parentId,
-        position: props.menuData.position,
+        parentMenuCode: props.menuData.parentMenuCode,
+        menuType: props.menuData.menuType,
         hidden: props.menuData.hidden,
         children: props.menuData.children || []
       }
@@ -237,7 +349,8 @@ watch(() => props.visible, (newVal) => {
         icon: undefined,
         permissionCode: undefined,
         parentId: undefined,
-        position: 'sidebar_nav',
+        parentMenuCode: undefined,
+        menuType: 'sidebar_nav',
         hidden: false,
         children: []
       }
@@ -269,7 +382,16 @@ async function handleSubmit() {
 
   await formRef.value.validate((valid) => {
     if (valid) {
-      // 保留 parentId，由父组件处理树形结构
+      // 额外的业务逻辑验证
+      if (formData.value.hidden && formData.value.parentMenuCode) {
+        const validation = validateMenuMounting(formData.value as MenuConfig, props.allMenus)
+        if (!validation.valid) {
+          ElMessage.error(validation.error || '挂载关系验证失败')
+          return
+        }
+      }
+
+      // 保留 parentId 和 parentMenuCode，由父组件处理
       emit('save', formData.value as MenuConfig & { parentId?: string })
     }
   })

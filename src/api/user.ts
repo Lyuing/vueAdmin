@@ -10,6 +10,7 @@ export interface User {
   phone?: string
   roles: string[]
   permissions: string[]
+  menus?: any[]
   status?: 'active' | 'disabled'
   createdAt: string
   updatedAt: string

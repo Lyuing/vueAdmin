@@ -23,7 +23,11 @@ export default {
     system: '系統管理',
     user: '使用者管理',
     role: '角色管理',
-    menu: '選單管理'
+    menu: '選單管理',
+    form: {
+      permissionCode: '頁面權限',
+      permissions: '操作權限'
+    }
   },
   validation: {
     required: '此項為必填項',

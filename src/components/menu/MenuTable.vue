@@ -1,6 +1,36 @@
 <template>
-  <el-table :data="data" style="width: 100%" row-key="id"
-    :tree-props="{ children: 'children', hasChildren: 'hasChildren' }" v-loading="loading" default-expand-all>
+  <!-- 批量操作工具栏 -->
+  <div v-if="selectedMenus.length > 0" class="batch-toolbar">
+    <div class="selected-info">
+      已选择 {{ selectedMenus.length }} 个菜单
+    </div>
+    <div class="batch-actions">
+      <el-button size="small" @click="batchSetHidden(true)">
+        <el-icon><Hide /></el-icon>
+        批量隐藏
+      </el-button>
+      <el-button size="small" @click="batchSetHidden(false)">
+        <el-icon><View /></el-icon>
+        批量显示
+      </el-button>
+      <el-button size="small" @click="clearSelection">
+        清空选择
+      </el-button>
+    </div>
+  </div>
+
+  <el-table 
+    ref="tableRef"
+    :data="data" 
+    style="width: 100%" 
+    row-key="id"
+    :tree-props="{ children: 'children', hasChildren: 'hasChildren' }" 
+    v-loading="loading" 
+    default-expand-all
+    @selection-change="handleSelectionChange"
+  >
+    <!-- 选择列 -->
+    <el-table-column type="selection" width="55" :selectable="isSelectable" />
     <el-table-column prop="title" :label="t('menu.form.title')" width="160" />
 
     <el-table-column :label="t('menu.form.icon')" width="100" align="center">
@@ -38,28 +68,44 @@
       </template>
     </el-table-column>
 
-    <el-table-column :label="t('menu.form.position')" width="120" align="center">
+    <el-table-column :label="t('menu.form.menuType')" width="120" align="center">
       <template #default="{ row }">
-        <el-tag v-if="row.position === 'top'" type="success" size="small">
+        <el-tag v-if="row.menuType === 'top'" type="success" size="small">
           {{ t('menu.form.topNav') }}
         </el-tag>
-        <el-tag v-else-if="row.position === 'sidebar_nav'" type="primary" size="small">
+        <el-tag v-else-if="row.menuType === 'sidebar_nav'" type="primary" size="small">
           {{ t('menu.form.sidebarNav') }}
         </el-tag>
-        <el-tag v-else-if="row.position === 'sidebar_directory'" type="info" size="small">
+        <el-tag v-else-if="row.menuType === 'sidebar_directory'" type="info" size="small">
           {{ t('menu.form.sidebarDirectory') }}
         </el-tag>
       </template>
     </el-table-column>
 
-    <el-table-column :label="t('menu.form.hidden')" width="100" align="center">
+    <el-table-column :label="t('menu.form.hidden')" width="120" align="center">
       <template #default="{ row }">
-        <el-tag v-if="!row.hidden" type="success" size="small">
-          {{ t('common.show') }}
-        </el-tag>
-        <el-tag v-else type="info" size="small">
-          {{ t('common.hide') }}
-        </el-tag>
+        <div class="hidden-status">
+          <el-tag v-if="!row.hidden" type="success" size="small">
+            {{ t('common.show') }}
+          </el-tag>
+          <el-tag v-else type="warning" size="small">
+            <el-icon style="margin-right: 4px;"><Hide /></el-icon>
+            {{ t('common.hide') }}
+          </el-tag>
+        </div>
+      </template>
+    </el-table-column>
+
+    <!-- 挂载关系列 - 仅对隐藏菜单显示 -->
+    <el-table-column :label="t('menu.form.parentNavigation')" width="150" align="center">
+      <template #default="{ row }">
+        <div v-if="row.hidden && row.parentMenuCode" class="mount-info">
+          <el-tag type="info" size="small">
+            <el-icon style="margin-right: 4px;"><Link /></el-icon>
+            {{ getParentMenuTitle(row.parentMenuCode) }}
+          </el-tag>
+        </div>
+        <span v-else>-</span>
       </template>
     </el-table-column>
 
@@ -88,9 +134,10 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { ElMessage } from 'element-plus'
-import { Top, Bottom } from '@element-plus/icons-vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { Top, Bottom, Hide, Link, View } from '@element-plus/icons-vue'
 import type { MenuConfig } from '@/types/navigation'
 import { getIconComponent } from '@/utils/icon'
 
@@ -99,6 +146,25 @@ const { t } = useI18n()
 // 获取图标组件
 const getIcon = (iconName?: string) => {
   return getIconComponent(iconName)
+}
+
+// 获取父级菜单标题
+const getParentMenuTitle = (parentMenuCode: string): string => {
+  const findMenuByCode = (menus: MenuConfig[], code: string): MenuConfig | null => {
+    for (const menu of menus) {
+      if (menu.permissionCode === code) {
+        return menu
+      }
+      if (menu.children && menu.children.length > 0) {
+        const found = findMenuByCode(menu.children, code)
+        if (found) return found
+      }
+    }
+    return null
+  }
+
+  const parentMenu = findMenuByCode(props.data, parentMenuCode)
+  return parentMenu ? parentMenu.title : parentMenuCode
 }
 
 interface Props {
@@ -114,6 +180,77 @@ interface Emits {
 
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
+
+// 表格引用和选择状态
+const tableRef = ref()
+const selectedMenus = ref<MenuConfig[]>([])
+
+// 处理选择变化
+const handleSelectionChange = (selection: MenuConfig[]) => {
+  selectedMenus.value = selection
+}
+
+// 清空选择
+const clearSelection = () => {
+  tableRef.value?.clearSelection()
+  selectedMenus.value = []
+}
+
+// 判断行是否可选择（可以根据业务需求调整）
+const isSelectable = (row: MenuConfig) => {
+  // 例如：顶级菜单不允许批量操作
+  return row.menuType !== 'top'
+}
+
+// 批量设置隐藏状态
+const batchSetHidden = async (hidden: boolean) => {
+  if (selectedMenus.value.length === 0) {
+    ElMessage.warning('请先选择要操作的菜单')
+    return
+  }
+
+  try {
+    await ElMessageBox.confirm(
+      `确定要${hidden ? '隐藏' : '显示'}选中的 ${selectedMenus.value.length} 个菜单吗？`,
+      '批量操作确认',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }
+    )
+
+    // 创建更新后的菜单数据
+    const updatedMenus = updateMenusHiddenStatus(props.data, selectedMenus.value, hidden)
+    
+    // 发送更新事件
+    emit('update', updatedMenus)
+    
+    // 清空选择
+    clearSelection()
+    
+    ElMessage.success(`成功${hidden ? '隐藏' : '显示'} ${selectedMenus.value.length} 个菜单`)
+  } catch (error) {
+    if (error !== 'cancel') {
+      console.error('批量操作失败:', error)
+      ElMessage.error('批量操作失败')
+    }
+  }
+}
+
+// 更新菜单隐藏状态的递归函数
+const updateMenusHiddenStatus = (menus: MenuConfig[], targetMenus: MenuConfig[], hidden: boolean): MenuConfig[] => {
+  return menus.map(menu => {
+    const isTarget = targetMenus.some(target => target.id === menu.id)
+    const updatedMenu = isTarget ? { ...menu, hidden } : { ...menu }
+    
+    if (updatedMenu.children && updatedMenu.children.length > 0) {
+      updatedMenu.children = updateMenusHiddenStatus(updatedMenu.children, targetMenus, hidden)
+    }
+    
+    return updatedMenu
+  })
+}
 
 /**
  * 查找菜单项及其同级数组
@@ -212,9 +349,7 @@ function handleEdit(menu: MenuConfig) {
   emit('edit', menu)
 }
 
-function handleDelete(menu: MenuConfig) {
-  emit('delete', menu)
-}
+// 删除功能目前模板中被注释，保留 emit 类型定义，但移除未使用的本地函数以避免 lint 错误
 
 function handleMoveUp(menu: MenuConfig) {
   moveMenu(menu, 'up')
@@ -254,6 +389,40 @@ function handleMoveDown(menu: MenuConfig) {
   flex-wrap: wrap;
   gap: 4px;
   align-items: center;
+}
+
+.batch-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  background-color: var(--el-fill-color-light);
+  border-radius: 6px;
+  border: 1px solid var(--el-border-color-lighter);
+
+  .selected-info {
+    font-size: 14px;
+    color: var(--el-text-color-primary);
+    font-weight: 500;
+  }
+
+  .batch-actions {
+    display: flex;
+    gap: 8px;
+  }
+}
+
+.hidden-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mount-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 // 响应式布局

@@ -47,10 +47,12 @@ export interface MenuConfig {
   permissionCode?: string
   /** 按钮权限点列表 */
   buttonPermissions?: ButtonPermission[]
-  /** 显示位置: 顶部导航、侧栏导航或侧栏目录 */
-  position: 'top' | 'sidebar_nav' | 'sidebar_directory'
+  /** 菜单类型: 顶部导航、侧栏导航或侧栏目录 */
+  menuType: 'top' | 'sidebar_nav' | 'sidebar_directory'
   /** 是否隐藏 */
   hidden: boolean
+  /** 挂载父级菜单的权限码，用于隐藏菜单指定其应该关联的父级菜单 */
+  parentMenuCode?: string
   /** 子菜单列表 */
   children?: MenuConfig[]
 }
@@ -86,10 +88,12 @@ export interface MenuItem {
   path?: string
   /** 关联的路由名称 */
   routeName?: string
-  /** 显示位置: 顶部导航、侧栏导航或侧栏目录 */
-  position: 'top' | 'sidebar_nav' | 'sidebar_directory'
+  /** 菜单类型: 顶部导航、侧栏导航或侧栏目录 */
+  menuType: 'top' | 'sidebar_nav' | 'sidebar_directory'
   /** 是否隐藏 */
   hidden: boolean
+  /** 挂载父级菜单的权限码，用于隐藏菜单指定其应该关联的父级菜单 */
+  parentMenuCode?: string
   /** 子菜单列表 */
   children?: MenuItem[]
   /** 菜单层级(自动计算) */
@@ -124,4 +128,14 @@ export interface TreeNode {
   isButton?: boolean
   /** 子节点 */
   children?: TreeNode[]
+}
+
+/**
+ * 菜单挂载关系验证结果
+ */
+export interface ValidationResult {
+  /** 验证是否通过 */
+  valid: boolean
+  /** 错误信息（验证失败时） */
+  error?: string
 }

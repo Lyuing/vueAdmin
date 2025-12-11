@@ -4,14 +4,16 @@ import type { RouteConfig } from '@/types/route'
  * 检查用户是否拥有指定权限
  */
 export function hasPermission(
-  requiredPermissions: string[] | undefined,
+  required: string | string[] | undefined,
   userPermissions: string[]
 ): boolean {
-  if (!requiredPermissions || requiredPermissions.length === 0) {
-    return true
-  }
+  if (!required) return true
 
-  return requiredPermissions.some(permission => userPermissions.includes(permission))
+  // 支持单字符串或字符串数组
+  const requiredList = Array.isArray(required) ? required : [required]
+  if (requiredList.length === 0) return true
+
+  return requiredList.some(permission => userPermissions.includes(permission))
 }
 
 /**
@@ -23,7 +25,13 @@ export function filterAccessRoutes(
 ): RouteConfig[] {
   return routes
     .filter(route => {
-      const hasAuth = hasPermission(route.meta.permissions, permissions)
+      // 优先使用单一的 permissionCode（与菜单配置对齐），回退到 meta.permissions
+      const required = (route.meta && (route.meta.permissionCode || route.meta.permissions)) as
+        | string
+        | string[]
+        | undefined
+
+      const hasAuth = hasPermission(required, permissions)
       if (hasAuth && route.children) {
         route.children = filterAccessRoutes(route.children, permissions)
       }

@@ -104,11 +104,14 @@ export default {
       id: 'Menu ID',
       title: 'Title',
       icon: 'Icon',
-      permissionCode: 'Permission Code',
-      permissions: 'Permissions',
+      permissionCode: 'Page Permission',
+      permissions: 'Action Permissions',
       parentMenu: 'Parent Menu',
-      position: 'Position',
+      menuType: 'Menu Type',
       hidden: 'Hidden',
+      hiddenMenu: 'Hidden Menu',
+      parentNavigation: 'Parent Navigation',
+      parentNavigationPlaceholder: 'Please select parent navigation',
       topNav: 'Top Navigation',
       sidebarNav: 'Sidebar Navigation',
       sidebarDirectory: 'Sidebar Directory',
@@ -129,8 +132,12 @@ export default {
       titleRequired: 'Please enter menu title',
       titleLength: 'Title length should be between 1-50 characters',
       permissionCodeFormat: 'Permission code format: module:action',
-      positionRequired: 'Please select menu position',
-      parentRequired: 'Please select parent menu'
+      menuTypeRequired: 'Please select menu type',
+      parentRequired: 'Please select parent menu',
+      parentNavigationRequired: 'Hidden menu must select parent navigation',
+      parentNavigationInvalid: 'The specified parent navigation does not exist',
+      circularReference: 'Cannot mount menu to itself or its submenu',
+      parentMenuHidden: 'Cannot mount to hidden parent menu'
     }
   },
   resource: {

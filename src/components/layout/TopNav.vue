@@ -83,6 +83,7 @@ import { useRouter, useRoute } from 'vue-router'
 
 import { useAuthStore } from '@/stores/auth'
 import { useNavigation } from '@/composables/useNavigation'
+import { useNavigationStore } from '@/stores/navigation'
 import { useTheme } from '@/composables/useTheme'
 import { storage } from '@/utils/storage'
 import { LANGUAGE_OPTIONS, getLanguageLabel, isValidLanguage } from '@/locales'
@@ -95,6 +96,7 @@ const route = useRoute()
 const { t, locale } = useI18n()
 const authStore = useAuthStore()
 const { topMenus } = useNavigation()
+const navigationStore = useNavigationStore()
 const { themeList, setTheme } = useTheme()
 
 // 使用配置获取当前语言显示名称
@@ -107,13 +109,31 @@ const languageOptions = LANGUAGE_OPTIONS
 
 // 判断菜单是否激活
 const isMenuActive = (menu: MenuItem) => {
-  if (!menu.path) return false
-  // 检查当前路由是否以菜单路径开头（支持子路由）
-  return route.path === menu.path || route.path.startsWith(menu.path + '/')
+  const { isMenuActive: checkMenuActive } = useNavigation()
+  return checkMenuActive(menu, route.name as string)
 }
 
 const handleMenuClick = (menu: MenuItem) => {
-  menu.path && router.push(menu.path)
+  try {
+    const path = navigationStore.resolveMenuPath(menu) || menu.path
+    if (path) {
+      router.push(path)
+      return
+    }
+
+    // 回退：若没有直接 path，尝试导航到第一个子项
+    if (menu.children && menu.children.length > 0) {
+      const firstChild = menu.children[0]
+      if (firstChild) {
+        const childPath = navigationStore.resolveMenuPath(firstChild) || firstChild.path
+        if (childPath) {
+          router.push(childPath)
+        }
+      }
+    }
+  } catch (error) {
+    console.error('Failed to resolve menu path:', error)
+  }
 }
 
 const handleLanguageChange = (lang: string) => {

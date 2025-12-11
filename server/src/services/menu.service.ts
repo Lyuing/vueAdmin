@@ -2,7 +2,7 @@ import { menuRepository } from '../repositories/menu.repository.js'
 import { roleMenuRepository } from '../repositories/role-menu.repository.js'
 import { userRepository } from '../repositories/user.repository.js'
 import { BusinessError } from '../types/common.types.js'
-import type { MenuConfig } from '../types/menu.types.js'
+import type { MenuConfig, ValidationResult } from '../types/menu.types.js'
 
 export class MenuService {
   private filterMenusByPermissions(menus: MenuConfig[], permissions: string[]): MenuConfig[] {
@@ -17,6 +17,104 @@ export class MenuService {
           ? this.filterMenusByPermissions(menu.children, permissions)
           : []
       }))
+  }
+
+  /**
+   * 通过权限码查找菜单项
+   */
+  private findMenuByPermissionCode(permissionCode: string, menus: MenuConfig[]): MenuConfig | null {
+    function traverse(items: MenuConfig[]): MenuConfig | null {
+      for (const item of items) {
+        if (item.permissionCode === permissionCode) {
+          return item
+        }
+        if (item.children && item.children.length > 0) {
+          const found = traverse(item.children)
+          if (found) return found
+        }
+      }
+      return null
+    }
+    
+    return traverse(menus)
+  }
+
+  /**
+   * 检查是否形成循环引用
+   */
+  private isCircularReference(menuPermissionCode: string, parentPermissionCode: string, allMenus: MenuConfig[]): boolean {
+    if (menuPermissionCode === parentPermissionCode) {
+      return true
+    }
+    
+    const parentMenu = this.findMenuByPermissionCode(parentPermissionCode, allMenus)
+    if (!parentMenu || !parentMenu.parentMenuCode) {
+      return false
+    }
+    
+    return this.isCircularReference(menuPermissionCode, parentMenu.parentMenuCode, allMenus)
+  }
+
+  /**
+   * 验证菜单挂载关系
+   */
+  private validateMenuMounting(menu: MenuConfig, allMenus: MenuConfig[]): ValidationResult {
+    if (!menu.hidden || !menu.parentMenuCode) {
+      return { valid: true }
+    }
+    
+    // 检查父级菜单是否存在
+    const parentMenu = this.findMenuByPermissionCode(menu.parentMenuCode, allMenus)
+    if (!parentMenu) {
+      return { 
+        valid: false, 
+        error: '指定的挂载父级菜单不存在' 
+      }
+    }
+    
+    // 检查是否形成循环引用
+    if (menu.permissionCode && this.isCircularReference(menu.permissionCode, menu.parentMenuCode, allMenus)) {
+      return { 
+        valid: false, 
+        error: '不能将菜单挂载到自身或其子菜单' 
+      }
+    }
+    
+    // 检查父级菜单是否可见
+    if (parentMenu.hidden) {
+      return { 
+        valid: false, 
+        error: '不能挂载到隐藏的父级菜单' 
+      }
+    }
+    
+    return { valid: true }
+  }
+
+  /**
+   * 菜单配置错误恢复
+   */
+  private recoverFromMenuErrors(menus: MenuConfig[]): MenuConfig[] {
+    return menus.map(menu => {
+      // 如果挂载关系无效，清除挂载配置
+      if (menu.hidden && menu.parentMenuCode) {
+        const validation = this.validateMenuMounting(menu, menus)
+        if (!validation.valid) {
+          console.warn(`菜单 ${menu.id} 挂载配置无效: ${validation.error}`)
+          return { ...menu, parentMenuCode: undefined }
+        }
+      }
+      
+      // 递归处理子菜单
+      if (menu.children) {
+        return {
+          ...menu,
+          children: this.recoverFromMenuErrors(menu.children)
+        }
+      }
+      
+      return menu
+    })
   }
 
   async getUserMenus(userId: string): Promise<MenuConfig[]> {
@@ -59,9 +157,17 @@ export class MenuService {
       icon: menu.icon,
       permissionCode: menu.permissionCode,
       buttonPermissions: menu.buttonPermissions,
-      position: menu.position || 'sidebar',
+      menuType: menu.menuType || 'sidebar',
       hidden: menu.hidden || false,
+      parentMenuCode: menu.parentMenuCode,
       children: menu.children || []
+    }
+
+    // 验证挂载关系
+    const allMenus = await menuRepository.findAll()
+    const validation = this.validateMenuMounting(newMenu, allMenus)
+    if (!validation.valid) {
+      throw new BusinessError(validation.error!, 'VALIDATION_ERROR', 400)
     }
 
     return await menuRepository.create(newMenu)
@@ -72,6 +178,16 @@ export class MenuService {
     
     if (!existing) {
       throw new BusinessError('菜单不存在', 'NOT_FOUND', 404)
+    }
+
+    // 合并更新数据
+    const updatedMenu = { ...existing, ...menu }
+    
+    // 验证挂载关系
+    const allMenus = await menuRepository.findAll()
+    const validation = this.validateMenuMounting(updatedMenu, allMenus)
+    if (!validation.valid) {
+      throw new BusinessError(validation.error!, 'VALIDATION_ERROR', 400)
     }
 
     const updated = await menuRepository.update(menuId, menu)
@@ -96,8 +212,10 @@ export class MenuService {
   }
 
   async saveAllMenus(menus: MenuConfig[]): Promise<void> {
-    // 直接替换整个菜单数据
-    await menuRepository.saveAll(menus)
+    // 应用错误恢复机制
+    const recoveredMenus = this.recoverFromMenuErrors(menus)
+    // 替换整个菜单数据
+    await menuRepository.saveAll(recoveredMenus)
   }
 }
 
