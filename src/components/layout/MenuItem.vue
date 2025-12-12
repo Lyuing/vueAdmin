@@ -6,7 +6,7 @@
       </el-icon>
       <span>{{ menu.title }}</span>
     </template>
-    <menu-item-renderer
+    <menu-item
       v-for="child in menu.children"
       :key="child.id"
       :menu="child"
