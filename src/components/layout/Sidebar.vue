@@ -14,7 +14,7 @@
       @select="handleMenuSelect"
     >
       <template v-for="menu in sidebarMenus" :key="menu.id">
-        <menu-item-renderer :menu="menu" />
+        <menu-item :menu="menu" />
       </template>
     </el-menu>
   </div>
@@ -25,7 +25,7 @@ import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useNavigation } from '@/composables/useNavigation'
 import { useNavigationStore } from '@/stores/navigation'
-import MenuItemRenderer from './MenuItemRenderer.vue'
+import MenuItem from './MenuItem.vue'
 
 const router = useRouter()
 const navigationStore = useNavigationStore()
