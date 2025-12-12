@@ -14,6 +14,7 @@ import { useAuthStore } from './stores/auth'
 import { useNavigationStore } from './stores/navigation'
 import { useTheme } from './composables/useTheme'
 import { routeMap } from './router/routes'
+import Breadcrumb from '@/components/common/Breadcrumb.vue'
 
 const app = createApp(App)
 const pinia = createPinia()
@@ -37,6 +38,8 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
   app.component(key, component)
 }
 
+// 添加全局组件
+app.component('Breadcrumb', Breadcrumb)
 // 初始化应用
 async function initApp() {
   // 全量路由 - 权限映射

@@ -126,12 +126,16 @@ export interface TreeNode {
   id: string
   /** 节点标签 */
   label: string
+  /** 禁用 */
+  disabled?: boolean
   /** 权限码 */
   permissionCode?: string
   /** 是否为按钮权限点 */
   isButton?: boolean
   /** 子节点 */
   children?: TreeNode[]
+  /** 数据 */
+  data?: any
 }
 
 /**

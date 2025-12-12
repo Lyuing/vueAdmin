@@ -77,37 +77,6 @@ const treeProps = {
   label: 'label'
 }
 
-// 将菜单数据转换为树形结构（包含按钮权限点）
-function transformMenusToTree(menus: MenuConfig[]): TreeNode[] {
-  return menus.map(menu => {
-    const node: TreeNode = {
-      id: menu.id,
-      label: menu.title,
-      permissionCode: menu.permissionCode,
-      children: []
-    }
-    
-    // 添加按钮权限点作为子节点
-    if (menu.buttonPermissions && menu.buttonPermissions.length > 0) {
-      const buttonNodes = menu.buttonPermissions.map(btn => ({
-        id: btn.code,
-        label: btn.name,
-        permissionCode: btn.code,
-        isButton: true
-      }))
-      node.children = buttonNodes
-    }
-    
-    // 递归处理子菜单
-    if (menu.children && menu.children.length > 0) {
-      const childMenuNodes = transformMenusToTree(menu.children)
-      node.children = [...(node.children || []), ...childMenuNodes]
-    }
-    
-    return node
-  })
-}
-
 // 监听对话框打开，加载数据
 watch(() => props.visible, async (newVal) => {
   if (newVal && props.roleId) {
@@ -151,6 +120,38 @@ async function loadData() {
   }
 }
 
+// 将菜单数据转换为树形结构（包含按钮权限点）
+function transformMenusToTree(menus: MenuConfig[]): TreeNode[] {
+  return menus.map(menu => {
+    const node: TreeNode = {
+      id: menu.id,
+      label: menu.title,
+      permissionCode: menu.permissionCode,
+      disabled: menu.menuType === 'sidebar_directory',
+      children: [],
+      data: menu
+    }
+    
+    // 添加按钮权限点作为子节点
+    if (menu.buttonPermissions && menu.buttonPermissions.length > 0) {
+      const buttonNodes = menu.buttonPermissions.map(btn => ({
+        id: btn.code,
+        label: btn.name,
+        permissionCode: btn.code,
+        isButton: true
+      }))
+      node.children = buttonNodes
+    }
+    
+    // 递归处理子菜单
+    if (menu.children && menu.children.length > 0) {
+      const childMenuNodes = transformMenusToTree(menu.children)
+      node.children = [...(node.children || []), ...childMenuNodes]
+    }
+    
+    return node
+  })
+}
 // 收集需要选中的节点ID
 function collectNodesToCheck(nodes: TreeNode[], permissionCodes: string[]): string[] {
   const nodeIds: string[] = []
@@ -292,6 +293,9 @@ function extractPermissionCodes(nodes: TreeNode[], selectedIds: string[]): strin
   .el-tree-node__label {
     font-size: 14px;
     flex: 1;
+  }
+  .el-checkbox.is-disabled {
+    display: none;
   }
 }
 

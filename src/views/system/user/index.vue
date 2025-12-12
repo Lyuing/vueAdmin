@@ -1,4 +1,5 @@
 <template>
+  <Breadcrumb class="breadcrumb-container" />
   <div class="user-page">
     <h2>{{ t('user.management') }}</h2>
     

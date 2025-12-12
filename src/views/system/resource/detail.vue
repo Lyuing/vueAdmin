@@ -1,4 +1,5 @@
 <template>
+  <Breadcrumb class="breadcrumb-container" />
   <div class="resource-detail-page">
     <h2>{{ t('resource.detail') }}</h2>
     

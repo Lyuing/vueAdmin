@@ -4,7 +4,6 @@
     <div class="layout-content">
       <Sidebar />
       <div class="main-content" :class="{ 'full-width': !hasSidebar }">
-        <Breadcrumb class="breadcrumb-container" />
         <div class="content-wrapper">
           <router-view />
         </div>
@@ -17,7 +16,6 @@
 import { computed } from 'vue'
 import TopNav from './TopNav.vue'
 import Sidebar from './Sidebar.vue'
-import Breadcrumb from '@/components/common/Breadcrumb.vue'
 import { useNavigation } from '@/composables/useNavigation'
 
 const { sidebarMenus } = useNavigation()

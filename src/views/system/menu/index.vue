@@ -1,4 +1,5 @@
 <template>
+  <Breadcrumb class="breadcrumb-container" />
   <div class="menu-page">
     <h2>{{ t('menu.menu') }}</h2>
     <el-card>

@@ -1,4 +1,5 @@
 <template>
+  <Breadcrumb class="breadcrumb-container" />
   <div class="resource-edit-page">
     <h2>{{ t('resource.edit') }}</h2>
     
