@@ -110,8 +110,8 @@ export default {
       menuType: 'Menu Type',
       hidden: 'Hidden',
       hiddenMenu: 'Hidden Menu',
-      parentNavigation: 'Parent Navigation',
-      parentNavigationPlaceholder: 'Please select parent navigation',
+      bindNavigation: 'Bind Navigation',
+      bindNavigationPlaceholder: 'Please select bind navigation',
       topNav: 'Top Navigation',
       sidebarNav: 'Sidebar Navigation',
       sidebarDirectory: 'Sidebar Directory',
@@ -134,10 +134,10 @@ export default {
       permissionCodeFormat: 'Permission code format: module:action',
       menuTypeRequired: 'Please select menu type',
       parentRequired: 'Please select parent menu',
-      parentNavigationRequired: 'Hidden menu must select parent navigation',
-      parentNavigationInvalid: 'The specified parent navigation does not exist',
-      circularReference: 'Cannot mount menu to itself or its submenu',
-      parentMenuHidden: 'Cannot mount to hidden parent menu'
+      bindNavigationRequired: 'Hidden menu must select bind navigation',
+      bindNavigationInvalid: 'The specified bind navigation does not exist',
+      circularReference: 'Cannot bind menu to itself or its submenu',
+      parentMenuHidden: 'Cannot bind to hidden parent menu'
     }
   },
   resource: {

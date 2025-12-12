@@ -38,9 +38,8 @@ export function useNavigation() {
     while (menu) {
       if (!menu.hidden) {
         links.unshift(menu)
-      } else if (menu.parentMenuCode) {
-        const shadowRoute = navigationStore.permissionRouteMap.get(menu.parentMenuCode)
-        const shadowMenu = navigationStore.routeNameMenuMap.get(shadowRoute?.name as string)
+      } else if (menu.bindMenuId) {
+        const shadowMenu = navigationStore.menuMap.get(menu.bindMenuId)
         if (shadowMenu) {
           links.unshift(shadowMenu)
         }

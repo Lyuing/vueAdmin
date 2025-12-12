@@ -123,7 +123,7 @@ export const useNavigationStore = defineStore('navigation', () => {
           menuType: config.menuType,
           hidden: config.hidden,
           parent,
-          parentMenuCode: config.parentMenuCode,
+          bindMenuId: config.bindMenuId,
           level,
           breadcrumbPath
         }

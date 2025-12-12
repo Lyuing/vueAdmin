@@ -51,8 +51,8 @@ export interface MenuConfig {
   menuType: 'top' | 'sidebar_nav' | 'sidebar_directory'
   /** 是否隐藏 */
   hidden: boolean
-  /** 挂载父级菜单的权限码，用于隐藏菜单指定其应该关联的父级菜单 */
-  parentMenuCode?: string
+  /** 绑定父级菜单的ID，用于隐藏菜单指定其应该关联的父级菜单 */
+  bindMenuId?: string
   /** 父菜单ID */
   parentId?: MenuConfig['id']
   /** 子菜单列表 */
@@ -96,8 +96,8 @@ export interface MenuItem {
   hidden: boolean
   /** 追溯父级菜单 */
   parent?: MenuItem | null
-  /** 挂载父级菜单的权限码，用于隐藏菜单指定其应该关联的父级菜单 */
-  parentMenuCode?: string
+  /** 绑定父级菜单的ID，用于隐藏菜单指定其应该关联的父级菜单 */
+  bindMenuId?: string
   /** 子菜单列表 */
   children?: MenuItem[]
   /** 菜单层级(自动计算) */

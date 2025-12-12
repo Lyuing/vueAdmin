@@ -110,8 +110,8 @@ export default {
       menuType: '菜单类型',
       hidden: '是否隐藏',
       hiddenMenu: '隐藏菜单',
-      parentNavigation: '挂载导航',
-      parentNavigationPlaceholder: '请选择挂载的父级菜单',
+      bindNavigation: '绑定导航',
+      bindNavigationPlaceholder: '请选择绑定的父级菜单',
       topNav: '顶部导航',
       sidebarNav: '侧栏导航',
       sidebarDirectory: '侧栏目录',
@@ -134,10 +134,10 @@ export default {
       permissionCodeFormat: '权限码格式: module:action',
       menuTypeRequired: '请选择菜单类型',
       parentRequired: '请选择父级菜单',
-      parentNavigationRequired: '隐藏菜单必须选择挂载导航',
-      parentNavigationInvalid: '指定的挂载父级菜单不存在',
-      circularReference: '不能将菜单挂载到自身或其子菜单',
-      parentMenuHidden: '不能挂载到隐藏的父级菜单'
+      bindNavigationRequired: '隐藏菜单必须选择绑定导航',
+      bindNavigationInvalid: '指定的绑定父级菜单不存在',
+      circularReference: '不能将菜单绑定到自身或其子菜单',
+      parentMenuHidden: '不能绑定到隐藏的父级菜单'
     }
   },
   resource: {

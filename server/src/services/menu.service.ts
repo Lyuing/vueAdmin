@@ -40,9 +40,46 @@ export class MenuService {
   }
 
   /**
-   * 检查是否形成循环引用
+   * 通过菜单ID查找菜单项
    */
-  private isCircularReference(menuPermissionCode: string, parentPermissionCode: string, allMenus: MenuConfig[]): boolean {
+  private findMenuByMenuId(menuId: string, menus: MenuConfig[]): MenuConfig | null {
+    function traverse(items: MenuConfig[]): MenuConfig | null {
+      for (const item of items) {
+        if (item.id === menuId) {
+          return item
+        }
+        if (item.children && item.children.length > 0) {
+          const found = traverse(item.children)
+          if (found) return found
+        }
+      }
+      return null
+    }
+    
+    return traverse(menus)
+  }
+
+  /**
+   * 检查是否形成循环引用（基于菜单ID）
+   */
+  private isCircularReference(menuId: string, bindMenuId: string, allMenus: MenuConfig[]): boolean {
+    if (menuId === bindMenuId) {
+      return true
+    }
+    
+    const bindMenu = this.findMenuByMenuId(bindMenuId, allMenus)
+    if (!bindMenu || !bindMenu.bindMenuId) {
+      return false
+    }
+    
+    return this.isCircularReference(menuId, bindMenu.bindMenuId, allMenus)
+  }
+
+  /**
+   * 检查是否形成循环引用（兼容旧的权限码方式）
+   * @deprecated 使用 isCircularReference 替代
+   */
+  private isCircularReferenceByPermissionCode(menuPermissionCode: string, parentPermissionCode: string, allMenus: MenuConfig[]): boolean {
     if (menuPermissionCode === parentPermissionCode) {
       return true
     }
@@ -52,13 +89,57 @@ export class MenuService {
       return false
     }
     
-    return this.isCircularReference(menuPermissionCode, parentMenu.parentMenuCode, allMenus)
+    return this.isCircularReferenceByPermissionCode(menuPermissionCode, parentMenu.parentMenuCode, allMenus)
   }
 
   /**
-   * 验证菜单挂载关系
+   * 验证菜单绑定关系
+   */
+  private validateMenuBinding(menu: MenuConfig, allMenus: MenuConfig[]): ValidationResult {
+    // 如果菜单不是隐藏的，或者没有绑定菜单ID，则验证通过
+    if (!menu.hidden || !menu.bindMenuId) {
+      return { valid: true }
+    }
+    
+    // 检查绑定的菜单是否存在
+    const bindMenu = this.findMenuByMenuId(menu.bindMenuId, allMenus)
+    if (!bindMenu) {
+      return { 
+        valid: false, 
+        error: '指定的绑定菜单不存在' 
+      }
+    }
+    
+    // 检查是否形成循环引用
+    if (this.isCircularReference(menu.id, menu.bindMenuId, allMenus)) {
+      return { 
+        valid: false, 
+        error: '不能将菜单绑定到自身或其子菜单' 
+      }
+    }
+    
+    // 检查绑定的菜单是否可见
+    if (bindMenu.hidden) {
+      return { 
+        valid: false, 
+        error: '不能绑定到隐藏的菜单' 
+      }
+    }
+    
+    return { valid: true }
+  }
+
+  /**
+   * 验证菜单挂载关系（兼容旧版本）
+   * @deprecated 使用 validateMenuBinding 替代
    */
   private validateMenuMounting(menu: MenuConfig, allMenus: MenuConfig[]): ValidationResult {
+    // 优先使用新的绑定验证
+    if (menu.bindMenuId) {
+      return this.validateMenuBinding(menu, allMenus)
+    }
+    
+    // 兼容旧的 parentMenuCode 验证
     if (!menu.hidden || !menu.parentMenuCode) {
       return { valid: true }
     }
@@ -73,7 +154,7 @@ export class MenuService {
     }
     
     // 检查是否形成循环引用
-    if (menu.permissionCode && this.isCircularReference(menu.permissionCode, menu.parentMenuCode, allMenus)) {
+    if (menu.permissionCode && this.isCircularReferenceByPermissionCode(menu.permissionCode, menu.parentMenuCode, allMenus)) {
       return { 
         valid: false, 
         error: '不能将菜单挂载到自身或其子菜单' 
@@ -96,24 +177,32 @@ export class MenuService {
    */
   private recoverFromMenuErrors(menus: MenuConfig[]): MenuConfig[] {
     return menus.map(menu => {
-      // 如果挂载关系无效，清除挂载配置
+      let recoveredMenu = { ...menu }
+      
+      // 检查新的绑定关系
+      if (menu.hidden && menu.bindMenuId) {
+        const validation = this.validateMenuBinding(menu, menus)
+        if (!validation.valid) {
+          console.warn(`菜单 ${menu.id} 绑定配置无效: ${validation.error}`)
+          recoveredMenu.bindMenuId = undefined
+        }
+      }
+      
+      // 兼容性处理：检查旧的挂载关系
       if (menu.hidden && menu.parentMenuCode) {
         const validation = this.validateMenuMounting(menu, menus)
         if (!validation.valid) {
           console.warn(`菜单 ${menu.id} 挂载配置无效: ${validation.error}`)
-          return { ...menu, parentMenuCode: undefined }
+          recoveredMenu.parentMenuCode = undefined
         }
       }
       
       // 递归处理子菜单
-      if (menu.children) {
-        return {
-          ...menu,
-          children: this.recoverFromMenuErrors(menu.children)
-        }
+      if (recoveredMenu.children) {
+        recoveredMenu.children = this.recoverFromMenuErrors(recoveredMenu.children)
       }
       
-      return menu
+      return recoveredMenu
     })
   }
 
@@ -157,15 +246,16 @@ export class MenuService {
       icon: menu.icon,
       permissionCode: menu.permissionCode,
       buttonPermissions: menu.buttonPermissions,
-      menuType: menu.menuType || 'sidebar',
+      menuType: menu.menuType || 'sidebar_nav',
       hidden: menu.hidden || false,
-      parentMenuCode: menu.parentMenuCode,
+      bindMenuId: menu.bindMenuId,
+      parentMenuCode: menu.parentMenuCode, // 兼容性保留
       children: menu.children || []
     }
 
-    // 验证挂载关系
+    // 验证绑定关系
     const allMenus = await menuRepository.findAll()
-    const validation = this.validateMenuMounting(newMenu, allMenus)
+    const validation = this.validateMenuBinding(newMenu, allMenus)
     if (!validation.valid) {
       throw new BusinessError(validation.error!, 'VALIDATION_ERROR', 400)
     }
@@ -183,9 +273,9 @@ export class MenuService {
     // 合并更新数据
     const updatedMenu = { ...existing, ...menu }
     
-    // 验证挂载关系
+    // 验证绑定关系
     const allMenus = await menuRepository.findAll()
-    const validation = this.validateMenuMounting(updatedMenu, allMenus)
+    const validation = this.validateMenuBinding(updatedMenu, allMenus)
     if (!validation.valid) {
       throw new BusinessError(validation.error!, 'VALIDATION_ERROR', 400)
     }
@@ -216,6 +306,40 @@ export class MenuService {
     const recoveredMenus = this.recoverFromMenuErrors(menus)
     // 替换整个菜单数据
     await menuRepository.saveAll(recoveredMenus)
+  }
+
+  /**
+   * 获取可绑定的菜单选项
+   * @param excludeMenuId 要排除的菜单ID（通常是当前编辑的菜单）
+   * @returns 可绑定的菜单选项列表
+   */
+  async getBindableMenuOptions(excludeMenuId?: string): Promise<MenuConfig[]> {
+    const allMenus = await menuRepository.findAll()
+    
+    // 过滤出可用于绑定的菜单选项
+    const filterBindableMenus = (menus: MenuConfig[]): MenuConfig[] => {
+      return menus
+        .filter(menu => {
+          // 排除指定的菜单ID（避免自己绑定自己）
+          if (excludeMenuId && menu.id === excludeMenuId) {
+            return false
+          }
+          
+          // 排除隐藏的菜单（隐藏菜单不能作为绑定目标）
+          if (menu.hidden) {
+            return false
+          }
+          
+          return true
+        })
+        .map(menu => ({
+          ...menu,
+          // 递归过滤子菜单
+          children: menu.children ? filterBindableMenus(menu.children) : []
+        }))
+    }
+    
+    return filterBindableMenus(allMenus)
   }
 }
 

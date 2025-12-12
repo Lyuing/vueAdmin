@@ -95,7 +95,7 @@
             "title": "资源编辑",
             "icon": "DataAnalysis",
             "permissionCode": "system_resource_edit",
-            "parentMenuCode": "system_resource",
+            "bindMenuId": "4-1",
             "menuType": "sidebar_nav",
             "hidden": true,
             "children": [],
@@ -106,7 +106,7 @@
             "title": "资源详情",
             "icon": "DataLine",
             "permissionCode": "system_resource_detail",
-            "parentMenuCode": "system_resource",
+            "bindMenuId": "4-1",
             "menuType": "sidebar_nav",
             "hidden": true,
             "children": []

@@ -95,13 +95,13 @@
       </template>
     </el-table-column>
 
-    <!-- 挂载关系列 - 仅对隐藏菜单显示 -->
-    <el-table-column :label="t('menu.form.parentNavigation')" width="150" align="center">
+    <!-- 绑定关系列 - 仅对隐藏菜单显示 -->
+    <el-table-column :label="t('menu.form.bindNavigation')" width="150" align="center">
       <template #default="{ row }">
-        <div v-if="row.hidden && row.parentMenuCode" class="mount-info">
+        <div v-if="row.hidden && row.bindMenuId" class="mount-info">
           <el-tag type="info" size="small">
             <el-icon style="margin-right: 4px;"><Link /></el-icon>
-            {{ getParentMenuTitle(row.parentMenuCode) }}
+            {{ getBindMenuTitle(row.bindMenuId) }}
           </el-tag>
         </div>
         <span v-else>-</span>
@@ -133,37 +133,55 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Top, Bottom, Hide, Link, View } from '@element-plus/icons-vue'
 import type { MenuConfig } from '@/types/navigation'
 import { getIconComponent } from '@/utils/icon'
+import { useNavigationStore } from '@/stores/navigation'
 
 const { t } = useI18n()
+const navigationStore = useNavigationStore()
 
 // 获取图标组件
 const getIcon = (iconName?: string) => {
   return getIconComponent(iconName)
 }
 
-// 获取父级菜单标题
-const getParentMenuTitle = (parentMenuCode: string): string => {
-  const findMenuByCode = (menus: MenuConfig[], code: string): MenuConfig | null => {
+// 创建当前改动的 菜单ID -> 菜单对象 映射缓存
+const menuIdMap = computed(() => {
+  const map = new Map<string, MenuConfig>()
+  const buildMap = (menus: MenuConfig[]) => {
     for (const menu of menus) {
-      if (menu.permissionCode === code) {
-        return menu
-      }
+      map.set(menu.id, menu)
       if (menu.children && menu.children.length > 0) {
-        const found = findMenuByCode(menu.children, code)
-        if (found) return found
+        buildMap(menu.children)
       }
     }
-    return null
   }
+  buildMap(props.data)
+  return map
+})
 
-  const parentMenu = findMenuByCode(props.data, parentMenuCode)
-  return parentMenu ? parentMenu.title : parentMenuCode
+// 获取绑定菜单标题 - 使用缓存映射提高性能
+const getBindMenuTitle = (bindMenuId: string): string => {
+  if (!bindMenuId) return '-'
+  
+  // 首先尝试从本地菜单数据中查找
+  const bindMenu = menuIdMap.value.get(bindMenuId)
+  if (bindMenu) {
+    return bindMenu.title
+  }
+  
+  // 如果本地没有找到，尝试从导航store中查找（可能是其他层级的菜单）
+  const storeMenu = navigationStore.menuMap.get(bindMenuId)
+  if (storeMenu) {
+    return storeMenu.title
+  }
+  // 如果都没找到，返回ID本身，表示可能存在数据不一致
+  console.warn(`绑定菜单ID ${bindMenuId} 未找到对应的菜单`)
+  return `[${bindMenuId}]`
 }
 
 interface Props {

@@ -42,8 +42,8 @@ export default {
       menuType: 'メニュータイプ',
       hidden: '非表示',
       hiddenMenu: '隠しメニュー',
-      parentNavigation: 'マウントナビゲーション',
-      parentNavigationPlaceholder: 'マウントする親メニューを選択してください',
+      bindNavigation: 'バインドナビゲーション',
+      bindNavigationPlaceholder: 'バインドする親メニューを選択してください',
       topNav: 'トップナビゲーション',
       sidebarNav: 'サイドバーナビゲーション',
       sidebarDirectory: 'サイドバーディレクトリ',
@@ -66,10 +66,10 @@ export default {
       permissionCodeFormat: '権限コード形式: module:action',
       menuTypeRequired: 'メニュータイプを選択してください',
       parentRequired: '親メニューを選択してください',
-      parentNavigationRequired: '隠しメニューはマウントナビゲーションを選択する必要があります',
-      parentNavigationInvalid: '指定されたマウント親メニューが存在しません',
-      circularReference: 'メニューを自分自身またはそのサブメニューにマウントできません',
-      parentMenuHidden: '隠された親メニューにマウントできません'
+      bindNavigationRequired: '隠しメニューはバインドナビゲーションを選択する必要があります',
+      bindNavigationInvalid: '指定されたバインド親メニューが存在しません',
+      circularReference: 'メニューを自分自身またはそのサブメニューにバインドできません',
+      parentMenuHidden: '隠された親メニューにバインドできません'
     }
   },
   validation: {
