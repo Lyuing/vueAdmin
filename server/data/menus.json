@@ -91,10 +91,10 @@
             "parentId": "4"
           },
           {
-            "id": "4-3",
-            "title": "资源编辑",
-            "icon": "DataAnalysis",
-            "permissionCode": "system_resource_edit",
+            "id": "4-2",
+            "title": "资源详情",
+            "icon": "DataLine",
+            "permissionCode": "system_resource_detail",
             "bindMenuId": "4-1",
             "menuType": "sidebar_nav",
             "hidden": true,
@@ -102,10 +102,10 @@
             "parentId": "4"
           },
           {
-            "id": "4-2",
-            "title": "资源详情",
-            "icon": "DataLine",
-            "permissionCode": "system_resource_detail",
+            "id": "4-3",
+            "title": "资源编辑",
+            "icon": "DataAnalysis",
+            "permissionCode": "system_resource_edit",
             "bindMenuId": "4-1",
             "menuType": "sidebar_nav",
             "hidden": true,

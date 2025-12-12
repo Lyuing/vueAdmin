@@ -38,9 +38,16 @@
 
       <!-- 绑定导航选择器 - 仅在隐藏菜单时显示 -->
       <el-form-item v-if="formData.hidden" :label="t('menu.form.bindNavigation')" prop="bindMenuId">
-        <el-tree-select v-model="formData.bindMenuId" :data="bindNavigationOptions"
-          :placeholder="t('menu.form.bindNavigationPlaceholder')" clearable check-strictly
-          :render-after-expand="false" node-key="value" :props="{ label: 'label', children: 'children' }" />
+        <el-tree-select 
+          v-model="formData.bindMenuId" 
+          :data="bindNavigationOptions"
+          :placeholder="t('menu.form.bindNavigationPlaceholder')" 
+          clearable 
+          check-strictly
+          :render-after-expand="false" 
+          node-key="value" 
+          :props="{ label: 'label', children: 'children', value: 'value' }"
+        />
         <div style="margin-top: 4px; font-size: 12px; color: var(--el-color-info);">
           选择隐藏菜单应该关联的父级菜单，用于面包屑导航和菜单激活
         </div>
@@ -183,10 +190,20 @@ const bindNavigationOptions = computed(() => {
   function buildNavigationOptions(menus: MenuConfig[]): any[] {
     return menus
       .filter(menu => {
-        // 排除自身及其后代
-        if ( props.menuData?.id === menu.id) return false
+        // 排除自身（但在编辑模式下，如果当前菜单还没有ID，则不排除）
+        if (props.menuData?.id && menu.id === props.menuData.id) {
+          return false
+        }
+        
+        // 如果是当前绑定的菜单，即使是隐藏的也要包含（用于回显）
+        if (formData.value.bindMenuId && menu.id === formData.value.bindMenuId) {
+          return true
+        }
+        
         // 排除隐藏菜单
-        if (menu.hidden) return false
+        if (menu.hidden) {
+          return false
+        }
         return true
       })
       .map(menu => {
@@ -207,16 +224,21 @@ const bindNavigationOptions = computed(() => {
 })
 
 // 监听菜单类型变化，清空父级菜单、绑定导航
-watch(() => formData.value.menuType, () => {
-  // 如果切换到顶部导航，清空父级菜单
-  formData.value.parentId = undefined
-  formData.value.bindMenuId = undefined
+watch(() => formData.value.menuType, (_newType, oldType) => {
+  // 只有当用户主动切换菜单类型时才清空，避免初始化时清空
+  if (oldType !== undefined) {
+    // 如果切换到顶部导航，清空父级菜单
+    formData.value.parentId = undefined
+    formData.value.bindMenuId = undefined
+  }
 })
 
 // 监听隐藏状态变化，清空绑定导航选择
-watch(() => formData.value.hidden, () => {
-  // 如果取消隐藏，清空绑定导航
-  formData.value.bindMenuId = undefined
+watch(() => formData.value.hidden, (newHidden, oldHidden) => {
+  // 只有当从隐藏变为显示时才清空绑定导航，避免初始化时清空
+  if (oldHidden === true && newHidden === false) {
+    formData.value.bindMenuId = undefined
+  }
 })
 
 // 监听绑定导航选择变化，进行实时验证
@@ -240,7 +262,6 @@ watch(() => props.visible, (newVal) => {
 function initFormData() { 
   if (props.mode === 'edit' && props.menuData) {
     // 编辑模式：填充数据
-    // 从树结构中查找父级ID
     console.log('编辑模式：填充数据', {...props.menuData})
     formData.value = {
       id: props.menuData.id,
@@ -344,6 +365,7 @@ function checkCircularReference(bindMenuId: string, children: MenuConfig[]): Men
   })
   return foundChild || null
 }
+
 </script>
 
 <style scoped lang="scss">
