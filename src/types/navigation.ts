@@ -53,6 +53,8 @@ export interface MenuConfig {
   hidden: boolean
   /** 挂载父级菜单的权限码，用于隐藏菜单指定其应该关联的父级菜单 */
   parentMenuCode?: string
+  /** 父菜单ID */
+  parentId?: MenuConfig['id']
   /** 子菜单列表 */
   children?: MenuConfig[]
 }
@@ -92,6 +94,8 @@ export interface MenuItem {
   menuType: 'top' | 'sidebar_nav' | 'sidebar_directory'
   /** 是否隐藏 */
   hidden: boolean
+  /** 追溯父级菜单 */
+  parent?: MenuItem | null
   /** 挂载父级菜单的权限码，用于隐藏菜单指定其应该关联的父级菜单 */
   parentMenuCode?: string
   /** 子菜单列表 */

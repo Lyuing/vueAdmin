@@ -30,7 +30,7 @@ import MenuItemRenderer from './MenuItemRenderer.vue'
 const router = useRouter()
 const navigationStore = useNavigationStore()
 
-const { sidebarMenus, sidebarCollapsed, toggleSidebar, activeMenuIds } = useNavigation()
+const { sidebarMenus, activeMenuIds, sidebarCollapsed, toggleSidebar } = useNavigation()
 
 // 是否有侧边栏菜单
 const hasSidebarMenus = computed(() => {

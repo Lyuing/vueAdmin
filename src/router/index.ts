@@ -2,7 +2,6 @@ import { createRouter, createWebHistory, type RouteRecordRaw, type Router } from
 import { staticRoutes, routeMap } from './routes'
 import { setupRouterGuards } from './guards'
 import { filterAccessRoutes } from './permission'
-import { useNavigationStore } from '@/stores/navigation'
 
 let router: Router | null = null
 
@@ -39,17 +38,8 @@ export async function addDynamicRoutes(permissions?: string[], force = false) {
 
   // 如果未传入 permissions，则尝试从导航 store 中读取菜单权限码映射
   let effectivePermissions: string[] = permissions || []
-  if ((!effectivePermissions || effectivePermissions.length === 0)) {
-    try {
-      const navStore = useNavigationStore()
-      // menuCache 提供所有权限码的快速访问
-      if (navStore && navStore.menuCache && typeof navStore.menuCache.getAllPermissionCodes === 'function') {
-        effectivePermissions = navStore.menuCache.getAllPermissionCodes()
-      }
-    } catch (error) {
-      // 忽略错误，fallback 到空权限数组（将根据 permission 配置决定路由是否开放）
-      console.warn('Failed to access navigation store for permissions fallback:', error)
-    }
+  if ( !effectivePermissions?.length ) {
+    console.warn('无权限码')
   }
 
   // 根据权限过滤路由（优先匹配 route.meta.permissionCode）

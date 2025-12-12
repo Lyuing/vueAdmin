@@ -37,18 +37,31 @@ const dialogVisible = ref(false)
 const dialogMode = ref<'create' | 'edit'>('create')
 const currentMenu = ref<MenuConfig | null>(null)
 
+// 页面加载时获取菜单列表
+onMounted(() => {
+  loadMenuList()
+})
 // 加载菜单列表
 async function loadMenuList() {
   try {
     loading.value = true
     const response = await getAllMenus()
-    menuList.value = response.data
+    menuList.value = addParentId(response.data)
   } catch (error) {
     console.error('加载菜单列表失败:', error)
     ElMessage.error(t('menu.message.loadFailed'))
   } finally {
     loading.value = false
   }
+}
+function addParentId ( menus: MenuConfig[], parentId?: string ): MenuConfig[] {
+  return menus.map(menu => {
+    parentId && (menu.parentId = parentId)
+    if (menu.children && menu.children.length > 0) {
+      menu.children = addParentId(menu.children, menu.id)
+    }
+    return menu
+  })
 }
 
 // 创建菜单
@@ -194,10 +207,6 @@ function handleCancel() {
   dialogVisible.value = false
 }
 
-// 页面加载时获取菜单列表
-onMounted(() => {
-  loadMenuList()
-})
 </script>
 
 <style scoped lang="scss">

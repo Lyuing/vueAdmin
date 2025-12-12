@@ -9,13 +9,13 @@
       "home:to_system_role",
       "home:to_system_menu",
       "dashboard",
-      "system_user",
+      "system",
       "system_user",
       "system_role",
       "system_menu",
-      "system_resource",
+      "system_resource_edit",
       "system_resource_detail",
-      "system_resource_edit"
+      "system_resource"
     ]
   },
   {
@@ -36,7 +36,7 @@
       "home",
       "home:to_system_user",
       "home:to_system_role",
-      "system_user",
+      "system",
       "system_user",
       "system_role",
       "system_menu"

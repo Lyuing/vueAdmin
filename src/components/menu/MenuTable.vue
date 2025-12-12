@@ -68,7 +68,7 @@
       </template>
     </el-table-column>
 
-    <el-table-column :label="t('menu.form.menuType')" width="120" align="center">
+    <el-table-column :label="t('menu.form.menuType')" width="110" align="center">
       <template #default="{ row }">
         <el-tag v-if="row.menuType === 'top'" type="success" size="small">
           {{ t('menu.form.topNav') }}
@@ -82,14 +82,13 @@
       </template>
     </el-table-column>
 
-    <el-table-column :label="t('menu.form.hidden')" width="120" align="center">
+    <el-table-column :label="t('menu.form.hidden')" width="100" align="center">
       <template #default="{ row }">
         <div class="hidden-status">
           <el-tag v-if="!row.hidden" type="success" size="small">
             {{ t('common.show') }}
           </el-tag>
           <el-tag v-else type="warning" size="small">
-            <el-icon style="margin-right: 4px;"><Hide /></el-icon>
             {{ t('common.hide') }}
           </el-tag>
         </div>
@@ -349,7 +348,10 @@ function handleEdit(menu: MenuConfig) {
   emit('edit', menu)
 }
 
-// 删除功能目前模板中被注释，保留 emit 类型定义，但移除未使用的本地函数以避免 lint 错误
+// 删除功能注释
+// function handleDelete(menu: MenuConfig) {
+//   emit('delete', menu)
+// }
 
 function handleMoveUp(menu: MenuConfig) {
   moveMenu(menu, 'up')

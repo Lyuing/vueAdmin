@@ -21,7 +21,7 @@ const pinia = createPinia()
 // 注册Pinia
 app.use(pinia)
 
-// 初始化Router
+// 初始化Router - 静态路由 login, 404等
 const router = initRouter()
 // 注册Router
 app.use(router)
@@ -39,16 +39,16 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
 
 // 初始化应用
 async function initApp() {
-  // 初始化导航权限映射
+  // 全量路由 - 权限映射
   const navigationStore = useNavigationStore()
   navigationStore.buildPermissionRouteMap(routeMap)
 
-  // 初始化认证状态
-  // 恢复缓存认证
+  // 恢复认证
   const authStore = useAuthStore()
-  authStore.restoreAuth()
+  await authStore.restoreAuth()
 
-  // 如果已登录，恢复动态路由
+  // 已登录，恢复动态路由
+  // 未登录，则保持静态路由，并在路由守卫中跳转登录页
   if (authStore.isLoggedIn && authStore.userInfo) {
     await addDynamicRoutes(authStore.userInfo.permissions)
   }

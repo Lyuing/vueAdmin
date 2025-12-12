@@ -4,7 +4,7 @@
       <h1 class="logo">{{ t('login.title') }}</h1>
       <div class="nav-menu">
         <div
-          v-for="menu in topMenus"
+          v-for="menu in navs"
           :key="menu.id"
           :class="['menu-item', { active: isMenuActive(menu) }]"
           @click="handleMenuClick(menu)"
@@ -79,7 +79,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRouter, useRoute } from 'vue-router'
+import { useRouter } from 'vue-router'
 
 import { useAuthStore } from '@/stores/auth'
 import { useNavigation } from '@/composables/useNavigation'
@@ -92,10 +92,9 @@ import type { MenuItem } from '@/types/navigation'
 
 
 const router = useRouter()
-const route = useRoute()
 const { t, locale } = useI18n()
 const authStore = useAuthStore()
-const { topMenus } = useNavigation()
+const { topMenus, activeTopMenu } = useNavigation()
 const navigationStore = useNavigationStore()
 const { themeList, setTheme } = useTheme()
 
@@ -107,32 +106,20 @@ const currentLanguage = computed(() => {
 // 语言选项配置
 const languageOptions = LANGUAGE_OPTIONS
 
+const navs = computed(() => {
+  return topMenus.value.filter(menu => !menu.hidden)
+})
 // 判断菜单是否激活
 const isMenuActive = (menu: MenuItem) => {
-  const { isMenuActive: checkMenuActive } = useNavigation()
-  return checkMenuActive(menu, route.name as string)
+  return menu.id === activeTopMenu.value?.id
 }
 
 const handleMenuClick = (menu: MenuItem) => {
   try {
-    const path = navigationStore.resolveMenuPath(menu) || menu.path
-    if (path) {
-      router.push(path)
-      return
-    }
-
-    // 回退：若没有直接 path，尝试导航到第一个子项
-    if (menu.children && menu.children.length > 0) {
-      const firstChild = menu.children[0]
-      if (firstChild) {
-        const childPath = navigationStore.resolveMenuPath(firstChild) || firstChild.path
-        if (childPath) {
-          router.push(childPath)
-        }
-      }
-    }
+    const path = navigationStore.resolveMenuPath(menu)
+    path && router.push(path)
   } catch (error) {
-    console.error('Failed to resolve menu path:', error)
+    console.error('跳转失败 path:', error)
   }
 }
 
