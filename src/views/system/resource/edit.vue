@@ -49,7 +49,7 @@
         </el-form-item>
 
         <el-form-item>
-          <el-button type="primary" @click="handleSave" :loading="saving">
+          <el-button type="primary" :loading="saving" @click="handleSave">
             {{ t('common.save') }}
           </el-button>
           <el-button @click="handleCancel">
