@@ -12,11 +12,23 @@
         </div>
       </template>
 
-      <MenuTable :data="menuList" :loading="loading" @edit="handleEdit" @delete="handleDelete" @update="handleMenuUpdate" />
+      <MenuTable
+        :data="menuList"
+        :loading="loading"
+        @edit="handleEdit"
+        @delete="handleDelete"
+        @update="handleMenuUpdate"
+      />
     </el-card>
 
-    <MenuDialog v-model:visible="dialogVisible" :mode="dialogMode" :menu-data="currentMenu" :all-menus="menuList"
-      @save="handleSave" @cancel="handleCancel" />
+    <MenuDialog
+      v-model:visible="dialogVisible"
+      :mode="dialogMode"
+      :menu-data="currentMenu"
+      :all-menus="menuList"
+      @save="handleSave"
+      @cancel="handleCancel"
+    />
   </div>
 </template>
 
@@ -55,7 +67,7 @@ async function loadMenuList() {
     loading.value = false
   }
 }
-function addParentId ( menus: MenuConfig[], parentId?: string ): MenuConfig[] {
+function addParentId(menus: MenuConfig[], parentId?: string): MenuConfig[] {
   return menus.map(menu => {
     parentId && (menu.parentId = parentId)
     if (menu.children && menu.children.length > 0) {
@@ -82,15 +94,11 @@ function handleEdit(menu: MenuConfig) {
 // 删除菜单
 async function handleDelete(menu: MenuConfig) {
   try {
-    await ElMessageBox.confirm(
-      t('menu.deleteConfirm'),
-      t('menu.delete'),
-      {
-        confirmButtonText: t('common.confirm'),
-        cancelButtonText: t('common.cancel'),
-        type: 'warning'
-      }
-    )
+    await ElMessageBox.confirm(t('menu.deleteConfirm'), t('menu.delete'), {
+      confirmButtonText: t('common.confirm'),
+      cancelButtonText: t('common.cancel'),
+      type: 'warning'
+    })
 
     await deleteMenu(menu.id)
     ElMessage.success(t('menu.message.deleteSuccess'))
@@ -156,7 +164,11 @@ async function handleSave(menuData: MenuConfig & { parentId?: string }) {
 }
 
 // 将菜单插入到父级菜单的 children 中
-function insertMenuToParent(menus: MenuConfig[], parentId: string, newMenu: MenuConfig): MenuConfig[] {
+function insertMenuToParent(
+  menus: MenuConfig[],
+  parentId: string,
+  newMenu: MenuConfig
+): MenuConfig[] {
   return menus.map(menu => {
     if (menu.id === parentId) {
       return {
@@ -207,7 +219,6 @@ async function handleMenuUpdate(updatedMenus: MenuConfig[]) {
 function handleCancel() {
   dialogVisible.value = false
 }
-
 </script>
 
 <style scoped lang="scss">

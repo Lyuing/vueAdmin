@@ -2,7 +2,7 @@
   <Breadcrumb class="breadcrumb-container" />
   <div class="resource-edit-page">
     <h2>{{ t('resource.edit') }}</h2>
-    
+
     <el-card v-loading="loading">
       <template #header>
         <div class="card-header">
@@ -27,10 +27,7 @@
         </el-form-item>
 
         <el-form-item :label="t('resource.type')" prop="type">
-          <el-input
-            v-model="formData.type"
-            :placeholder="t('resource.type')"
-          />
+          <el-input v-model="formData.type" :placeholder="t('resource.type')" />
         </el-form-item>
 
         <el-form-item :label="t('resource.description')" prop="description">
@@ -97,12 +94,8 @@ const rules: FormRules = {
     { required: true, message: t('validation.required'), trigger: 'blur' },
     { min: 1, max: 100, message: t('validation.maxLength', { max: 100 }), trigger: 'blur' }
   ],
-  type: [
-    { required: true, message: t('validation.required'), trigger: 'blur' }
-  ],
-  status: [
-    { required: true, message: t('validation.required'), trigger: 'change' }
-  ]
+  type: [{ required: true, message: t('validation.required'), trigger: 'blur' }],
+  status: [{ required: true, message: t('validation.required'), trigger: 'change' }]
 }
 
 // 加载资源详情
@@ -118,7 +111,7 @@ async function loadResourceDetail() {
   try {
     const response = await getResourceById(id)
     const resource = response.data
-    
+
     // 填充表单数据
     formData.name = resource.name
     formData.type = resource.type
@@ -155,11 +148,12 @@ async function handleSave() {
     })
 
     ElMessage.success(t('resource.message.updateSuccess'))
-    
+
     // 跳转到详情页
     router.push(`/system/resource/${id}`)
   } catch (error) {
-    if (error !== false) { // 排除表单验证失败的情况
+    if (error !== false) {
+      // 排除表单验证失败的情况
       console.error('保存资源失败:', error)
       ElMessage.error(t('resource.message.updateFailed'))
     }
@@ -183,7 +177,7 @@ onMounted(() => {
 <style scoped lang="scss">
 .resource-edit-page {
   padding: 20px;
-  
+
   h2 {
     margin: 0 0 20px;
     font-size: 24px;
@@ -210,7 +204,7 @@ onMounted(() => {
   // 响应式布局
   @media (max-width: 768px) {
     padding: 10px;
-    
+
     h2 {
       font-size: 20px;
       margin-bottom: 15px;

@@ -2,7 +2,7 @@
   <Breadcrumb class="breadcrumb-container" />
   <div class="resource-detail-page">
     <h2>{{ t('resource.detail') }}</h2>
-    
+
     <el-card v-loading="loading">
       <template #header>
         <div class="card-header">
@@ -43,8 +43,11 @@
           <el-descriptions-item :label="t('resource.description')" :span="2">
             {{ resource.description || '-' }}
           </el-descriptions-item>
-          <el-descriptions-item v-if="resource.metadata && Object.keys(resource.metadata).length > 0" 
-                                :label="t('resource.metadata')" :span="2">
+          <el-descriptions-item
+            v-if="resource.metadata && Object.keys(resource.metadata).length > 0"
+            :label="t('resource.metadata')"
+            :span="2"
+          >
             <pre>{{ JSON.stringify(resource.metadata, null, 2) }}</pre>
           </el-descriptions-item>
         </el-descriptions>
@@ -129,7 +132,7 @@ onMounted(() => {
 <style scoped lang="scss">
 .resource-detail-page {
   padding: 20px;
-  
+
   h2 {
     margin: 0 0 20px;
     font-size: 24px;
@@ -169,7 +172,7 @@ onMounted(() => {
   // 响应式布局
   @media (max-width: 768px) {
     padding: 10px;
-    
+
     h2 {
       font-size: 20px;
       margin-bottom: 15px;
