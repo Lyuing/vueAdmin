@@ -3,7 +3,7 @@
     "id": "1",
     "username": "admin",
     "password": "123456",
-    "nickname": "管理员",
+    "realName": "管理员",
     "avatar": "",
     "email": "admin@example.com",
     "phone": "13800138000",
@@ -22,7 +22,7 @@
     "id": "1764920748165",
     "username": "test1",
     "password": "test123",
-    "nickname": "test1",
+    "realName": "test1",
     "roles": [
       {
         "id": 3,
@@ -38,7 +38,7 @@
     "id": "1765261005333",
     "username": "test2",
     "password": "test123",
-    "nickname": "test2",
+    "realName": "test2",
     "roles": [
       {
         "id": 2,
@@ -52,13 +52,19 @@
   },
   {
     "id": "1765261005334",
-    "username": "test3",
-    "password": "chUPmo2+n/kIBqqfMjyUbDGNQASxsHDPJOU34816DPxz9xfj84xKOU1H50sQy+5Yy+sGSd3nRUGK9s3So24DUfFEscK/RXCx+7Hb2Jt+E9gJgnuoTGTNK9v4eWnPhRRZVFgN4X8eHwg6C4x7cVzrYAAmGlCje0nVx7oV0kRA9a51XQ09lzGXvASpl3U0SJmaKWtBl8TRkX1oU3lnLsXXcbVz/AniSb/h0JL/kxWfTuVgZoyPiJIjId9g41ldpZx4nlr8cb2ipk2CEYMDj3cxo4OFrcML+otQpxSqxdfmuHEomWXsnTPxxdMV9pEYH2xDbQfAp4DUhYs/J5nTmxhBgQ==",
-    "avatar": "",
-    "email": "",
+    "username": "test4",
+    "password": "HSydF0NUaX713LhJVVhi0Fe2LvcJiblAbEL/uKgiu5GtTeXe84DJ4pgVtOh49jxETuGwuRITDNbRPCtF1vsKVdbg3tNHHjjzLNUHx280k/bK9ziBfzfoBxBV5W2ApfhxTbjYjgJ8F5nDp0cLJjVNvZz1UQCve0yZGnz7kWYLeJDlAyY0XFGsRJi/p4MS6IX/gzSX3w8dQ9NnW5hXyFfNjhf5xD1HoJaXDhIQluLEad5H4FE/4HH0gKKl1bG4fMRhu1ZXRjoQ9VN6SvcvPWjd2Mm6D/9lnDCrDvLqXk6hQvBGB26GTi0W+3nYC1N9GhIFVYPz2PXILwV7DWnvT9WS0g==",
     "phone": "",
+    "roles": [
+      {
+        "id": 2,
+        "name": "普通用户",
+        "code": "user"
+      }
+    ],
     "status": "ACTIVE",
-    "createdTime": "2026-02-03T09:41:15.119Z",
-    "updateTime": "2026-02-03T09:41:15.119Z"
+    "createdTime": "2026-02-03T09:59:09.693Z",
+    "updateTime": "2026-02-03T12:41:28.818Z",
+    "realName": "测试"
   }
 ]

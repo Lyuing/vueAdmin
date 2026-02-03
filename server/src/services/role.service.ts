@@ -96,14 +96,18 @@ export class RoleService {
   /**
    * 获取角色的权限列表（返回permissionId数组，用于前端回显）
    */
-  async getRolePermissions(roleId: number): Promise<number[]> {
+  async getRolePermissions(roleId: number): Promise<Partial<RolePermission>[]> {
     const role = await roleRepository.findByIdNumber(roleId)
     if (!role) {
       return []
     }
-
     // 返回permissionId数组
-    return role.permissions.map(p => p.permissionId)
+    return (
+      role.permissions?.map(p => ({
+        id: p.permissionId,
+        code: p.permissionCode
+      })) || []
+    )
   }
 
   /**

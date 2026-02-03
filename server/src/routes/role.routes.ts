@@ -13,7 +13,7 @@ router.post('/roles/v1/delete', auth, requireAdmin, ctx => roleController.delete
 
 // 权限接口
 router.get('/permissions/v1/tree', auth, requireAdmin, ctx => roleController.getAllPermissions(ctx))
-router.get('/permissions/v1/flat/by-role-id', auth, requireAdmin, ctx =>
+router.get('/permissions/v1/fetchByRole', auth, requireAdmin, ctx =>
   roleController.getRolePermissions(ctx)
 )
 router.post('/permissions/v1/batch-save', auth, requireAdmin, ctx =>

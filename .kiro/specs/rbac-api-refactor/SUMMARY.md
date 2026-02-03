@@ -41,7 +41,7 @@
 
 **字段映射：**
 - `id` → `userId`
-- `nickname` → `realName`
+- `realName` → `realName`
 - `allMenuTree` → `menus`
 - 所有字段类型与前端CurrentResponse匹配
 

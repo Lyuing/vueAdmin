@@ -151,7 +151,7 @@ if (role && role.permissions) {
 
 ### API响应变化
 
-**获取角色权限接口 (GET /api/permissions/v1/flat/by-role-id)：**
+**获取角色权限接口 (GET /api/permissions/v1/fetchByRole)：**
 ```typescript
 // 之前返回：string[]
 ["home", "dashboard", "system_user"]

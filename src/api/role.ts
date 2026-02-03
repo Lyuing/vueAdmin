@@ -39,7 +39,7 @@ export function getAllPermissions(): Promise<RolePermission[]> {
 }
 // 获取角色权限
 export function getRolePermissions(roleId: number): Promise<RolePermission[]> {
-  return http.get('/permissions/v1/flat/by-role-id', { roleId })
+  return http.get('/permissions/v1/fetchByRole', { roleId })
 }
 // 保存角色权限
 export function saveRolePermissions(roleId: number, permissionIds: number[]): Promise<void> {

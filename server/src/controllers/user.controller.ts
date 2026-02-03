@@ -26,7 +26,7 @@ export class UserController {
       users = users.filter(
         user =>
           user.username.toLowerCase().includes(kw) ||
-          user.nickname.toLowerCase().includes(kw) ||
+          user.realName.toLowerCase().includes(kw) ||
           (user.email && user.email.toLowerCase().includes(kw))
       )
     }

@@ -77,7 +77,7 @@ export class AuthService {
       permissions: Array.from(permissionSet),
       menuTree,
       roles: roleNames,
-      realName: user.nickname,
+      realName: user.realName,
       email: user.email,
       sessionId: `session_${Date.now()}`
     }
@@ -137,7 +137,7 @@ export class AuthService {
       permissions: Array.from(permissionSet),
       menuTree,
       roles: roleNames,
-      realName: user.nickname,
+      realName: user.realName,
       email: user.email,
       sessionId: `session_${Date.now()}`
     }

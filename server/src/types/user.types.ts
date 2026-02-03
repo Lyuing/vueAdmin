@@ -8,7 +8,7 @@ export interface User {
   id: string
   username: string
   password: string
-  nickname: string
+  realName: string
   avatar?: string
   email?: string
   phone?: string
@@ -21,21 +21,23 @@ export interface User {
 export interface UserCreateInput {
   username: string
   password: string
-  nickname: string
+  realName: string
   avatar?: string
   email?: string
   phone?: string
-  roles: Role[]
+  roles?: Role[]
+  roleIds?: number[] // 支持前端传递角色ID数组
 }
 
 export interface UserUpdateInput {
   id: string
   username?: string
-  nickname?: string
+  realName?: string
   avatar?: string
   email?: string
   phone?: string
   roles?: Role[]
+  roleIds?: number[] // 支持前端传递角色ID数组
   status?: 'ACTIVE' | 'INACTIVE' | 'LOCKED'
 }
 

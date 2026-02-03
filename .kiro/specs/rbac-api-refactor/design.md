@@ -233,7 +233,7 @@ classDiagram
     class BackendUser {
         +id: string
         +username: string
-        +nickname: string
+        +realName: string
         +email: string
         +roles: Role[]
         +status: string

@@ -2,7 +2,7 @@
   <div class="user-profile">
     <!-- 公共组件使用 PascalCase 命名 -->
     <div>
-      <h2 class="user-profile__title">{{ title }} - {{ nickname }}</h2>
+      <h2 class="user-profile__title">{{ title }} - {{ realName }}</h2>
       <p>{{ pagination.totalElements }}</p>
       <el-input v-model="searchKeyword"></el-input>
     </div>
@@ -133,7 +133,7 @@ const { pagination } = usePagination({
 const title = computed(() => {
   return props.showTitle ? `用户列表` : ''
 })
-const nickname = computed(() => {
+const realName = computed(() => {
   return userInfo.value?.username || ''
 })
 

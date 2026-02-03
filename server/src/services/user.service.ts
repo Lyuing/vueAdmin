@@ -10,6 +10,30 @@ import type {
 } from '../types/user.types.js'
 
 export class UserService {
+  /**
+   * 将角色ID数组转换为完整的角色对象数组
+   * @param roleIds 角色ID数组
+   * @returns 完整的角色对象数组
+   */
+  private async convertRoleIdsToRoles(
+    roleIds: number[]
+  ): Promise<Array<{ id: number; name: string; code: string }>> {
+    const roles: Array<{ id: number; name: string; code: string }> = []
+
+    for (const roleId of roleIds) {
+      const role = await roleRepository.findByIdNumber(roleId)
+      if (role) {
+        roles.push({
+          id: role.id,
+          name: role.name,
+          code: role.code
+        })
+      }
+    }
+
+    return roles
+  }
+
   async getAllUsers(): Promise<User[]> {
     return await userRepository.findAll()
   }
@@ -53,7 +77,7 @@ export class UserService {
       roles: roleNames,
       allMenuTree,
       email: user.email,
-      realName: user.nickname,
+      realName: user.realName,
       phone: user.phone,
       status: user.status || 'ACTIVE',
       createTime: user.createdTime,
@@ -67,9 +91,12 @@ export class UserService {
       throw new BusinessError('用户名已存在', 'DUPLICATE_USERNAME', 400)
     }
 
-    // 验证邮箱是否已存在
-    if (input.email && (await userRepository.existsByEmail(input.email))) {
-      throw new BusinessError('邮箱已存在', 'DUPLICATE_EMAIL', 400)
+    // 处理角色信息：如果传了roleIds，需要转换为完整的角色对象
+    let roles: any[] = []
+    if (input.roleIds && input.roleIds.length > 0) {
+      roles = await this.convertRoleIdsToRoles(input.roleIds)
+    } else if (input.roles) {
+      roles = input.roles
     }
 
     // 生成新的用户ID
@@ -81,11 +108,11 @@ export class UserService {
       id: newId,
       username: input.username,
       password: input.password,
-      nickname: input.nickname,
+      realName: input.realName,
       avatar: input.avatar || '',
       email: input.email || '',
       phone: input.phone || '',
-      roles: input.roles,
+      roles: roles,
       status: 'ACTIVE',
       createdTime: new Date().toISOString(),
       updateTime: new Date().toISOString()
@@ -108,20 +135,21 @@ export class UserService {
       }
     }
 
-    // 如果更新了邮箱，检查是否与其他用户冲突
-    if (input.email && input.email !== existing.email) {
-      if (await userRepository.existsByEmail(input.email)) {
-        throw new BusinessError('邮箱已存在', 'DUPLICATE_EMAIL', 400)
-      }
+    // 处理角色信息：如果传了roleIds，需要转换为完整的角色对象
+    let roles: any[] | undefined = undefined
+    if (input.roleIds && input.roleIds.length > 0) {
+      roles = await this.convertRoleIdsToRoles(input.roleIds)
+    } else if (input.roles !== undefined) {
+      roles = input.roles
     }
 
     const updated = await userRepository.update(input.id, {
       username: input.username,
-      nickname: input.nickname,
+      realName: input.realName,
       avatar: input.avatar,
       email: input.email,
       phone: input.phone,
-      roles: input.roles,
+      roles: roles,
       status: input.status,
       updateTime: new Date().toISOString()
     })
