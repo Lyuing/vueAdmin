@@ -40,7 +40,7 @@ export default {
     createName: '作成者',
 
     updateTime: '更新日時',
-    createdAt: '作成日時',
+    createdTime: '作成日時',
     startDate: '開始日',
     endDate: '終了日',
 

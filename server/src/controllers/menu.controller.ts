@@ -7,24 +7,24 @@ export class MenuController {
   async getUserMenus(ctx: Context): Promise<void> {
     const userId = ctx.state.user.userId
     const menus = await menuService.getUserMenus(userId)
-    success(ctx, { data: menus })
+    success(ctx, menus)
   }
 
   async getAllMenus(ctx: Context): Promise<void> {
     const menus = await menuService.getAllMenus()
-    success(ctx, { data: menus })
+    success(ctx, menus)
   }
 
   async createMenu(ctx: Context): Promise<void> {
     const menu = ctx.request.body as Partial<MenuConfig>
     const created = await menuService.createMenu(menu)
-    success(ctx, { data: created })
+    success(ctx, created)
   }
 
   async updateMenu(ctx: Context): Promise<void> {
     const menu = ctx.request.body as Partial<MenuConfig>
     const updated = await menuService.updateMenu(menu.id!, menu)
-    success(ctx, { data: updated })
+    success(ctx, updated)
   }
 
   async deleteMenu(ctx: Context): Promise<void> {
@@ -35,7 +35,7 @@ export class MenuController {
 
   async getPermissionCodes(ctx: Context): Promise<void> {
     const codes = await menuService.getPermissionCodes()
-    success(ctx, { data: codes })
+    success(ctx, codes)
   }
 
   async saveAllMenus(ctx: Context): Promise<void> {

@@ -14,8 +14,9 @@
         "code": "admin"
       }
     ],
-    "createdAt": "2024-01-01T00:00:00.000Z",
-    "updatedAt": "2024-01-01T00:00:00.000Z"
+    "createdTime": "2024-01-01T00:00:00.000Z",
+    "updateTime": "2024-01-01T00:00:00.000Z",
+    "status": "ACTIVE"
   },
   {
     "id": "1764920748165",
@@ -29,8 +30,9 @@
         "code": "test"
       }
     ],
-    "createdAt": "2025-12-05T07:45:48.165Z",
-    "updatedAt": "2025-12-09T06:33:57.699Z"
+    "createdTime": "2025-12-05T07:45:48.165Z",
+    "updateTime": "2025-12-09T06:33:57.699Z",
+    "status": "ACTIVE"
   },
   {
     "id": "1765261005333",
@@ -44,7 +46,19 @@
         "code": "user"
       }
     ],
-    "createdAt": "2025-12-09T06:16:45.333Z",
-    "updatedAt": "2025-12-09T06:16:45.333Z"
+    "createdTime": "2025-12-09T06:16:45.333Z",
+    "updateTime": "2025-12-09T06:16:45.333Z",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "1765261005334",
+    "username": "test3",
+    "password": "chUPmo2+n/kIBqqfMjyUbDGNQASxsHDPJOU34816DPxz9xfj84xKOU1H50sQy+5Yy+sGSd3nRUGK9s3So24DUfFEscK/RXCx+7Hb2Jt+E9gJgnuoTGTNK9v4eWnPhRRZVFgN4X8eHwg6C4x7cVzrYAAmGlCje0nVx7oV0kRA9a51XQ09lzGXvASpl3U0SJmaKWtBl8TRkX1oU3lnLsXXcbVz/AniSb/h0JL/kxWfTuVgZoyPiJIjId9g41ldpZx4nlr8cb2ipk2CEYMDj3cxo4OFrcML+otQpxSqxdfmuHEomWXsnTPxxdMV9pEYH2xDbQfAp4DUhYs/J5nTmxhBgQ==",
+    "avatar": "",
+    "email": "",
+    "phone": "",
+    "status": "ACTIVE",
+    "createdTime": "2026-02-03T09:41:15.119Z",
+    "updateTime": "2026-02-03T09:41:15.119Z"
   }
 ]

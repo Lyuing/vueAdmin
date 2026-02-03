@@ -2,7 +2,7 @@
   <div class="top-nav">
     <div class="nav-left">
       <h1 class="logo flex items-center">
-        <img class="logo-img" src="@/assets/images/logo.png" :alt="t('basic.title')" />
+        <img class="logo-img" src="/vite.svg" :alt="t('basic.title')" />
         <span>{{ t('basic.title') }}</span>
       </h1>
       <div class="nav-menu">

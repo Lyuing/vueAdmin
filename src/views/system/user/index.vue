@@ -162,7 +162,7 @@ import {
   resetPassword
 } from '@/api/user'
 import { getAllRoles } from '@/api/role'
-import { getRegionsTree } from '@/api/region'
+// import { getRegionsTree } from '@/api/region'
 
 import { type User } from '@/types/user'
 import { type Role } from '@/types/role'
@@ -211,7 +211,7 @@ const currentUser = ref<User | null>(null)
 // 初始化
 onMounted(() => {
   loadRoleList()
-  loadRegionTree()
+  // loadRegionTree()
 })
 
 // 加载角色列表
@@ -224,44 +224,44 @@ async function loadRoleList() {
   }
 }
 
-// 获取部门组织树
-async function loadRegionTree() {
-  try {
-    const response = await getRegionsTree()
-    const { map, nodes } = formatRegionTree(response)
-    regionTree.value = nodes || []
-    regionIdMap.value = map
-    // console.log('读取部门节点树', {...nodes}, {...map})
-  } catch (error) {
-    console.error('加载部门列表失败:', error)
-  }
-}
-// 构建组织id映射
-function formatRegionTree(
-  tree: RegionTreeNode[],
-  parent?: RegionTreeNode
-): { map: Record<number, RegionTreeNode>; nodes: RegionTreeNode[] } {
-  const map: Record<number, RegionTreeNode> = {}
-  let nodes = tree.map(region => {
-    const node: RegionTreeNode = {
-      ...region,
-      parent
-    }
-    if (region.children?.length) {
-      const { map: subMap, nodes: subNodes } = formatRegionTree(region.children, node)
-      node.children = subNodes
-      Object.assign(map, subMap)
-    }
-    map[region.id] = node
-    return node
-  })
+// // 获取部门组织树
+// async function loadRegionTree() {
+//   try {
+//     const response = await getRegionsTree()
+//     const { map, nodes } = formatRegionTree(response)
+//     regionTree.value = nodes || []
+//     regionIdMap.value = map
+//     // console.log('读取部门节点树', {...nodes}, {...map})
+//   } catch (error) {
+//     console.error('加载部门列表失败:', error)
+//   }
+// }
+// // 构建组织id映射
+// function formatRegionTree(
+//   tree: RegionTreeNode[],
+//   parent?: RegionTreeNode
+// ): { map: Record<number, RegionTreeNode>; nodes: RegionTreeNode[] } {
+//   const map: Record<number, RegionTreeNode> = {}
+//   let nodes = tree.map(region => {
+//     const node: RegionTreeNode = {
+//       ...region,
+//       parent
+//     }
+//     if (region.children?.length) {
+//       const { map: subMap, nodes: subNodes } = formatRegionTree(region.children, node)
+//       node.children = subNodes
+//       Object.assign(map, subMap)
+//     }
+//     map[region.id] = node
+//     return node
+//   })
 
-  // 屏蔽根节点
-  if (!nodes[0]?.parentId) {
-    nodes = [...(nodes[0]?.children || [])]
-  }
-  return { map, nodes }
-}
+//   // 屏蔽根节点
+//   if (!nodes[0]?.parentId) {
+//     nodes = [...(nodes[0]?.children || [])]
+//   }
+//   return { map, nodes }
+// }
 // 获取部门名称
 function getRegionLink(regionId: number): RegionTreeNode[] {
   const region = regionIdMap.value[regionId]
@@ -289,13 +289,7 @@ function getRegionName(regionId: number): string {
 // 格式化日期
 function formatDate(dateString: string): string {
   const date = new Date(dateString)
-  return date.toLocaleString('zh-CN', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit'
-  })
+  return date.toLocaleString('zh-CN')
 }
 
 // 处理创建用户

@@ -105,14 +105,10 @@ export const routeMap: RouteConfig[] = [
           permissionCode: 'menu:system_menu'
         }
       },
-
-      /**
-       * 运营监控中心
-       */
       {
-        path: '/workbench',
-        name: 'Workbench',
-        component: () => import('@/views/workbench/index.vue'),
+        path: '/operation/menu',
+        name: 'Operation',
+        component: () => import('@/views/dashboard/index.vue'),
         meta: {
           title: '工作台',
           requiresAuth: true,

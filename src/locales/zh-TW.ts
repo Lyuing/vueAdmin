@@ -40,7 +40,7 @@ export default {
     createName: '建立人',
 
     updateTime: '更新時間',
-    createdAt: '建立時間',
+    createdTime: '建立時間',
     startDate: '開始時間',
     endDate: '結束時間',
 

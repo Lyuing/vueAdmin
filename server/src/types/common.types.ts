@@ -1,22 +1,23 @@
 export interface ApiResponse<T = any> {
-  code: number | string
+  code: number
   message: string
   data: T | null
 }
 
 export interface ApiError {
-  code: string
+  code: number
+  errorCode: string
   message: string
   statusCode: number
 }
 
 export class BusinessError extends Error {
-  code: string
+  errorCode: string | number
   statusCode: number
 
-  constructor(message: string, code: string, statusCode: number) {
+  constructor(message: string, errorCode: string | number, statusCode: number) {
     super(message)
-    this.code = code
+    this.errorCode = errorCode
     this.statusCode = statusCode
     this.name = 'BusinessError'
   }

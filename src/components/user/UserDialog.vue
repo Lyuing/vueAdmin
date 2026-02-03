@@ -31,7 +31,7 @@
         <el-input v-model.trim="formData.phone" :placeholder="t('user.pleaseInputPhone')" />
       </el-form-item>
 
-      <el-form-item :label="t('basic.department')" prop="departmentId">
+      <!-- <el-form-item :label="t('basic.department')" prop="departmentId">
         <el-tree-select
           v-model="formData.departmentId"
           :data="regionTree"
@@ -42,7 +42,7 @@
           node-key="id"
           :props="{ label: 'name', children: 'children' }"
         />
-      </el-form-item>
+      </el-form-item> -->
 
       <el-form-item :label="t('basic.role')" prop="roleIds">
         <el-select

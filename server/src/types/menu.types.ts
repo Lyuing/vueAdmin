@@ -8,6 +8,7 @@ export interface MenuConfig {
   id: string
   title: string
   icon?: string
+  permissionId?: number
   permissionCode?: string
   buttonPermissions?: ButtonPermission[]
   menuType: 'top' | 'sidebar_nav' | 'sidebar_directory'
@@ -24,14 +25,4 @@ export interface RoleMenuConfig {
   roleId: string
   roleName: string
   permissionCodes: string[]
-}
-
-/**
- * 菜单挂载关系验证结果
- */
-export interface ValidationResult {
-  /** 验证是否通过 */
-  valid: boolean
-  /** 错误信息（验证失败时） */
-  error?: string
 }

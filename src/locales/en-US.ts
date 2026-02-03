@@ -48,7 +48,7 @@ export default {
     createName: 'Creator',
 
     updateTime: 'Update Time',
-    createdAt: 'Created At',
+    createdTime: 'Created At',
     startDate: 'Start Date',
     endDate: 'End Date',
 
@@ -187,6 +187,7 @@ export default {
     disabledAccount: 'User is disabled, please contact system administrator',
     invalidAccount: 'Username or password error',
     accountExpired: 'Account expired',
+    accountLocked: 'Account is locked',
     encryptFailed: 'Encryption failed',
     initRsaFailed: 'Failed to initialize RSA',
     RsaNotInit: 'RSA not initialized',

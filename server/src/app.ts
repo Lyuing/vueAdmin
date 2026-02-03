@@ -8,6 +8,8 @@ import { errorHandler } from './middlewares/error.middleware.js'
 import { logger } from './middlewares/logger.middleware.js'
 import { registerRoutes } from './routes/index.js'
 import { menuRepository } from './repositories/menu.repository.js'
+import { userRepository } from './repositories/user.repository.js'
+import { roleRepository } from './repositories/role.repository.js'
 
 const app = new Koa()
 
@@ -44,4 +46,6 @@ async function start() {
 // 加载数据文件
 async function loadData() {
   await menuRepository.init()
+  await userRepository.init()
+  await roleRepository.init()
 }

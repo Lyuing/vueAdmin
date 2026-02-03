@@ -265,7 +265,7 @@ const handleLoginSuccess = async (response: LoginResponse) => {
 // 处理登录错误
 const handleLoginError = (err: any) => {
   console.error('登录失败:', err)
-  const { status, data: { code, data: { message } = {} } = {} } = err
+  const { status, data: { code, data, message } = {} } = err
   let errorMessage = message || t('login.loginFailed')
 
   if (status === 404) {
@@ -273,11 +273,11 @@ const handleLoginError = (err: any) => {
   } else if (code === 40101) {
     errorMessage = t('login.nonExistAccount')
   } else if (code === 40102) {
-    errorMessage = t('login.disabledAccount')
-  } else if (code === 40103) {
     errorMessage = message || t('login.invalidAccount')
+  } else if (code === 40103) {
+    errorMessage = t('login.disabledAccount')
   } else if (code === 40104) {
-    errorMessage = t('login.accountExpired')
+    errorMessage = t('login.accountLocked')
   }
 
   ElMessage.error(errorMessage)

@@ -48,7 +48,7 @@ export default {
     createName: '创建人',
 
     updateTime: '更新时间',
-    createdAt: '创建时间',
+    createdTime: '创建时间',
     startDate: '开始时间',
     endDate: '结束时间',
 
@@ -185,6 +185,7 @@ export default {
     disabledAccount: '用户被禁用，请联系统管理员',
     invalidAccount: '用户名或密码错误',
     accountExpired: '账号过期',
+    accountLocked: '账号被锁定',
     encryptFailed: '加密失败',
     initRsaFailed: '初始化 RSA 失败',
     RsaNotInit: 'RSA 未初始化',

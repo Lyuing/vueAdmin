@@ -8,7 +8,6 @@ export interface UserInfo {
   menus?: any[] // 用户菜单配置
   roles: string[]
   departmentId?: number
-  tokenType?: string
   email?: string
   realName?: string
   sessionId?: string
@@ -43,26 +42,18 @@ export interface LoginRequest {
 }
 
 // 登录返回数据
-export type LoginResponse =
-  | {
-      accessToken: string
-      tokenType: string
-      userId: number
-      username: string
-      permissions: string[]
-      menuTree: any[] // 用户菜单配置
-      roles: string[]
-      realName?: string
-      departmentId?: number
-      email?: string
-      sessionId?: string
-    }
-  | {
-      message: string
-      requirePasswordChange: boolean
-      userId: number
-      username: string
-    }
+export type LoginResponse = {
+  accessToken: string
+  userId: number
+  username: string
+  permissions: string[]
+  menuTree: any[] // 用户菜单配置
+  roles: string[]
+  realName?: string
+  departmentId?: number
+  email?: string
+  sessionId?: string
+}
 
 // 获取当前用户接口返回数据
 export interface CurrentResponse {

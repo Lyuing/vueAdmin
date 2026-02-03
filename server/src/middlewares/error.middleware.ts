@@ -10,12 +10,13 @@ export async function errorHandler(ctx: Context, next: Next): Promise<void> {
     console.error('Error:', err)
 
     if (err instanceof BusinessError) {
-      error(ctx, err.code, err.message, err.statusCode)
+      // 使用HTTP状态码作为code
+      error(ctx, err.statusCode, err.message, err.statusCode)
     } else {
       const message =
         config.env === 'production' ? 'Internal server error' : err.message || 'Unknown error'
 
-      error(ctx, 'INTERNAL_ERROR', message, 500)
+      error(ctx, 500, message, 500)
     }
   }
 }

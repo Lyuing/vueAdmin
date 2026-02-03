@@ -127,13 +127,3 @@ export interface RoleMenuConfig {
   /** 该角色可访问的权限码列表 */
   permissionCodes: string[]
 }
-
-/**
- * 菜单挂载关系验证结果
- */
-export interface ValidationResult {
-  /** 验证是否通过 */
-  valid: boolean
-  /** 错误信息（验证失败时） */
-  error?: string
-}
