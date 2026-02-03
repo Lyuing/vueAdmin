@@ -1,67 +1,118 @@
 <template>
-  <Breadcrumb class="breadcrumb-container" />
-  <div class="role-page">
-    <h2>{{ t('role.management') }}</h2>
-    
-    <el-card v-loading="loading">
-      <template #header>
-        <div class="card-header">
-          <span>{{ t('role.list') }}</span>
-          <el-button type="primary" @click="handleCreate">
-            {{ t('role.add') }}
-          </el-button>
+  <div class="role-page-container">
+    <div class="role-page">
+      <h2 class="flex flex-between">
+        <span>{{ t('role.management') }}</span>
+        <el-button type="primary" @click="handleCreate">
+          {{ t('role.add') }}
+        </el-button>
+      </h2>
+      <div class="filter-header">
+        <el-input
+          v-model.trim="searchKeyword"
+          class="search-input"
+          :maxlength="20"
+          :placeholder="t('role.searchPlaceholder')"
+          @keyup.enter="handleSearch"
+        />
+        <div>
+          <el-button type="info" @click="handleSearch">{{ t('common.search') }}</el-button>
+          <el-button type="info" @click="handleReset">{{ t('common.reset') }}</el-button>
         </div>
-      </template>
-      
-      <el-table :data="roleList" style="width: 100%">
-        <el-table-column prop="name" :label="t('role.form.name')" width="150" />
-        <el-table-column prop="code" :label="t('role.form.code')" width="150" />
-        <el-table-column prop="description" :label="t('role.form.description')" min-width="200" />
-        <el-table-column :label="t('role.userCount')" width="100">
-          <template #default="{ row }">
-            {{ getUserCount(row.id) }}
-          </template>
-        </el-table-column>
-        <el-table-column prop="status" :label="t('role.form.status')" width="100">
-          <template #default="{ row }">
-            <el-tag :type="row.status === 'active' ? 'success' : 'info'">
-              {{ row.status === 'active' ? t('common.active') : t('common.disabled') }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column :label="t('common.actions')" width="250" fixed="right">
-          <template #default="{ row }">
-            <el-button size="small" type="primary" @click="handleEdit(row)">
-              {{ t('common.edit') }}
-            </el-button>
-            <el-button size="small" type="warning" @click="handlePermission(row)">
-              {{ t('role.permission') }}
-            </el-button>
-            <el-button size="small" type="danger" @click="handleDelete(row)">
-              {{ t('common.delete') }}
-            </el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-    </el-card>
+      </div>
+      <div v-loading="loading" class="card-wrap">
+        <el-table :data="roleList" class="flex-1">
+          <el-table-column prop="name" :label="t('role.name')" width="150" show-overflow-tooltip />
+          <!-- <el-table-column prop="code" :label="t('role.code')" width="150" /> -->
+          <el-table-column
+            prop="description"
+            :label="t('role.description')"
+            min-width="200"
+            show-overflow-tooltip
+          />
+          <el-table-column prop="userCount" :label="t('role.userCount')" width="100" />
+          <!-- <el-table-column prop="status" :label="t('common.status')" width="100">
+            <template #default="{ row }">
+              <el-tag :type="row.status === 'ACTIVE' ? 'success' : 'info'">
+                {{ row.status === 'ACTIVE' ? t('common.active') : t('common.disabled') }}
+              </el-tag>
+            </template>
+          </el-table-column> -->
+          <el-table-column prop="roleType" :label="t('role.type')" width="100">
+            <template #default="{ row }">
+              <el-tag :type="row.roleType === RoleType.SYSTEM ? 'info' : 'primary'">
+                {{ row.roleType === RoleType.SYSTEM ? t('role.systemRole') : t('role.customRole') }}
+              </el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column :label="t('common.actions')" width="250" fixed="right">
+            <template #default="{ row }">
+              <template v-if="row.roleType !== RoleType.SYSTEM">
+                <el-button size="small" type="primary" link @click="handleEdit(row)">
+                  {{ t('common.edit') }}
+                </el-button>
+                <el-button size="small" type="warning" link @click="handlePermission(row)">
+                  {{ t('role.permission') }}
+                </el-button>
+                <el-popover title="" placement="top" :disabled="!row.userCount">
+                  <p>{{ t('role.userBindTip', { count: row.userCount }) }}</p>
+                  <template #reference>
+                    <el-button
+                      size="small"
+                      type="danger"
+                      link
+                      :disabled="!!row.userCount"
+                      @click="handleDelete(row)"
+                    >
+                      {{ t('common.delete') }}
+                    </el-button>
+                  </template>
+                </el-popover>
+              </template>
+              <template v-else>
+                <el-button size="small" type="primary" link disabled>
+                  {{ t('common.edit') }}
+                </el-button>
+                <el-button size="small" type="warning" link @click="handlePermission(row, true)">
+                  {{ t('role.viewPermission') }}
+                </el-button>
+              </template>
+            </template>
+          </el-table-column>
+        </el-table>
+        <!-- 分页 -->
+        <el-pagination
+          background
+          class="paginationer"
+          :current-page="pagination.currentPage"
+          :total="pagination.totalElements"
+          :page-sizes="pagination.pageSizes"
+          :page-size="pagination.pageSize"
+          :layout="pagination.layout"
+          @current-change="handleCurrentChange"
+          @size-change="handleSizeChange"
+        />
+      </div>
 
-    <!-- 角色编辑对话框 -->
-    <RoleDialog
-      v-model:visible="dialogVisible"
-      :mode="dialogMode"
-      :role-data="currentRole"
-      @save="handleSave"
-      @cancel="handleCancel"
-    />
+      <!-- 角色编辑对话框 -->
+      <RoleDialog
+        v-model:visible="dialogVisible"
+        :mode="dialogMode"
+        :role-data="currentRole"
+        @save="handleSave"
+        @cancel="handleCancel"
+      />
 
-    <!-- 菜单权限配置对话框 -->
-    <MenuPermissionDialog
-      v-model:visible="menuPermDialogVisible"
-      :role-id="currentRoleForPerm?.id || ''"
-      :role-name="currentRoleForPerm?.name || ''"
-      @success="handlePermissionSuccess"
-      @cancel="handlePermissionCancel"
-    />
+      <!-- 菜单权限配置对话框 -->
+      <MenuPermissionDialog
+        v-model:visible="menuPermDialogVisible"
+        :role-id="currentRoleForPerm?.id || 0"
+        :role-name="currentRoleForPerm?.name || ''"
+        :read-only="readonlyPermissions"
+        @success="handlePermissionSuccess"
+        @cancel="handlePermissionCancel"
+      />
+    </div>
   </div>
 </template>
 
@@ -69,56 +120,65 @@
 import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { getAllRoles, createRole, updateRole, deleteRole, type Role } from '@/api/role'
-import { getAllUsers, type User } from '@/api/user'
+import { getRolesList, createRole, updateRole, deleteRole } from '@/api/role'
+import { type Role, RoleType } from '@/types/role'
+import { usePagination } from '@/composables/usePagination'
+
 import RoleDialog from '@/components/role/RoleDialog.vue'
 import MenuPermissionDialog from '@/components/role/MenuPermissionDialog.vue'
 
 const { t } = useI18n()
+const {
+  pagination,
+  serializeParams,
+  handleCurrentChange,
+  handleSizeChange,
+  updatePagination,
+  resetPagination
+} = usePagination({
+  onChange: fetchRoleList
+})
 
 // 状态管理
 const roleList = ref<Role[]>([])
-const userList = ref<User[]>([])
 const loading = ref(false)
 const dialogVisible = ref(false)
 const dialogMode = ref<'create' | 'edit'>('create')
 const currentRole = ref<Role | null>(null)
 const menuPermDialogVisible = ref(false)
 const currentRoleForPerm = ref<Role | null>(null)
+// 角色权限 - 只读
+const readonlyPermissions = ref<boolean>(false)
 
 // 初始化
 onMounted(() => {
-  loadRoleList()
-  loadUserList()
+  fetchRoleList()
 })
 
+// 查询
+const searchKeyword = ref('')
+function handleSearch() {
+  fetchRoleList()
+}
+function handleReset() {
+  searchKeyword.value = ''
+  resetPagination()
+}
 // 加载角色列表
-async function loadRoleList() {
+async function fetchRoleList() {
   loading.value = true
   try {
-    const response = await getAllRoles()
-    roleList.value = response.data
+    const response = await getRolesList({
+      keyword: searchKeyword.value,
+      ...serializeParams()
+    })
+    roleList.value = response.list
+    updatePagination(response)
   } catch (error) {
     console.error('加载角色列表失败:', error)
-    ElMessage.error(t('role.message.loadFailed'))
   } finally {
     loading.value = false
   }
-}
-
-// 加载用户列表（用于统计用户数）
-async function loadUserList() {
-  try {
-    const response = await getAllUsers()
-    userList.value = response.data
-  } catch (error) {
-    console.error('加载用户列表失败:', error)
-  }
-}
-
-// 获取角色的用户数量
-function getUserCount(roleId: string): number {
-  return userList.value.filter(user => user.roles.includes(roleId)).length
 }
 
 // 处理创建角色
@@ -137,34 +197,30 @@ function handleEdit(role: Role) {
 
 // 处理删除角色
 async function handleDelete(role: Role) {
-  const userCount = getUserCount(role.id)
-  
+  const userCount = role.userCount || 0
+
   try {
-    await ElMessageBox.confirm(
-      t('role.deleteConfirm', { count: userCount }),
-      t('role.delete'),
-      {
-        confirmButtonText: t('common.confirm'),
-        cancelButtonText: t('common.cancel'),
-        type: 'warning'
-      }
-    )
+    await ElMessageBox.confirm(t('role.deleteConfirm', { count: userCount }), t('role.delete'), {
+      confirmButtonText: t('common.confirm'),
+      cancelButtonText: t('common.cancel'),
+      type: 'warning'
+    })
 
     await deleteRole(role.id)
-    ElMessage.success(t('role.message.deleteSuccess'))
-    await loadRoleList()
+    ElMessage.success(t('role.deleteSuccess'))
+    await fetchRoleList()
   } catch (error) {
     if (error !== 'cancel') {
       console.error('删除角色失败:', error)
-      ElMessage.error(t('common.deleteFailed'))
     }
   }
 }
 
 // 处理配置权限
-function handlePermission(role: Role) {
+function handlePermission(role: Role, readonly?: boolean) {
   currentRoleForPerm.value = role
   menuPermDialogVisible.value = true
+  readonlyPermissions.value = !!readonly
 }
 
 // 处理保存角色
@@ -172,17 +228,16 @@ async function handleSave(roleData: Partial<Role>) {
   try {
     if (dialogMode.value === 'create') {
       await createRole(roleData)
-      ElMessage.success(t('role.message.createSuccess'))
+      ElMessage.success(t('role.createSuccess'))
     } else {
       await updateRole(roleData.id!, roleData)
-      ElMessage.success(t('role.message.updateSuccess'))
+      ElMessage.success(t('role.updateSuccess'))
     }
-    
+
     dialogVisible.value = false
-    await loadRoleList()
+    await fetchRoleList()
   } catch (error) {
     console.error('保存角色失败:', error)
-    ElMessage.error(t('common.saveFailed'))
   }
 }
 
@@ -203,52 +258,54 @@ function handlePermissionCancel() {
 </script>
 
 <style scoped lang="scss">
+.role-page-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-white);
+  border-radius: var(--radius-xl);
+  padding: $spacing-8 $spacing-20 $spacing-20;
+}
 .role-page {
-  padding: 20px;
-  
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
   h2 {
-    margin: 0 0 20px;
+    margin: $spacing-12 0;
     font-size: 24px;
-    font-weight: 600;
-    color: var(--el-text-color-primary);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-color-base);
   }
+}
+.filter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-16;
+}
 
-  :deep(.el-card) {
-    border-radius: 8px;
-    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-  }
-
-  .card-header {
+.card-wrap {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  overflow: hidden;
+  :deep(.el-card__body) {
+    padding: $spacing-16;
+    height: 100%;
+    flex: 1;
+    overflow: hidden;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-weight: 600;
-    font-size: 16px;
+    flex-direction: column;
   }
+}
 
-  :deep(.el-table) {
-    .el-button + .el-button {
-      margin-left: 8px;
-    }
-  }
+.search-input {
+  width: 400px;
+}
 
-  // 响应式布局
-  @media (max-width: 768px) {
-    padding: 10px;
-    
-    h2 {
-      font-size: 20px;
-      margin-bottom: 15px;
-    }
-
-    :deep(.el-table) {
-      font-size: 12px;
-
-      .el-button {
-        padding: 5px 10px;
-        font-size: 12px;
-      }
-    }
-  }
+.paginationer {
+  margin-top: $spacing-16;
+  // justify-content: flex-end;
 }
 </style>

@@ -12,9 +12,9 @@ export function useNavigation() {
   const { sidebarCollapsed } = storeToRefs(navigationStore)
 
   // 获取顶部菜单
-  const topMenus = computed(() => navigationStore.menuTree.filter(item => item.menuType === 'top'))
+  const topNavs = computed(() => navigationStore.menuTree.filter(item => item.menuType === 'top'))
   // 激活的顶部导航
-  const activeTopMenu = computed<MenuItem | null>(() => {
+  const activeTopNav = computed<MenuItem | null>(() => {
     let topNav = null
     if (route?.name) {
       topNav = navigationStore.routeNameMenuMap.get(route.name as string) || null
@@ -22,13 +22,13 @@ export function useNavigation() {
     while (topNav?.parent) {
       topNav = topNav.parent
     }
-    // console.warn('追溯父级 Active Top Menu:', topNav)
     return topNav
   })
 
   // 获取侧边栏菜单（根据当前路由名称）
-  const sidebarMenus = computed(() => navigationStore.getSidebarMenus(activeTopMenu.value))
+  const sidebarMenus = computed(() => navigationStore.getSidebarMenus(activeTopNav.value))
 
+  // 导航链路 - 完整链路
   const links = computed(() => {
     let links = []
     let menu = null
@@ -36,54 +36,73 @@ export function useNavigation() {
       menu = navigationStore.routeNameMenuMap.get(route.name as string) || null
     }
     while (menu) {
-      if (!menu.hidden) {
-        links.unshift(menu)
-      } else if (menu.bindMenuId) {
-        const shadowMenu = navigationStore.menuMap.get(menu.bindMenuId)
-        if (shadowMenu) {
-          links.unshift(shadowMenu)
+      /**
+       * 链路追踪
+       *  完全显示每个路由的链路
+       *  导航菜单、面包屑使用时自行筛选
+       */
+      links.unshift(menu)
+      if (menu.bindMenuId) {
+        const shadowMenus = getShadowMenus(menu.bindMenuId)
+        // console.warn('绑定菜单', shadowMenus)
+        if (shadowMenus?.length) {
+          links.unshift(...shadowMenus)
         }
       }
-      console.log('导航链路', links)
+      // console.log('导航链路', links)
       menu = menu.parent
     }
     return links
   })
+  // 获取某个菜单的綁定导航链路
+  function getShadowMenus(menuId: number): MenuItem[] {
+    const links = []
+    let shadowMenu: MenuItem | null = navigationStore.menuMap.get(menuId) as MenuItem
+    while (shadowMenu && links.length < 10) {
+      links.unshift({ ...shadowMenu })
+      if (shadowMenu.hidden && shadowMenu.bindMenuId) {
+        shadowMenu = navigationStore.menuMap.get(shadowMenu.bindMenuId) as MenuItem
+      } else {
+        shadowMenu = null
+      }
+    }
+    return links
+  }
 
   // 获取当前激活的菜单路径（用于侧边栏激活）
   const activeMenuIds = computed(() => {
-    const navsLink = links.value.map(item => item.id)
-    console.warn('导航路径:', navsLink)
+    const navsLink = links.value.filter(item => !item.hidden).map(item => item.id)
+    // console.warn('导航路径:', navsLink)
     return navsLink
   })
 
-
-  // 面包屑：根据路由响应式计算
+  // 获取面包屑：根据路由响应式计算
   const breadcrumbs = computed<BreadcrumbItem[]>(() => {
-    const breadcrumbsList = links.value.map(item => {
-      return {
-        title: item.title,
-        path: item.path,
-        icon: item.icon,
-      }
-    })
-    console.log('面包屑', breadcrumbsList)
+    const breadcrumbsList = links.value
+      .map(item => {
+        return {
+          ...item,
+          title: item.title,
+          path: item.path,
+          icon: item.icon,
+          isDirectory: item.menuType === 'sidebar_directory'
+        }
+      })
+      .filter(item => item.menuType !== 'top' && item.level > 2)
+    // console.log('面包屑', breadcrumbsList)
     return breadcrumbsList
   })
-
-  // 开发环境下打印调试信息：顶部菜单、侧栏菜单、面包屑
-  if (import.meta.env.DEV) {}
 
   return {
     // 状态
     breadcrumbs,
-    topMenus,
-    activeTopMenu,
+    topNavs,
+    activeTopNav,
     sidebarMenus,
     sidebarCollapsed,
     activeMenuIds,
 
     // Store方法
-    toggleSidebar: navigationStore.toggleSidebar,
+    toggleSidebar: navigationStore.toggleSidebar
   }
 }

@@ -38,37 +38,43 @@ export interface ButtonPermission {
  */
 export interface MenuConfig {
   /** 菜单唯一标识 */
-  id: string
+  id: number
   /** 菜单标题 */
   title: string
   /** 菜单图标 */
   icon?: string
   /** 关联的权限码 */
-  permissionCode?: string
+  permissionCode: string
   /** 按钮权限点列表 */
   buttonPermissions?: ButtonPermission[]
   /** 菜单类型: 顶部导航、侧栏导航或侧栏目录 */
   menuType: 'top' | 'sidebar_nav' | 'sidebar_directory'
   /** 是否隐藏 */
   hidden: boolean
-  /** 绑定父级菜单的ID，用于隐藏菜单指定其应该关联的父级菜单 */
-  bindMenuId?: string
   /** 父菜单ID */
   parentId?: MenuConfig['id']
+  /** 挂载菜单的ID，用于隐藏菜单后指定其应该关联的菜单元 */
+  bindMenuId?: MenuConfig['id']
   /** 子菜单列表 */
   children?: MenuConfig[]
+  /** 页面缓存策略 - 仅对页面类型菜单有效 */
+  keepAlive?: boolean
+  /** 菜单排序 */
+  sort?: number
 }
 
 /**
  * 面包屑项
  */
-export interface BreadcrumbItem {
+export interface BreadcrumbItem extends Partial<MenuItem> {
   /** 面包屑标题 */
   title: string
   /** 关联的路由路径 */
   path?: string
   /** 图标 */
   icon?: string
+  /** 菜单类型 */
+  isDirectory?: boolean
 }
 
 /**
@@ -77,7 +83,7 @@ export interface BreadcrumbItem {
  */
 export interface MenuItem {
   /** 菜单唯一标识 */
-  id: string
+  id: number
   /** 菜单标题 */
   title: string
   /** 菜单图标 */
@@ -97,13 +103,17 @@ export interface MenuItem {
   /** 追溯父级菜单 */
   parent?: MenuItem | null
   /** 绑定父级菜单的ID，用于隐藏菜单指定其应该关联的父级菜单 */
-  bindMenuId?: string
+  bindMenuId?: MenuConfig['id']
   /** 子菜单列表 */
   children?: MenuItem[]
   /** 菜单层级(自动计算) */
   level: number
   /** 预计算的面包屑路径 */
   breadcrumbPath: BreadcrumbItem[]
+  /** 页面缓存策略 - 仅对页面类型菜单有效 */
+  keepAlive?: boolean
+  /** 菜单排序 */
+  sort?: number
 }
 
 /**
@@ -116,26 +126,6 @@ export interface RoleMenuConfig {
   roleName: string
   /** 该角色可访问的权限码列表 */
   permissionCodes: string[]
-}
-
-/**
- * 权限树节点（用于角色权限分配界面）
- */
-export interface TreeNode {
-  /** 节点ID */
-  id: string
-  /** 节点标签 */
-  label: string
-  /** 禁用 */
-  disabled?: boolean
-  /** 权限码 */
-  permissionCode?: string
-  /** 是否为按钮权限点 */
-  isButton?: boolean
-  /** 子节点 */
-  children?: TreeNode[]
-  /** 数据 */
-  data?: any
 }
 
 /**

@@ -5,7 +5,7 @@
       <Sidebar />
       <div class="main-content" :class="{ 'full-width': !hasSidebar }">
         <div class="content-wrapper">
-          <router-view />
+          <RouterView />
         </div>
       </div>
     </div>
@@ -16,6 +16,7 @@
 import { computed } from 'vue'
 import TopNav from './TopNav.vue'
 import Sidebar from './Sidebar.vue'
+import RouterView from './RouterView.vue'
 import { useNavigation } from '@/composables/useNavigation'
 
 const { sidebarMenus } = useNavigation()
@@ -56,7 +57,7 @@ const hasSidebar = computed(() => {
 
 .content-wrapper {
   flex: 1;
-  padding: 8px 20px 20px;
+  padding: 20px;
   overflow-y: auto;
 }
 

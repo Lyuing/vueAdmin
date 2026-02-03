@@ -1,12 +1,18 @@
 <template>
   <el-dialog
     :model-value="visible"
-    :title="`${t('role.permission')} - ${roleName}`"
+    :title="title"
     width="600px"
     :close-on-click-modal="false"
     @update:model-value="handleUpdateVisible"
     @close="handleClose"
   >
+    <!-- <div class="menu-top">
+      <el-radio-group v-model="showAll">
+        <el-radio :value="0">{{ t('role.showAll') }}</el-radio>
+        <el-radio :value="1">{{ t('role.showNavOnly') }}</el-radio>
+      </el-radio-group>
+    </div> -->
     <div v-loading="loading" class="menu-tree-container">
       <el-tree
         ref="treeRef"
@@ -15,11 +21,14 @@
         node-key="id"
         show-checkbox
         default-expand-all
-        :check-strictly="true"
+        :check-strictly="false"
       >
         <template #default="{ node, data }">
           <span class="tree-node-label">
             <el-icon v-if="data.isButton" class="button-icon">
+              <Open />
+            </el-icon>
+            <el-icon v-else-if="data.isApi" class="button-icon">
               <Operation />
             </el-icon>
             <span>{{ node.label }}</span>
@@ -33,28 +42,43 @@
 
     <template #footer>
       <el-button @click="handleCancel">{{ t('common.cancel') }}</el-button>
-      <el-button type="primary" :loading="saving" @click="handleSubmit">
-        {{ t('common.save') }}
-      </el-button>
+      <el-popover
+        title=""
+        :content="t('role.unshownPermissionTip')"
+        placement="top"
+        :disabled="!showAll || readOnly"
+      >
+        <template #reference>
+          <el-button
+            type="primary"
+            :loading="saveLoading"
+            :disabled="readOnly"
+            @click="handleSubmit"
+          >
+            {{ t('common.save') }}
+          </el-button>
+        </template>
+      </el-popover>
     </template>
   </el-dialog>
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ElMessage, ElTree } from 'element-plus'
-import { Operation } from '@element-plus/icons-vue'
-import { getAllMenus } from '@/api/menu'
-import { getRoleMenus, saveRoleMenus } from '@/api/role'
-import type { MenuConfig, TreeNode } from '@/types/navigation'
+import { Open, Operation } from '@element-plus/icons-vue'
+import { getAllPermissions, getRolePermissions, saveRolePermissions } from '@/api/role'
+import type { TreeNode, RolePermission } from '@/types/role'
+import { checkKeepPermission } from '@/composables/usePermission'
 
 const { t } = useI18n()
 
 interface Props {
   visible: boolean
-  roleId: string
+  roleId: number
   roleName: string
+  readOnly: boolean
 }
 
 interface Emits {
@@ -69,7 +93,7 @@ const emit = defineEmits<Emits>()
 const treeRef = ref<InstanceType<typeof ElTree>>()
 const treeData = ref<TreeNode[]>([])
 const loading = ref(false)
-const saving = ref(false)
+const saveLoading = ref(false)
 
 // 树形组件配置
 const treeProps = {
@@ -77,105 +101,79 @@ const treeProps = {
   label: 'label'
 }
 
-// 监听对话框打开，加载数据
-watch(() => props.visible, async (newVal) => {
-  if (newVal && props.roleId) {
-    await loadData()
-  }
+/**
+ * 展示条件 - 当前版本仅支持菜单权限点
+ * 0: 显示所有
+ * 1: 显示导航
+ */
+const showAll = ref<0 | 1>(1)
+
+// 标题
+const title = computed(() => {
+  const pre = props.readOnly ? t('role.viewPermission') : t('role.permission')
+  return `${pre} - ${props.roleName}`
 })
+
+// 监听对话框打开，加载数据
+watch(
+  () => [props.visible, showAll.value],
+  async newVal => {
+    if (newVal && props.roleId) {
+      await loadData()
+    }
+  }
+)
 
 // 加载菜单树和角色权限
 async function loadData() {
   loading.value = true
   try {
     // 并行加载菜单树和角色权限
-    const [menusResponse, roleMenusResponse] = await Promise.all([
-      getAllMenus(),
-      getRoleMenus(props.roleId)
+    const [treeResponse, rolePermissionsResponse] = await Promise.all([
+      getAllPermissions(),
+      getRolePermissions(props.roleId)
     ])
+    // console.log('获取所有权限树:', treeResponse)
 
-    // 转换为树形结构
-    treeData.value = transformMenusToTree(menusResponse.data)
-    
-    console.log('角色权限数据:', roleMenusResponse.data)
-    console.log('树形数据:', treeData.value)
-    
-    // 设置选中的节点（根据权限码）
-    if (roleMenusResponse.data.permissionCodes && roleMenusResponse.data.permissionCodes.length > 0) {
-      // 使用 nextTick 确保树已渲染
-      await new Promise(resolve => setTimeout(resolve, 0))
-      
-      // 收集所有需要选中的节点ID（包括页面和按钮权限点）
-      const nodesToCheck = collectNodesToCheck(treeData.value, roleMenusResponse.data.permissionCodes)
-      console.log('需要选中的节点:', nodesToCheck)
-      
-      // 父子节点独立，直接设置所有匹配的节点
-      treeRef.value?.setCheckedKeys(nodesToCheck, false)
-    }
+    // 格式化权限树为树形结构
+    treeData.value = formatTree(treeResponse)
+    // 使用 nextTick 确保树已渲染
+    await new Promise(resolve => setTimeout(resolve, 0))
+    // 父子节点独立，直接设置所有匹配的节点
+    rolePermissionsResponse.forEach(permissionData => {
+      treeRef.value?.setChecked(permissionData.id, true, false)
+    })
   } catch (error) {
     console.error('加载菜单权限失败:', error)
-    ElMessage.error(t('role.message.loadFailed'))
+    // ElMessage.error(t('role.loadFailed'))
   } finally {
     loading.value = false
   }
 }
 
-// 将菜单数据转换为树形结构（包含按钮权限点）
-function transformMenusToTree(menus: MenuConfig[]): TreeNode[] {
-  return menus.map(menu => {
-    const node: TreeNode = {
-      id: menu.id,
-      label: menu.title,
-      permissionCode: menu.permissionCode,
-      disabled: menu.menuType === 'sidebar_directory',
-      children: [],
-      data: menu
-    }
-    
-    // 添加按钮权限点作为子节点
-    if (menu.buttonPermissions && menu.buttonPermissions.length > 0) {
-      const buttonNodes = menu.buttonPermissions.map(btn => ({
-        id: btn.code,
-        label: btn.name,
-        permissionCode: btn.code,
-        isButton: true
-      }))
-      node.children = buttonNodes
-    }
-    
-    // 递归处理子菜单
-    if (menu.children && menu.children.length > 0) {
-      const childMenuNodes = transformMenusToTree(menu.children)
-      node.children = [...(node.children || []), ...childMenuNodes]
-    }
-    
-    return node
-  })
-}
-// 收集需要选中的节点ID
-function collectNodesToCheck(nodes: TreeNode[], permissionCodes: string[]): string[] {
-  const nodeIds: string[] = []
-  
-  function traverse(items: TreeNode[]) {
-    for (const item of items) {
-      if (item.permissionCode && permissionCodes.includes(item.permissionCode)) {
-        nodeIds.push(item.id)
+// 将权限数据转换为树形结构（包含按钮权限点）
+function formatTree(permissions: RolePermission[]): TreeNode[] {
+  return permissions
+    .map(permission => {
+      const node: TreeNode = {
+        ...permission,
+        label: permission.name,
+        permissionCode: permission.code,
+        disabled: props.readOnly || checkKeepPermission(permission.code),
+        isButton: permission.type === 'BUTTON',
+        isApi: permission.type === 'API',
+        children: permission.children?.length ? formatTree(permission.children) : undefined
       }
-      if (item.children && item.children.length > 0) {
-        traverse(item.children)
-      }
-    }
-  }
-  
-  traverse(nodes)
-  return nodeIds
+      if (showAll.value && (node.isApi || node.isButton)) return
+      return node
+    })
+    .filter(i => !!i)
 }
 
-// 更新显示状态
+// 更新对话框状态
 function handleUpdateVisible(value: boolean) {
   emit('update:visible', value)
 }
-
 // 关闭对话框
 function handleClose() {
   // 清空选中状态
@@ -193,53 +191,38 @@ function handleCancel() {
 async function handleSubmit() {
   if (!treeRef.value) return
 
-  saving.value = true
+  saveLoading.value = true
   try {
     // 获取所有选中的节点（父子节点独立，不需要获取半选中）
-    const checkedKeys = treeRef.value.getCheckedKeys() as string[]
-
-    console.log('选中的节点ID:', checkedKeys)
-
-    // 提取权限码（包括页面权限点和按钮权限点）
-    const permissionCodes = extractPermissionCodes(treeData.value, checkedKeys)
-    
-    console.log('转换后的权限码:', permissionCodes)
+    const checkedKeys = treeRef.value.getCheckedKeys() as number[]
+    const checkedHalfKeys = treeRef.value.getHalfCheckedKeys() as number[]
+    // console.log('选中权限ID:', checkedKeys)
+    // console.log('路径上的权限ID:', checkedHalfKeys)
+    const keys = new Set([...checkedKeys, ...checkedHalfKeys])
 
     // 保存角色菜单权限
-    await saveRoleMenus(props.roleId, permissionCodes)
-    
-    ElMessage.success(t('role.message.permissionSaveSuccess'))
+    await saveRolePermissions(props.roleId, [...keys])
+
+    ElMessage.success(t('role.permissionSaveSuccess'))
     emit('success')
     emit('update:visible', false)
   } catch (error) {
     console.error('保存菜单权限失败:', error)
-    ElMessage.error(t('common.saveFailed'))
+    // ElMessage.error(t('common.saveFailed'))
   } finally {
-    saving.value = false
+    saveLoading.value = false
   }
-}
-
-// 提取权限码
-function extractPermissionCodes(nodes: TreeNode[], selectedIds: string[]): string[] {
-  const permissionCodes: string[] = []
-  
-  function traverse(items: TreeNode[]) {
-    for (const item of items) {
-      if (selectedIds.includes(item.id) && item.permissionCode) {
-        permissionCodes.push(item.permissionCode)
-      }
-      if (item.children && item.children.length > 0) {
-        traverse(item.children)
-      }
-    }
-  }
-  
-  traverse(nodes)
-  return permissionCodes
 }
 </script>
 
 <style scoped lang="scss">
+.menu-top {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: -12px;
+  margin-bottom: 4px;
+  padding-right: 8px;
+}
 .menu-tree-container {
   min-height: 300px;
   max-height: 500px;
@@ -294,14 +277,11 @@ function extractPermissionCodes(nodes: TreeNode[], selectedIds: string[]): strin
     font-size: 14px;
     flex: 1;
   }
-  .el-checkbox.is-disabled {
-    display: none;
-  }
 }
 
 :deep(.el-dialog) {
   border-radius: 8px;
-  
+
   .el-dialog__header {
     padding: 20px 20px 10px;
     border-bottom: 1px solid var(--el-border-color-lighter);
@@ -314,19 +294,6 @@ function extractPermissionCodes(nodes: TreeNode[], selectedIds: string[]): strin
   .el-dialog__footer {
     padding: 10px 20px 20px;
     border-top: 1px solid var(--el-border-color-lighter);
-  }
-}
-
-// 响应式布局
-@media (max-width: 768px) {
-  :deep(.el-dialog) {
-    width: 90% !important;
-    margin: 0 auto;
-  }
-
-  .menu-tree-container {
-    max-height: 400px;
-    padding: 10px;
   }
 }
 </style>

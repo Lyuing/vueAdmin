@@ -1,10 +1,11 @@
 import { createRouter, createWebHistory, type RouteRecordRaw, type Router } from 'vue-router'
 import { staticRoutes, routeMap } from './routes'
-import { setupRouterGuards } from './guards'
 import { filterAccessRoutes } from './permission'
 
-let router: Router | null = null
+export { setupRouterGuards } from './guards'
+export { routeMap }
 
+let router: Router | null = null
 let dynamicRoutesAdded = false
 
 /**
@@ -18,13 +19,11 @@ export function initRouter() {
     history: createWebHistory(import.meta.env.BASE_URL),
     routes: staticRoutes as RouteRecordRaw[]
   })
-  // 注册路由守卫
-  setupRouterGuards(router)
   return router
 }
 
 function ensureRouter(): Router {
-  if (!router) throw new Error('Router not initialized. Call initRouter() before using router.')
+  if (!router) throw new Error('路由未初始化')
   return router
 }
 
@@ -35,29 +34,32 @@ export async function addDynamicRoutes(permissions?: string[], force = false) {
   const r = ensureRouter()
 
   if (dynamicRoutesAdded && !force) return
+  let effectivePermissions: string[] = permissions?.filter(i => i.includes('menu:')) || []
 
-  // 如果未传入 permissions，则尝试从导航 store 中读取菜单权限码映射
-  let effectivePermissions: string[] = permissions || []
-  if ( !effectivePermissions?.length ) {
+  if (!effectivePermissions?.length) {
     console.warn('无权限码')
   }
 
   // 根据权限过滤路由（优先匹配 route.meta.permissionCode）
   const accessibleRoutes = filterAccessRoutes(routeMap, effectivePermissions)
-
+  console.log('--- [动态路由] 下发权限', JSON.parse(JSON.stringify(effectivePermissions)))
+  console.log('--- [动态路由] 下发权限的路由', JSON.parse(JSON.stringify(accessibleRoutes)))
   // 添加路由到 router
   accessibleRoutes.forEach(route => {
     r.addRoute(route as RouteRecordRaw)
+    // console.log('--- [动态路由] 正在添加的路由', route.path)
   })
 
-  // 添加404路由（必须在最后）
-  r.addRoute({
-    path: '/:pathMatch(.*)*',
-    redirect: '/404',
-    name: 'NotFound'
-  })
+  // 不能添加通配路由，否则路由守卫会匹配到并反复跳转
+  // 添加404路由
+  // r.addRoute({
+  //   path: '/:pathMatch(.*)*',
+  //   redirect: '/404',
+  //   name: 'NotFound'
+  // })
 
   dynamicRoutesAdded = true
+  console.log('--- [动态路由] 加载完成', r.getRoutes())
 }
 
 /**
@@ -74,8 +76,11 @@ export function resetRouter() {
 
   // 移除所有动态添加的路由（保留静态路由）
   routes.forEach(route => {
-    // 只移除动态添加的路由，保留静态路由（login, 403, 404）
-    if (route.name && !['Login', 'Forbidden', 'NotFound'].includes(route.name as string)) {
+    // 只移除动态添加的路由，保留静态路由（login, 403, 404, 500）
+    if (
+      route.name &&
+      !['Login', 'Forbidden', 'NotFound', 'ServerError'].includes(route.name as string)
+    ) {
       try {
         r.removeRoute(route.name)
       } catch {
@@ -84,12 +89,12 @@ export function resetRouter() {
     }
   })
 
-  // 确保404路由被移除（如果存在）
-  try {
-    r.removeRoute('NotFound')
-  } catch {
-    // 忽略错误，路由可能不存在
-  }
+  // // 确保404路由被移除（如果存在）
+  // try {
+  //   r.removeRoute('NotFound')
+  // } catch {
+  //   // 忽略错误，路由可能不存在
+  // }
 }
 
 export function getRouter() {

@@ -8,7 +8,11 @@
     "email": "admin@example.com",
     "phone": "13800138000",
     "roles": [
-      "admin"
+      {
+        "id": 1,
+        "name": "管理员",
+        "code": "admin"
+      }
     ],
     "createdAt": "2024-01-01T00:00:00.000Z",
     "updatedAt": "2024-01-01T00:00:00.000Z"
@@ -19,7 +23,11 @@
     "password": "test123",
     "nickname": "test1",
     "roles": [
-      "test"
+      {
+        "id": 3,
+        "name": "权限测试",
+        "code": "test"
+      }
     ],
     "createdAt": "2025-12-05T07:45:48.165Z",
     "updatedAt": "2025-12-09T06:33:57.699Z"
@@ -30,7 +38,11 @@
     "password": "test123",
     "nickname": "test2",
     "roles": [
-      "user"
+      {
+        "id": 2,
+        "name": "普通用户",
+        "code": "user"
+      }
     ],
     "createdAt": "2025-12-09T06:16:45.333Z",
     "updatedAt": "2025-12-09T06:16:45.333Z"

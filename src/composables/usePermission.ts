@@ -2,6 +2,12 @@ import { computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import type { RouteLocationNormalized } from 'vue-router'
 
+const ReservedPermission = ['menu:welcome', 'menu:system_menu']
+// 检查是否自留权限
+export function checkKeepPermission(permissionCode?: string): boolean {
+  return ReservedPermission.includes(permissionCode || '')
+}
+
 export function usePermission() {
   const authStore = useAuthStore()
 
@@ -16,10 +22,7 @@ export function usePermission() {
    * @param permissionCode 权限码或权限码数组
    * @param requireAll 是否需要全部权限（默认false，只需一个）
    */
-  function hasPermission(
-    permissionCode: string | string[],
-    requireAll = false
-  ): boolean {
+  function hasPermission(permissionCode: string | string[], requireAll = false): boolean {
     if (!authStore.isLoggedIn) {
       return false
     }
@@ -98,45 +101,8 @@ export function usePermission() {
     }
 
     // 检查权限码
-    if (route.meta?.permissionCode && typeof route.meta.permissionCode === 'string') {
-      if (!hasPermission(route.meta.permissionCode)) {
-        if (import.meta.env.DEV) {
-          console.warn('[usePermission] Permission denied:', {
-            path: route.path,
-            permissionCode: route.meta.permissionCode,
-            userPermissions: permissions.value
-          })
-        }
-        return false
-      }
-    }
-
-    // 检查permissions数组（兼容旧代码）
-    if (route.meta?.permissions && Array.isArray(route.meta.permissions)) {
-      const permList = route.meta.permissions as string[]
-      if (!hasPermission(permList)) {
-        if (import.meta.env.DEV) {
-          console.warn('[usePermission] Permissions denied:', {
-            path: route.path,
-            permissions: route.meta.permissions,
-            userPermissions: permissions.value
-          })
-        }
-        return false
-      }
-    }
-
-    // 检查角色
-    if (route.meta?.roles && Array.isArray(route.meta.roles)) {
-      const roleList = route.meta.roles as string[]
-      if (!hasRole(roleList)) {
-        if (import.meta.env.DEV) {
-          console.warn('[usePermission] Roles denied:', {
-            path: route.path,
-            roles: route.meta.roles,
-            userRoles: roles.value
-          })
-        }
+    if (route.meta?.permissionCode) {
+      if (!hasPermission(route.meta.permissionCode as string)) {
         return false
       }
     }

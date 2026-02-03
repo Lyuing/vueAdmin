@@ -12,10 +12,9 @@ export async function errorHandler(ctx: Context, next: Next): Promise<void> {
     if (err instanceof BusinessError) {
       error(ctx, err.code, err.message, err.statusCode)
     } else {
-      const message = config.env === 'production' 
-        ? 'Internal server error' 
-        : err.message || 'Unknown error'
-      
+      const message =
+        config.env === 'production' ? 'Internal server error' : err.message || 'Unknown error'
+
       error(ctx, 'INTERNAL_ERROR', message, 500)
     }
   }

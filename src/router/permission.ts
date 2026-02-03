@@ -19,10 +19,7 @@ export function hasPermission(
 /**
  * 根据权限过滤路由配置表
  */
-export function filterAccessRoutes(
-  routes: RouteConfig[],
-  permissions: string[]
-): RouteConfig[] {
+export function filterAccessRoutes(routes: RouteConfig[], permissions: string[]): RouteConfig[] {
   return routes
     .filter(route => {
       // 优先使用单一的 permissionCode（与菜单配置对齐），回退到 meta.permissions
@@ -32,12 +29,16 @@ export function filterAccessRoutes(
         | undefined
 
       const hasAuth = hasPermission(required, permissions)
-      if (hasAuth && route.children) {
-        route.children = filterAccessRoutes(route.children, permissions)
-      }
       return hasAuth
     })
-    .map(route => ({ ...route }))
+    .map(route => {
+      // 创建新路由对象，避免修改原对象
+      const routeCopy = { ...route }
+      if (route.children) {
+        routeCopy.children = filterAccessRoutes(route.children, permissions)
+      }
+      return routeCopy
+    })
 }
 
 /**

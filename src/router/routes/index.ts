@@ -33,6 +33,16 @@ export const staticRoutes: RouteConfig[] = [
       requiresAuth: false,
       hidden: true
     }
+  },
+  {
+    path: '/500',
+    name: 'ServerError',
+    component: () => import('@/views/error/500.vue'),
+    meta: {
+      title: '服务器内部错误',
+      requiresAuth: false,
+      hidden: true
+    }
   }
 ]
 
@@ -59,19 +69,12 @@ export const routeMap: RouteConfig[] = [
         meta: {
           title: '首页',
           requiresAuth: true,
-          permissionCode: 'home'
+          permissionCode: 'menu:welcome'
         }
       },
-      {
-        path: '/dashboard',
-        name: 'Dashboard',
-        component: () => import('@/views/dashboard/index.vue'),
-        meta: {
-          title: '工作台',
-          requiresAuth: true,
-          permissionCode: 'dashboard'
-        }
-      },
+      /**
+       * 系统管理
+       */
       {
         path: '/system/user',
         name: 'SystemUser',
@@ -79,7 +82,7 @@ export const routeMap: RouteConfig[] = [
         meta: {
           title: '用户管理',
           requiresAuth: true,
-          permissionCode: 'system_user'
+          permissionCode: 'menu:system_user'
         }
       },
       {
@@ -89,7 +92,7 @@ export const routeMap: RouteConfig[] = [
         meta: {
           title: '角色管理',
           requiresAuth: true,
-          permissionCode: 'system_role'
+          permissionCode: 'menu:system_role'
         }
       },
       {
@@ -99,37 +102,21 @@ export const routeMap: RouteConfig[] = [
         meta: {
           title: '菜单管理',
           requiresAuth: true,
-          permissionCode: 'system_menu'
+          permissionCode: 'menu:system_menu'
         }
       },
+
+      /**
+       * 运营监控中心
+       */
       {
-        path: '/system/resource',
-        name: 'SystemResource',
-        component: () => import('@/views/system/resource/index.vue'),
+        path: '/workbench',
+        name: 'Workbench',
+        component: () => import('@/views/workbench/index.vue'),
         meta: {
-          title: '资源管理',
+          title: '工作台',
           requiresAuth: true,
-          permissionCode: 'system_resource'
-        }
-      },
-      {
-        path: '/system/resource/detail/:id',
-        name: 'SystemResourceDetail',
-        component: () => import('@/views/system/resource/detail.vue'),
-        meta: {
-          title: '资源详情',
-          requiresAuth: true,
-          permissionCode: 'system_resource_detail'
-        }
-      },
-      {
-        path: '/system/resource/edit/:id',
-        name: 'SystemResourceEdit',
-        component: () => import('@/views/system/resource/edit.vue'),
-        meta: {
-          title: '编辑资源',
-          requiresAuth: true,
-          permissionCode: 'system_resource_edit'
+          permissionCode: 'menu:workbench'
         }
       }
     ]

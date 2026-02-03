@@ -2,146 +2,72 @@
   <div class="home-page">
     <el-card class="welcome-card">
       <h2>{{ t('menu.home') }}</h2>
-      <p>管理系统</p>
+      <p>{{ t('basic.name') }}</p>
       <el-divider />
       <div class="info-grid">
         <div class="info-item">
           <el-icon :size="40" color="#409EFF"><User /></el-icon>
           <div class="info-text">
-            <div class="info-label">用户名</div>
+            <div class="info-label">{{ t('basic.username') }}</div>
             <div class="info-value">{{ authStore.userInfo?.username }}</div>
           </div>
         </div>
         <div class="info-item">
           <el-icon :size="40" color="#67C23A"><UserFilled /></el-icon>
           <div class="info-text">
-            <div class="info-label">昵称</div>
-            <div class="info-value">{{ authStore.userInfo?.nickname }}</div>
+            <div class="info-label">{{ t('basic.realName') }}</div>
+            <div class="info-value">{{ authStore.userInfo?.realName }}</div>
           </div>
         </div>
         <div class="info-item">
           <el-icon :size="40" color="#E6A23C"><Key /></el-icon>
           <div class="info-text">
-            <div class="info-label">角色</div>
+            <div class="info-label">{{ t('basic.role') }}</div>
             <div class="info-value">{{ authStore.userInfo?.roles.join(', ') }}</div>
           </div>
         </div>
       </div>
     </el-card>
-
-    <el-row :gutter="20" style="margin-top: 20px">
-      <el-col :span="12">
-        <el-card>
-          <template #header>
-            <span>功能特性</span>
-          </template>
-          <ul class="feature-list">
-            <li> Vue3 + TypeScript + Vite</li>
-            <li> Element Plus UI组件库</li>
-            <li> 用户认证与权限控制</li>
-            <li> 国际化多语言支持</li>
-            <li> 主题切换功能</li>
-          </ul>
-        </el-card>
-      </el-col>
-      <el-col :span="12">
-        <el-card>
-          <template #header>
-            <span>快速操作</span>
-          </template>
-          <div class="quick-actions">
-            <el-button type="primary" @click="changeLanguage">
-              切换语言
-            </el-button>
-            <el-button type="success" @click="changeTheme">
-              切换主题
-            </el-button>
-            <el-button type="warning" @click="viewDashboard">
-              查看工作台
-            </el-button>
-          </div>
-        </el-card>
-      </el-col>
-    </el-row>
-
-    <el-row :gutter="20" style="margin-top: 20px">
-      <el-col :span="24">
-        <el-card>
-          <template #header>
-            <span>系统管理</span>
-          </template>
-          <div class="system-actions">
-            <el-button 
-              v-if="hasPermission('home:to_system_user')"
-              type="primary" 
-              :icon="User"
-              @click="navigateTo('/system/user')"
-            >
-              用户管理
-            </el-button>
-            <el-button 
-              v-if="hasPermission('home:to_system_role')"
-              type="success" 
-              :icon="UserFilled"
-              @click="navigateTo('/system/role')"
-            >
-              角色管理
-            </el-button>
-            <el-button 
-              v-if="hasPermission('home:to_system_menu')"
-              type="warning" 
-              :icon="Menu"
-              @click="navigateTo('/system/menu')"
-            >
-              菜单管理
-            </el-button>
-          </div>
-        </el-card>
-      </el-col>
-    </el-row>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { User, UserFilled, Key, Menu } from '@element-plus/icons-vue'
+import { User, UserFilled, Key } from '@element-plus/icons-vue'
 import { useAuthStore } from '@/stores/auth'
-import { useTheme } from '@/composables/useTheme'
-import { storage } from '@/utils/storage'
+import { useNavigationStore } from '@/stores/navigation'
+import { onMounted } from 'vue'
 
 const router = useRouter()
-const { t, locale } = useI18n()
+const { t } = useI18n()
 const authStore = useAuthStore()
-const { currentTheme, setTheme } = useTheme()
+const navigationStore = useNavigationStore()
 
-const changeLanguage = () => {
-  const newLocale = locale.value === 'zh-CN' ? 'en-US' : 'zh-CN'
-  locale.value = newLocale
-  storage.set('locale', newLocale)
-}
+// 跳转到已加载的第一个导航页面
+const redirectPage = () => {
+  const findFirstPath = (menus: any[]): string | undefined => {
+    for (const menu of menus) {
+      if (menu.path && !menu.hidden && menu.permissionCode !== 'menu:welcome') {
+        return menu.path
+      }
+      if (menu.children && menu.children.length > 0) {
+        const path = findFirstPath(menu.children)
+        if (path) return path
+      }
+    }
+    return undefined
+  }
 
-const changeTheme = async () => {
-  const themes = ['default', 'green', 'purple']
-  const currentIndex = themes.indexOf(currentTheme.value)
-  const nextIndex = (currentIndex + 1) % themes.length
-  const nextTheme = themes[nextIndex]
-  if (nextTheme) {
-    await setTheme(nextTheme)
+  const firstPath = findFirstPath(navigationStore.menuTree)
+  if (firstPath) {
+    router.push(firstPath)
   }
 }
 
-const viewDashboard = () => {
-  router.push('/dashboard')
-}
-
-const navigateTo = (path: string) => {
-  router.push(path)
-}
-
-const hasPermission = (permission: string): boolean => {
-  return authStore.userInfo?.permissions.includes(permission) || false
-}
+onMounted(() => {
+  redirectPage()
+})
 </script>
 
 <style scoped lang="scss">

@@ -1,6 +1,11 @@
 <template>
   <div class="icon-picker">
-    <el-input :model-value="modelValue" :placeholder="t('menu.form.selectIcon')" readonly @click="dialogVisible = true">
+    <el-input
+      :model-value="modelValue"
+      :placeholder="t('menu.selectIcon')"
+      readonly
+      @click="dialogVisible = true"
+    >
       <template #prefix>
         <el-icon v-if="modelValue">
           <component :is="getIcon(modelValue)" />
@@ -16,9 +21,19 @@
       </template>
     </el-input>
 
-    <el-dialog v-model="dialogVisible" :title="t('menu.form.selectIcon')" width="800px" :close-on-click-modal="false">
+    <el-dialog
+      v-model="dialogVisible"
+      :title="t('menu.selectIcon')"
+      width="800px"
+      :close-on-click-modal="false"
+    >
       <div class="icon-picker-dialog">
-        <el-input v-model="searchText" :placeholder="t('menu.form.searchIcon')" clearable class="search-input">
+        <el-input
+          v-model="searchText"
+          :placeholder="t('menu.searchIcon')"
+          clearable
+          class="search-input"
+        >
           <template #prefix>
             <el-icon>
               <Search />
@@ -27,8 +42,13 @@
         </el-input>
 
         <div class="icon-list">
-          <div v-for="icon in filteredIcons" :key="icon" class="icon-item" :class="{ active: modelValue === icon }"
-            @click="handleSelect(icon)">
+          <div
+            v-for="icon in filteredIcons"
+            :key="icon"
+            class="icon-item"
+            :class="{ active: modelValue === icon }"
+            @click="handleSelect(icon)"
+          >
             <el-icon :size="24">
               <component :is="getIcon(icon)" />
             </el-icon>
@@ -36,7 +56,7 @@
           </div>
         </div>
 
-        <el-empty v-if="filteredIcons.length === 0" :description="t('menu.form.noIconFound')" />
+        <el-empty v-if="filteredIcons.length === 0" :description="t('menu.noIconFound')" />
       </div>
     </el-dialog>
   </div>

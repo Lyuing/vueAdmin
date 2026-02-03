@@ -1,19 +1,21 @@
 <template>
-  <router-view v-slot="{ Component }">
-    <transition name="fade" mode="out-in">
-      <component :is="Component" />
-    </transition>
-  </router-view>
+  <el-config-provider :locale="currentElementLocale">
+    <router-view v-slot="{ Component }">
+      <transition name="fade" mode="out-in">
+        <component :is="Component" />
+      </transition>
+    </router-view>
+  </el-config-provider>
 </template>
 
 <script setup lang="ts">
-// App根组件
+import { currentElementLocale } from '@/locales'
 </script>
 
-<style>
+<style scoped lang="scss">
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.3s ease;
+  transition: opacity var(--transition-duration) ease;
 }
 
 .fade-enter-from,

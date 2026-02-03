@@ -1,22 +1,33 @@
 <template>
   <div v-if="hasSidebarMenus" :class="['sidebar', { collapsed: sidebarCollapsed }]">
-    <div class="collapse-btn" @click="toggleSidebar()">
-      <el-icon>
-        <component :is="sidebarCollapsed ? 'Expand' : 'Fold'" />
-      </el-icon>
+    <div class="collapse-box" @click="toggleSidebar()">
+      <p class="collapse-btn">
+        <i
+          :class="[
+            'zk-monitor',
+            'zk-monitor-icon-zhankai',
+            'collapsed-icon',
+            sidebarCollapsed ? 'collapsed-expand' : 'collapsed-fold'
+          ]"
+        ></i>
+      </p>
     </div>
-    <el-menu 
-      :default-active="activeMenuId"
-      :default-openeds="openedMenuIds"
-      :collapse="sidebarCollapsed"
-      :unique-opened="false"
-      class="sidebar-menu"
-      @select="handleMenuSelect"
-    >
-      <template v-for="menu in sidebarMenus" :key="menu.id">
-        <menu-item :menu="menu" />
-      </template>
-    </el-menu>
+    <div class="menu-wraper">
+      <el-scrollbar>
+        <el-menu
+          :default-active="activeMenuId"
+          :default-openeds="openedMenuIds"
+          :collapse="sidebarCollapsed"
+          :unique-opened="false"
+          class="sidebar-menu"
+          @select="handleMenuSelect"
+        >
+          <template v-for="menu in sidebarMenus" :key="menu.id">
+            <menu-item :menu="menu" />
+          </template>
+        </el-menu>
+      </el-scrollbar>
+    </div>
   </div>
 </template>
 
@@ -40,17 +51,17 @@ const hasSidebarMenus = computed(() => {
 // 当前激活的菜单ID（最后一个，即当前菜单）
 const activeMenuId = computed(() => {
   const ids = activeMenuIds.value
-  return ids.length > 0 ? ids[ids.length - 1] : ''
+  return ids.length > 0 ? `${ids[ids.length - 1]}` : ''
 })
 
 // 需要展开的菜单ID列表（除了最后一个）
 const openedMenuIds = computed(() => {
   const ids = activeMenuIds.value
-  return ids.length > 1 ? ids.slice(0, -1) : []
+  return ids.length > 1 ? [`${ids.slice(0, -1)}`] : []
 })
 
 // 处理菜单选择
-const handleMenuSelect = (menuId: string) => {
+const handleMenuSelect = (menuId: number) => {
   // 通过菜单ID查找菜单项，然后跳转到对应的路由
   const menu = navigationStore.menuMap.get(menuId)
   if (!menu) return
@@ -61,95 +72,80 @@ const handleMenuSelect = (menuId: string) => {
 
 <style scoped lang="scss">
 .sidebar {
+  width: $sidebar-width;
   position: relative;
-  width: 200px;
-  background-color: var(--color-bg-base);
-  transition: width 0.3s;
   flex-shrink: 0;
-
-  &::after {
-    content: '';
-    position: absolute;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    width: 1px;
-    background-color: var(--color-border);
-    z-index: 1;
-  }
-
+  background-color: var(--bgc-menu);
+  transition: all var(--transition-duration);
   &.collapsed {
-    width: 64px;
+    width: 0;
+    transform: translateX(-100%);
   }
 }
-
-.collapse-btn {
+.menu-wraper {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  padding: 0 $spacing-20;
+}
+.collapse-box {
+  width: 26px;
+  height: 60px;
   position: absolute;
-  right: -1px;
-  top: 12px;
+  right: -20px;
+  top: 50%;
+  overflow: hidden;
+  transform: translateY(-50%);
   z-index: 10;
+  cursor: pointer;
+}
+.collapse-btn {
+  width: 16px;
+  height: 100%;
+  margin: auto;
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 24px;
-  height: 24px;
-  cursor: pointer;
-  background-color: var(--color-bg-base);
-  border: 1px solid var(--color-border);
-  border-radius: 50%;
-  transition: all 0.3s;
   color: var(--color-text-regular);
-  transform: translateX(50%);
+  background-color: var(--bgc-menu);
+  border-radius: 0 var(--radius-m) var(--radius-m) 0;
+  transition: all var(--transition-duration);
 
   &:hover {
-    background-color: var(--color-bg-hover);
-    color: var(--color-text-primary);
     box-shadow: var(--shadow-light);
+    .collapsed-icon {
+      color: var(--color-white-70);
+    }
+  }
+
+  .collapsed-icon {
+    font-size: var(--font-size-xs);
+    color: var(--color-gray-500);
+
+    &.collapsed-expand {
+      transform: rotate(-90deg);
+    }
+    &.collapsed-fold {
+      transform: rotate(90deg);
+    }
   }
 }
 
 .sidebar-menu {
   border-right: none;
   height: 100%;
-  overflow-y: auto;
+  width: 100% !important;
+  padding: $spacing-24 0;
+  overflow: hidden;
   background-color: var(--color-bg-base);
 
   :deep(.el-menu-item),
   :deep(.el-sub-menu__title) {
-    height: 48px;
-    line-height: 48px;
-    color: var(--color-text-regular);
-
-    &:hover {
-      background-color: var(--color-bg-hover);
-      color: var(--color-text-primary);
-    }
+    border-radius: $radius-m;
+    margin-top: $spacing-4;
   }
-
   :deep(.el-menu-item.is-active) {
-    color: var(--color-primary);
-    background-color: var(--color-bg-active);
-  }
-
-  :deep(.el-sub-menu__title) {
-    &:hover {
-      background-color: var(--color-bg-hover);
-    }
-  }
-}
-
-@media (max-width: 768px) {
-  .sidebar {
-    position: fixed;
-    left: 0;
-    top: 60px;
-    bottom: 0;
-    z-index: 99;
-    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
-
-    &.collapsed {
-      left: -200px;
-    }
+    background-color: var(--menu-bg-active);
   }
 }
 </style>

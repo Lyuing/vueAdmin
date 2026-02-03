@@ -7,41 +7,32 @@
     @update:model-value="handleUpdateVisible"
     @close="handleClose"
   >
-    <el-form
-      ref="formRef"
-      :model="formData"
-      :rules="rules"
-      label-width="100px"
-    >
-      <el-form-item :label="t('role.form.name')" prop="name">
+    <el-form ref="formRef" :model="formData" :rules="rules" label-width="100px">
+      <el-form-item :label="t('role.name')" prop="name">
         <el-input
-          v-model="formData.name"
-          :placeholder="t('role.validation.nameRequired')"
+          v-model.trim="formData.name"
+          :placeholder="t('role.searchPlaceholder')"
+          :maxlength="20"
         />
       </el-form-item>
 
-      <el-form-item :label="t('role.form.code')" prop="code">
+      <!-- <el-form-item :label="t('role.code')" prop="code">
         <el-input
-          v-model="formData.code"
-          :placeholder="t('role.validation.codeRequired')"
+          v-model.trim="formData.code"
+          :placeholder="t('role.codePlaceholder')"
+          :maxlength="20"
           :disabled="mode === 'edit'"
         />
-      </el-form-item>
+      </el-form-item> -->
 
-      <el-form-item :label="t('role.form.description')" prop="description">
+      <el-form-item :label="t('role.description')" prop="description">
         <el-input
-          v-model="formData.description"
+          v-model.trim="formData.description"
           type="textarea"
           :rows="3"
-          :placeholder="t('role.form.descriptionPlaceholder')"
+          :maxlength="200"
+          :placeholder="t('role.descriptionPlaceholder')"
         />
-      </el-form-item>
-
-      <el-form-item :label="t('role.form.status')" prop="status">
-        <el-radio-group v-model="formData.status">
-          <el-radio value="active">{{ t('common.active') }}</el-radio>
-          <el-radio value="disabled">{{ t('common.disabled') }}</el-radio>
-        </el-radio-group>
       </el-form-item>
     </el-form>
 
@@ -56,7 +47,7 @@
 import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { FormInstance, FormRules } from 'element-plus'
-import type { Role } from '@/api/role'
+import type { Role } from '@/types/role'
 
 const { t } = useI18n()
 
@@ -80,46 +71,50 @@ const formData = ref<Partial<Role>>({
   name: '',
   code: '',
   description: '',
-  status: 'active'
+  status: 'ACTIVE'
 })
 
 // 表单验证规则
 const rules: FormRules = {
   name: [
-    { required: true, message: t('role.validation.nameRequired'), trigger: 'blur' },
-    { min: 2, max: 20, message: t('role.validation.nameLength'), trigger: 'blur' }
+    { required: true, message: t('validation.roleNameRequired'), trigger: 'blur' },
+    { min: 2, max: 20, message: t('validation.roleNameLength'), trigger: 'blur' }
   ],
   code: [
-    { required: true, message: t('role.validation.codeRequired'), trigger: 'blur' },
-    { pattern: /^[a-zA-Z0-9_]+$/, message: t('role.validation.codeFormat'), trigger: 'blur' }
-  ]
+    { pattern: /^[a-zA-Z0-9_]+$/, message: t('validation.roleCodeFormat'), trigger: 'blur' },
+    { max: 20, message: t('validation.roleCodeMaxLength'), trigger: 'blur' }
+  ],
+  description: [{ max: 200, message: t('validation.roleDescriptionMaxLength'), trigger: 'blur' }]
 }
 
 // 监听对话框打开，初始化表单数据
-watch(() => props.visible, (newVal) => {
-  if (newVal) {
-    if (props.mode === 'edit' && props.roleData) {
-      // 编辑模式：填充数据
-      formData.value = {
-        id: props.roleData.id,
-        name: props.roleData.name,
-        code: props.roleData.code,
-        description: props.roleData.description || '',
-        status: props.roleData.status
+watch(
+  () => props.visible,
+  newVal => {
+    if (newVal) {
+      if (props.mode === 'edit' && props.roleData) {
+        // 编辑模式：填充数据
+        formData.value = {
+          id: props.roleData.id,
+          name: props.roleData.name,
+          code: props.roleData.code,
+          description: props.roleData.description || '',
+          status: props.roleData.status
+        }
+      } else {
+        // 创建模式：重置表单
+        formData.value = {
+          name: '',
+          code: '',
+          description: '',
+          status: 'ACTIVE'
+        }
       }
-    } else {
-      // 创建模式：重置表单
-      formData.value = {
-        name: '',
-        code: '',
-        description: '',
-        status: 'active'
-      }
+      // 清除验证
+      formRef.value?.clearValidate()
     }
-    // 清除验证
-    formRef.value?.clearValidate()
   }
-})
+)
 
 // 更新显示状态
 function handleUpdateVisible(value: boolean) {
@@ -141,7 +136,7 @@ function handleCancel() {
 async function handleSubmit() {
   if (!formRef.value) return
 
-  await formRef.value.validate((valid) => {
+  await formRef.value.validate(valid => {
     if (valid) {
       emit('save', formData.value)
     }
@@ -152,7 +147,7 @@ async function handleSubmit() {
 <style scoped lang="scss">
 :deep(.el-dialog) {
   border-radius: 8px;
-  
+
   .el-dialog__header {
     padding: 20px 20px 10px;
     border-bottom: 1px solid var(--el-border-color-lighter);

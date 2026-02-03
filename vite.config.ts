@@ -5,10 +5,18 @@ import tailwindcss from '@tailwindcss/vite'
 
 // https://vite.dev/config/
 export default defineConfig({
+  // base: '/app/',
   plugins: [vue(), tailwindcss()],
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src')
+    }
+  },
+  css: {
+    preprocessorOptions: {
+      scss: {
+        additionalData: `@use "@/styles/variables.scss" as *;`
+      }
     }
   },
   server: {

@@ -1,10 +1,10 @@
 import type { Context, Next } from 'koa'
-import { verifyToken } from '../utils/token.util.js'
+import { verifyToken } from '../utils/token.js'
 import { BusinessError } from '../types/common.types.js'
 
 export async function auth(ctx: Context, next: Next): Promise<void> {
   const authorization = ctx.headers.authorization
-  
+
   if (!authorization) {
     throw new BusinessError('未提供认证令牌', 'AUTH_FAILED', 401)
   }

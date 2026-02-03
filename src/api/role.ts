@@ -1,59 +1,47 @@
 import http from './http'
-
-export interface Role {
-  id: string
-  name: string
-  code: string
-  description?: string
-  status: 'active' | 'disabled'
-  createdAt: string
-  updatedAt: string
-}
-
-export interface RoleMenuRelation {
-  roleId: string
-  roleName: string
-  permissionCodes: string[]
-}
+import type { Role, RolePermission } from '@/types/role'
+import type { PageRequest, PageResponse } from '@/types/api'
 
 /**
- * 获取所有角色
+ * 角色
  */
-export function getAllRoles(): Promise<{ data: Role[] }> {
-  return http.get('/role/allRole')
+// 获取所有角色
+export function getAllRoles(): Promise<Role[]> {
+  return http.get('/roles/v1')
+}
+// 查询所有角色-分页
+export function getRolesList(
+  options?: PageRequest<{
+    keyword?: string
+  }>
+): Promise<PageResponse<Role>> {
+  return http.get('/roles/v1/page', options)
 }
 
-/**
- * 创建角色
- */
-export function createRole(role: Partial<Role>): Promise<{ data: Role }> {
-  return http.post('/role', role)
+// 创建
+export function createRole(role: Partial<Role>): Promise<Role> {
+  return http.post('/roles/v1', role)
 }
 
-/**
- * 更新角色
- */
-export function updateRole(id: string, role: Partial<Role>): Promise<{ data: Role }> {
-  return http.post('/role/update', { id, ...role })
+// 更新
+export function updateRole(id: number, role: Partial<Role>): Promise<{ data: Role }> {
+  return http.post('/roles/v1/update', { id, ...role })
 }
 
-/**
- * 删除角色
- */
-export function deleteRole(id: string): Promise<void> {
-  return http.post('/role/delete', { id })
+// 删除
+export function deleteRole(id: number): Promise<void> {
+  return http.post('/roles/v1/delete?id=' + id)
 }
 
-/**
- * 获取角色的菜单权限
- */
-export function getRoleMenus(roleId: string): Promise<{ data: RoleMenuRelation }> {
-  return http.post('/role/roleMenus', { roleId })
+// 获取完整权限
+export function getAllPermissions(): Promise<RolePermission[]> {
+  return http.get('/permissions/v1/tree')
 }
-
-/**
- * 保存角色的菜单权限
- */
-export function saveRoleMenus(roleId: string, permissionCodes: string[]): Promise<void> {
-  return http.post('/role/saveRoleMenus', { roleId, permissionCodes })
+// 获取角色权限
+export function getRolePermissions(roleId: number): Promise<RolePermission[]> {
+  return http.get('/permissions/v1/flat/by-role-id', { roleId })
+}
+// 保存角色权限
+export function saveRolePermissions(roleId: number, permissionIds: number[]): Promise<void> {
+  return http.post('/permissions/v1/batch-save', { roleId, permissionIds })
 }

@@ -1,22 +1,22 @@
 <template>
-  <el-sub-menu v-if="menu.children && menu.children.length > 0" :index="menu.id">
+  <el-sub-menu v-if="menu.children && menu.children.length > 0" :index="menu.id + ''">
     <template #title>
       <el-icon v-if="menu.icon">
         <component :is="getIcon(menu.icon)" />
       </el-icon>
-      <span>{{ menu.title }}</span>
+      <el-tooltip :content="t(`nav.${menu.permissionCode}`)" :show-after="800" placement="top">
+        <span class="truncate">{{ t(`nav.${menu.permissionCode}`) }}</span>
+      </el-tooltip>
     </template>
-    <menu-item
-      v-for="child in menu.children"
-      :key="child.id"
-      :menu="child"
-    />
+    <menu-item v-for="child in menu.children" :key="child.id" :menu="child" />
   </el-sub-menu>
-  <el-menu-item v-else :index="menu.id" @click="handleMenuClick">
+  <el-menu-item v-else :index="menu.id + ''" @click="handleMenuClick">
     <el-icon v-if="menu.icon">
       <component :is="getIcon(menu.icon)" />
     </el-icon>
-    <span>{{ menu.title }}</span>
+    <el-tooltip :content="t(`nav.${menu.permissionCode}`)" :show-after="800" placement="top">
+      <span class="truncate">{{ t(`nav.${menu.permissionCode}`) }}</span>
+    </el-tooltip>
   </el-menu-item>
 </template>
 
@@ -25,6 +25,8 @@ import { useRouter } from 'vue-router'
 import { getIconComponent } from '@/utils/icon'
 import { useNavigationStore } from '@/stores/navigation'
 import type { MenuItem } from '@/types/navigation'
+
+import { t } from '@/locales'
 
 const props = defineProps<{
   menu: MenuItem
@@ -43,4 +45,3 @@ const getIcon = (iconName?: string) => {
   return getIconComponent(iconName)
 }
 </script>
-

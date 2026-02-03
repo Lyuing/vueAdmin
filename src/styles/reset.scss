@@ -1,0 +1,248 @@
+// 全局重置样式
+// *, *::before, *::after {
+//   box-sizing: border-box;
+// }
+// html, body,
+// div, span, object, iframe,
+// h1, h2, h3, h4, h5, h6,
+// p, figure, blockquote, pre, ul, ol, dl, dd, dt, th, td,
+// article, aside, figure, footer, header, main, nav, section,
+// input, select, textarea, button, canvas, svg, img, audio, video {
+//   margin: 0;
+//   padding: 0;
+//   border: 0;
+//   outline: none;
+// }
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  font-family: 'Harmony', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+    sans-serif;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-regular);
+  color: var(--text-color-base);
+  line-height: 1.5;
+  background-color: var(--bgc-page);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+ul, ol {
+  list-style: none;
+}
+i {
+  font-style: normal;
+}
+img {
+  display: block;
+  max-width: 100%;
+}
+
+#app {
+  width: 100%;
+  height: 100%;
+}
+
+// 滚动条样式
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #c1c1c1;
+  border-radius: 4px;
+
+  &:hover {
+    background-color: #a8a8a8;
+  }
+}
+
+// 通用工具类
+.text-center {
+  text-align: center;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.mt-10 {
+  margin-top: 10px;
+}
+
+.mt-20 {
+  margin-top: 20px;
+}
+
+.mb-10 {
+  margin-bottom: 10px;
+}
+
+.mb-20 {
+  margin-bottom: 20px;
+}
+
+.ml-10 {
+  margin-left: 10px;
+}
+
+.mr-10 {
+  margin-right: 10px;
+}
+
+.p-10 {
+  padding: 10px;
+}
+
+.p-20 {
+  padding: 20px;
+}
+
+// drawer 样式修改
+.el-drawer__header {
+  height: 70px;
+  color: var(--text-color-base);
+  font-size: var(--font-size-m);
+  font-weight: var(--font-weight-bold);
+  padding: 0 20px 0 16px;
+  margin-bottom: 0;
+}
+.el-drawer__body {
+  padding: 16px;
+  background-color: var(--bgc-page);
+}
+.store-drawer-content {
+  width: 100%;
+  height: 100%;
+  padding: 16px;
+  background-color: var(--color-white);
+  border-radius: var(--radius-l);
+}
+.el-drawer__close {
+  color: var(--text-color-base);
+}
+
+// 日期选择器样式修改
+.el-range-editor.el-input__wrapper {
+  /* 方案4关键：利用 Order 调整位置 */
+  .el-range__icon {
+    order: 10; // 移到最后
+    margin-left: 8px;
+    margin-right: 0;
+  }
+  .el-range-input:nth-of-type(1) {
+    order: 1; // 开始日期
+  }
+  .el-range-separator {
+    padding: 0;
+    order: 2; // 分隔符
+  }
+  .el-range-input:nth-of-type(2) {
+    order: 3; // 结束日期
+  }
+  .el-range__close-icon {
+    order: 9; // 清除图标放在日历图标左侧
+    margin-left: auto;
+  }
+}
+
+// 按钮样式主题覆盖
+.el-button--info {
+  --el-button-bg-color: var(--color-gray-200);
+  --el-button-border-color: var(--color-gray-200);
+  --el-button-text-color: var(--text-color-base);
+
+  --el-button-hover-text-color: var(--text-color-base);
+  --el-button-hover-bg-color: var(--color-gray-400);
+  --el-button-hover-border-color: var(--color-gray-400);
+
+  --el-button-active-color: var(--text-color-base);
+  --el-button-active-bg-color: var(--color-gray-500);
+  --el-button-active-border-color: var(--color-gray-500);
+
+  --el-button-disabled-text-color: var(--text-color-disabled);
+  --el-button-disabled-bg-color: var(--color-gray-200);
+  --el-button-disabled-border-color: var(--color-gray-200);
+}
+
+// 表格样式主题覆盖
+.el-table {
+  --el-table-header-bg-color: var(--bgc-page);
+  --el-table-header-text-color: var(--text-color-secondary);
+  
+    font-size: var(--font-size-xs);
+  .el-table__header-wrapper {
+    border-radius: var(--radius-l);
+  }
+  .el-table__header .el-table__cell.is-leaf {
+    padding: 17px 0;
+    border-bottom: none;
+    font-weight: var(--font-weight-base);
+  }
+  .el-table__header .cell {
+    line-height: 1.4;
+  }
+  .el-table__body .el-table__cell {
+    padding: 13px 0;
+    color: var(--text-color-base);
+    font-weight: var(--font-weight-regular);
+  }
+  .el-table__body .cell {
+    line-height: 1.4;
+  //   min-height: 34px;
+  //   padding: 13px 0;
+  //   display: flex;
+  //   align-items: center;
+  }
+}
+
+// 分页样式主题覆盖
+.el-pagination {
+  --el-pagination-border-radius: var(--radius-m);
+  --el-text-color-regular: var(--text-color-base);
+
+  width: 100%;
+  justify-content: flex-end;
+  &>.is-first {
+    justify-self: start;
+    margin-right: auto;
+  }
+}
+
+// popover 样式主题覆盖
+.el-popper {
+  padding: 14px 16px;
+}
+
+// empty 样式主题覆盖
+.el-empty {
+  --el-empty-description-margin-top: 2px;
+}

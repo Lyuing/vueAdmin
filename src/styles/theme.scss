@@ -1,0 +1,149 @@
+/**
+ * 统一主题样式文件
+ * 方便后续拓展主题切换
+ */
+
+@use './variables.scss' as *;
+
+// 主题变量定义（由 SCSS 变量生成 CSS 自定义属性）
+:root {
+
+  // 基础颜色
+  --color-primary: #{$color-primary};   // 主题色           #4281F8
+  --color-success: #{$color-success};   // 安全、成功       #4CAF50
+  --color-normal: #{$color-normal};    // 正常、轻微       #4CAF50
+  --color-remind: #{$color-remind};     // 提醒、一般         #4281F8
+  --color-warning: #{$color-warning};   // 警告、中等         #F19B50
+  --color-danger: #{$color-danger};     // 危险、严重、错误   #F6475D
+  --color-info: #{$color-info};
+  --color-gold: #{$color-gold};         // 金色系           #F7C48B
+  --color-blue: #{$color-blue};         // 蓝色系           #629CF9
+
+  // 中性色
+  --color-black: #{$color-black};
+  --color-white: #{$color-white};
+  --color-white-12: #{$color-white-12};
+  --color-white-70: #{$color-white-70};
+
+  // 灰度色
+  --color-gray-50: #{$color-gray-50};
+  --color-gray-100: #{$color-gray-100};   // 灰阶1 列表选中 #f6f8fc
+  --color-gray-200: #{$color-gray-200};   // 灰阶2 按钮   #f2f3f5
+  --color-gray-300: #{$color-gray-300};   // 灰阶3 背景等 #f6f6f6
+  --color-gray-400: #{$color-gray-400};   // 灰阶4 浅悬浮 #ececec
+  --color-gray-500: #{$color-gray-500};   // 灰阶5 浅点击 #c9cdd4
+  --color-gray-600: #{$color-gray-600};   // 灰阶6 标签灰背景
+  --color-gray-700: #{$color-gray-700};
+  --color-gray-800: #{$color-gray-800};
+  --color-gray-900: #{$color-gray-900};
+
+  // 背景颜色
+  --bgc-base: #{$bgc-base};         // 基础色 #F5F7FA
+  --bgc-page: #{$bgc-page};         // 页面背景色 #F6F6F6
+  --bgc-overlay: #{$bgc-overlay};   // 遮罩层颜色 rgba(0, 0, 0, 0.1)
+  --bgc-black: #{$bgc-black};       // 背景 黑色 #1D2129
+  --bgc-nav: #{$bgc-nav};           // 导航栏背景色 #131317
+  --bgc-menu: #{$bgc-menu};         // 菜单栏背景色 #1D2129
+  --bgc-button-grey: #{$color-gray-400};   // 按钮灰色背景色 #ECECEC
+
+  // 主题背景灰
+  --bgc-tag-primary: #{$bgc-tag-primary};   // 主题色             #E8F4FF
+  --bgc-tag-success: #{$bgc-tag-success};   // 安全、成功         #EDF4F2
+  --bgc-tag-normal: #{$bgc-tag-normal};    // 正常、轻微         #EDF4F2
+  --bgc-tag-remind: #{$bgc-tag-remind};     // 提醒、一般         #E8F4FF
+  --bgc-tag-warning: #{$bgc-tag-warning};   // 警告、中等         #F4F2ED
+  --bgc-tag-danger:  #{$bgc-tag-danger};     // 危险、严重、错误   #F7F0F0
+
+  // 文字颜色
+  // 常规灰色
+  --text-color-base: #{$text-color-base};               // 默认黑色   #1D2129
+  --text-color-secondary: #{$text-color-secondary};     // 次要灰色   #4E5969
+  --text-color-support: #{$text-color-support};         // 辅助灰色   #8B8E99
+  --text-color-placeholder: #{$text-color-support};     // 占位符灰色 #8B8E99
+  --text-color-disabled: #{$text-color-disabled};       // 禁用灰色   #BBBFCC
+
+  // 主题色相关
+  --text-color-primary: #{$color-primary};    // 主题色文字
+  --text-color-hover: #{$color-primary};
+  --text-color-active: #{$color-primary};
+  --text-color-white: #{$color-white};        // 白色文字
+
+
+
+  // 边框颜色
+  --border-color: #{$border-color};           // 边框色 #E5E6EB
+  --border: 1px solid #{$border-color};
+  --border-light: 1px solid  #{$border-color-light};
+  --border-lighter: 1px solid  #{$border-color-lighter};
+  --border-lightest: 1px solid  #{$border-color-lightest};
+
+  // 侧边导航栏
+  --menu-color-text: #{$color-white-70};
+  --menu-bg-hover: #{$color-white-12};
+  --menu-bg-active: #{$color-primary};
+  --menu-active-color-text: #{$color-white};
+
+  // 字体
+  --font-size-base: #{$font-size-base};     // 14px
+  --font-size-xxl: #{$font-size-xxl};       // 24px
+  --font-size-xl: #{$font-size-xl};         // 20px
+  --font-size-l: #{$font-size-l};           // 18px
+  --font-size-m: #{$font-size-m};           // 16px
+  --font-size-s: #{$font-size-s};           // 13px
+  --font-size-xs: #{$font-size-xs};         // 12px
+  // 字重
+  --font-weight-base: #{$font-weight-base};         // 400
+  --font-weight-regular: #{$font-weight-regular};   // 500
+  --font-weight-bold: #{$font-weight-bold};         // 700
+
+  // 圆角
+  --radius-xxl: #{$radius-xxl};   // 16px
+  --radius-xl: #{$radius-xl};   // 12px
+  --radius-l: #{$radius-l};   // 8px
+  --radius-m: #{$radius-m};   // 4px
+  --radius-s: #{$radius-s};   // 2px
+  --radius-circle: #{$radius-circle};  // 50%
+
+  // 阴影
+  --shadow-base: #{$shadow-base};   // 基础阴影
+  --shadow-light: #{$shadow-light};
+  --shadow-dark: #{$shadow-dark};
+
+  // 选择器
+  --select-width: #{$select-width};
+  --select-height: #{$select-height};
+
+  // 页面标题行
+  --page-header-height: #{$page-header-height};
+
+
+  // 动画时间
+  --transition-duration: 300ms;
+}
+
+// Element Plus 主题色映射
+:root {
+  --el-color-primary: var(--color-primary);
+  --el-color-success: var(--color-success);
+  --el-color-warning: var(--color-warning);
+  --el-color-danger: var(--color-danger);
+  --el-color-info: var(--color-info);
+
+  --el-menu-text-color: var(--menu-color-text);
+  --el-menu-active-color: var(--color-white);
+  --el-menu-bg-color: #{$color-transparent};
+  --el-menu-hover-bg-color: var(--menu-bg-hover);
+  --el-menu-item-font-size: var(--font-size);
+  --el-menu-item-height: #{$sidebar-menu-height};
+  --el-menu-sub-item-height: #{$sidebar-menu-height};
+  --el-menu-level-padding: 28px;
+
+  --el-text-color-regular: var(--text-color-secondary);
+
+  --el-overlay-color-lighter: var(--bgc-overlay);
+  --el-transition-duration: var(--transition-duration);
+}
+.el-popper{
+  --el-text-color-primary: var(--text-color-secondary);
+  --el-bg-color: var(--color-white)
+}

@@ -1,7 +1,10 @@
 <template>
   <div class="top-nav">
     <div class="nav-left">
-      <h1 class="logo">{{ t('login.title') }}</h1>
+      <h1 class="logo flex items-center">
+        <img class="logo-img" src="@/assets/images/logo.png" :alt="t('basic.title')" />
+        <span>{{ t('basic.title') }}</span>
+      </h1>
       <div class="nav-menu">
         <div
           v-for="menu in navs"
@@ -18,50 +21,15 @@
     </div>
     <div class="nav-right">
       <!-- 语言切换 -->
-      <el-dropdown @command="handleLanguageChange">
-        <span class="nav-item">
-          <el-icon><Place /></el-icon>
-          <span>{{ currentLanguage }}</span>
-        </span>
-        <template #dropdown>
-          <el-dropdown-menu>
-            <el-dropdown-item 
-              v-for="lang in languageOptions" 
-              :key="lang.code"
-              :command="lang.code"
-            >
-              {{ lang.label }}
-            </el-dropdown-item>
-          </el-dropdown-menu>
-        </template>
-      </el-dropdown>
-
-      <!-- 主题切换 -->
-      <el-dropdown @command="handleThemeChange">
-        <span class="nav-item">
-          <el-icon><Brush /></el-icon>
-          <span>{{ t('theme.title') }}</span>
-        </span>
-        <template #dropdown>
-          <el-dropdown-menu>
-            <el-dropdown-item
-              v-for="theme in themeList"
-              :key="theme.name"
-              :command="theme.name"
-            >
-              {{ t(`theme.${theme.name}`) }}
-            </el-dropdown-item>
-          </el-dropdown-menu>
-        </template>
-      </el-dropdown>
+      <LanguageSwitcher />
 
       <!-- 用户信息 -->
       <el-dropdown @command="handleUserCommand">
         <span class="nav-item user-info">
           <el-avatar :size="32" :src="authStore.userInfo?.avatar">
-            {{ authStore.userInfo?.nickname?.charAt(0) }}
+            {{ authStore.userInfo?.username?.charAt(0) }}
           </el-avatar>
-          <span>{{ authStore.userInfo?.nickname }}</span>
+          <span>{{ authStore.userInfo?.username }}</span>
         </span>
         <template #dropdown>
           <el-dropdown-menu>
@@ -84,34 +52,23 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useNavigation } from '@/composables/useNavigation'
 import { useNavigationStore } from '@/stores/navigation'
-import { useTheme } from '@/composables/useTheme'
-import { storage } from '@/utils/storage'
-import { LANGUAGE_OPTIONS, getLanguageLabel, isValidLanguage } from '@/locales'
+import LanguageSwitcher from '@/components/common/LanguageSwitcher.vue'
+
 import { getIconComponent } from '@/utils/icon'
 import type { MenuItem } from '@/types/navigation'
 
-
 const router = useRouter()
-const { t, locale } = useI18n()
+const { t } = useI18n()
 const authStore = useAuthStore()
-const { topMenus, activeTopMenu } = useNavigation()
+const { topNavs, activeTopNav } = useNavigation()
 const navigationStore = useNavigationStore()
-const { themeList, setTheme } = useTheme()
-
-// 使用配置获取当前语言显示名称
-const currentLanguage = computed(() => {
-  return getLanguageLabel(locale.value)
-})
-
-// 语言选项配置
-const languageOptions = LANGUAGE_OPTIONS
 
 const navs = computed(() => {
-  return topMenus.value.filter(menu => !menu.hidden)
+  return topNavs.value.filter(menu => !menu.hidden)
 })
 // 判断菜单是否激活
 const isMenuActive = (menu: MenuItem) => {
-  return menu.id === activeTopMenu.value?.id
+  return menu.id === activeTopNav.value?.id
 }
 
 const handleMenuClick = (menu: MenuItem) => {
@@ -121,21 +78,6 @@ const handleMenuClick = (menu: MenuItem) => {
   } catch (error) {
     console.error('跳转失败 path:', error)
   }
-}
-
-const handleLanguageChange = (lang: string) => {
-  try {
-    if (isValidLanguage(lang)) {
-      locale.value = lang
-      storage.set('locale', lang)
-    }
-  } catch (error) {
-    console.error('Failed to change language:', error)
-  }
-}
-
-const handleThemeChange = async (themeName: string) => {
-  await setTheme(themeName)
 }
 
 const handleUserCommand = (command: string) => {
@@ -155,11 +97,11 @@ const getIcon = (iconName?: string) => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: 60px;
-  padding: 0 20px;
-  background-color: var(--color-bg-base);
+  height: $nav-height;
+  padding: 0 $spacing-20;
+  color: var(--text-color-white);
+  background-color: var(--bgc-nav);
   box-shadow: var(--shadow-base);
-  border-bottom: 1px solid var(--color-border-lighter);
   z-index: 100;
 }
 
@@ -171,9 +113,14 @@ const getIcon = (iconName?: string) => {
 
 .logo {
   margin: 0;
-  font-size: 20px;
+  font-size: 16px;
   font-weight: 600;
-  color: var(--color-primary);
+}
+.logo-img {
+  height: 26px;
+  width: 95px;
+  margin-right: 8px;
+  vertical-align: middle;
 }
 
 .nav-menu {
@@ -189,16 +136,16 @@ const getIcon = (iconName?: string) => {
   cursor: pointer;
   border-radius: 4px;
   transition: all 0.3s;
-  color: var(--color-text-regular);
+  color: var(--menu-color-text);
 
   &:hover {
-    background-color: var(--color-bg-hover);
-    color: var(--color-text-primary);
+    background-color: var(--bg-hover);
+    color: var(--menu-active-color-text);
   }
 
   &.active {
-    color: var(--color-primary);
-    background-color: var(--color-bg-active);
+    color: var(--text-color-hover);
+    background-color: var(--bg-active);
   }
 }
 
@@ -218,11 +165,11 @@ const getIcon = (iconName?: string) => {
   transition: all 0.3s;
   border: none;
   outline: none;
-  color: var(--color-text-regular);
+  color: var(--text-color-white);
 
   &:hover {
-    background-color: var(--color-bg-hover);
-    color: var(--color-text-primary);
+    background-color: var(--bg-hover);
+    color: var(--text-color-hover);
   }
 
   &:focus {
@@ -242,20 +189,6 @@ const getIcon = (iconName?: string) => {
   .el-dropdown-link {
     outline: none;
     border: none;
-  }
-}
-
-@media (max-width: 768px) {
-  .logo {
-    font-size: 16px;
-  }
-
-  .nav-menu {
-    display: none;
-  }
-
-  .nav-item span {
-    display: none;
   }
 }
 </style>
