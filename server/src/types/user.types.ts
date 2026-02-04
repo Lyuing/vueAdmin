@@ -27,6 +27,7 @@ export interface UserCreateInput {
   phone?: string
   roles?: Role[]
   roleIds?: number[] // 支持前端传递角色ID数组
+  clientId?: string // 支持RSA加密密码
 }
 
 export interface UserUpdateInput {

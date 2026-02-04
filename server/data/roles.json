@@ -5,7 +5,7 @@
     "code": "admin",
     "description": "系统管理员，拥有所有权限",
     "createdTime": "2024-01-01T00:00:00.000Z",
-    "updateTime": "2024-01-01T00:00:00.000Z",
+    "updateTime": "2026-02-04T03:00:36.843Z",
     "permissions": [
       {
         "permissionId": 1001,
@@ -16,12 +16,12 @@
         "permissionCode": "menu:monitor"
       },
       {
-        "permissionId": 1003,
-        "permissionCode": "menu:system"
-      },
-      {
         "permissionId": 1004,
         "permissionCode": "menu:workbench"
+      },
+      {
+        "permissionId": 1003,
+        "permissionCode": "menu:system"
       },
       {
         "permissionId": 1005,
@@ -43,15 +43,19 @@
     "code": "user",
     "description": "普通用户，拥有基础功能权限",
     "createdTime": "2024-01-01T00:00:00.000Z",
-    "updateTime": "2024-01-01T00:00:00.000Z",
+    "updateTime": "2026-02-04T03:00:14.138Z",
     "permissions": [
       {
-        "permissionId": 1001,
-        "permissionCode": "menu:welcome"
+        "permissionId": 1002,
+        "permissionCode": "menu:monitor"
       },
       {
         "permissionId": 1004,
         "permissionCode": "menu:workbench"
+      },
+      {
+        "permissionId": 1001,
+        "permissionCode": "menu:welcome"
       }
     ]
   },
@@ -61,6 +65,24 @@
     "code": "test",
     "description": "测试",
     "createdTime": "2025-12-05T07:45:03.904Z",
-    "updateTime": "2026-02-03T09:22:48.202Z"
+    "updateTime": "2026-02-04T03:00:42.583Z",
+    "permissions": [
+      {
+        "permissionId": 1005,
+        "permissionCode": "menu:system_user"
+      },
+      {
+        "permissionId": 1006,
+        "permissionCode": "menu:system_role"
+      },
+      {
+        "permissionId": 1001,
+        "permissionCode": "menu:welcome"
+      },
+      {
+        "permissionId": 1003,
+        "permissionCode": "menu:system"
+      }
+    ]
   }
 ]

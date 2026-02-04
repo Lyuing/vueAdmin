@@ -85,10 +85,23 @@ export class UserService {
     }
   }
 
+  // eslint-disable-next-line complexity
   async createUser(input: UserCreateInput): Promise<User> {
     // 验证用户名是否已存在
     if (await userRepository.existsByUsername(input.username)) {
       throw new BusinessError('用户名已存在', 'DUPLICATE_USERNAME', 400)
+    }
+
+    // 处理密码：如果提供了clientId，说明密码是RSA加密的，需要解密
+    let actualPassword = input.password
+    if (input.clientId) {
+      const { rsaService } = await import('./rsa.service.js')
+      try {
+        actualPassword = await rsaService.decryptPassword(input.password, input.clientId)
+      } catch (error) {
+        console.error('密码解密失败:', error)
+        throw new BusinessError('密码解密失败', 'DECRYPTION_FAILED', 400)
+      }
     }
 
     // 处理角色信息：如果传了roleIds，需要转换为完整的角色对象
@@ -107,7 +120,7 @@ export class UserService {
     const newUser: User = {
       id: newId,
       username: input.username,
-      password: input.password,
+      password: actualPassword, // 保存解密后的明文密码
       realName: input.realName,
       avatar: input.avatar || '',
       email: input.email || '',
