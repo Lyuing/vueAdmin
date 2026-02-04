@@ -70,12 +70,13 @@ export class RoleRepository {
     return true
   }
 
-  async createWithAutoId(role: Omit<Role, 'id' | 'createdTime' | 'updateTime'>): Promise<Role> {
+  async createWithAutoId(
+    role: Omit<Role, 'id' | 'createdTime' | 'updateTime' | 'userCount'>
+  ): Promise<Role> {
     const maxId = this.data.length > 0 ? Math.max(...this.data.map(r => r.id)) : 0
     const newRole: Role = {
       ...role,
       id: maxId + 1,
-      userCount: role.userCount || 0,
       permissions: role.permissions || [],
       createdTime: new Date().toISOString(),
       updateTime: new Date().toISOString()

@@ -1,4 +1,5 @@
 import { roleRepository } from '../repositories/role.repository.js'
+import { userRepository } from '../repositories/user.repository.js'
 import { menuRepository } from '../repositories/menu.repository.js'
 import { BusinessError } from '../types/common.types.js'
 import type {
@@ -11,12 +12,40 @@ import type {
 import type { MenuConfig } from '../types/menu.types.js'
 
 export class RoleService {
+  /**
+   * 计算角色的用户数量
+   */
+  private async calculateUserCount(roleId: number): Promise<number> {
+    const allUsers = await userRepository.findAll()
+    return allUsers.filter(user => user.roles && user.roles.some(role => role.id === roleId)).length
+  }
+
+  /**
+   * 为角色列表添加动态计算的用户数量
+   */
+  private async enrichRolesWithUserCount(roles: Role[]): Promise<Role[]> {
+    return Promise.all(
+      roles.map(async role => ({
+        ...role,
+        userCount: await this.calculateUserCount(role.id)
+      }))
+    )
+  }
+
   async getAllRoles(): Promise<Role[]> {
-    return await roleRepository.findAll()
+    const roles = await roleRepository.findAll()
+    return await this.enrichRolesWithUserCount(roles)
   }
 
   async getRoleById(id: number): Promise<Role | null> {
-    return await roleRepository.findByIdNumber(id)
+    const role = await roleRepository.findByIdNumber(id)
+    if (!role) return null
+
+    // 动态计算用户数量
+    return {
+      ...role,
+      userCount: await this.calculateUserCount(role.id)
+    }
   }
 
   async createRole(input: RoleCreateInput): Promise<Role> {
@@ -30,13 +59,19 @@ export class RoleService {
       throw new BusinessError('角色名称已存在', 'DUPLICATE_NAME', 400)
     }
 
-    return await roleRepository.createWithAutoId({
+    // 创建角色时不需要传入userCount，它会在读取时动态计算
+    const newRole = await roleRepository.createWithAutoId({
       name: input.name,
       code: input.code,
       description: input.description || '',
-      userCount: 0,
       permissions: input.permissions || []
     })
+
+    // 返回时添加动态计算的用户数量
+    return {
+      ...newRole,
+      userCount: 0 // 新创建的角色用户数量为0
+    }
   }
 
   async updateRole(input: RoleUpdateInput): Promise<Role> {
@@ -71,7 +106,11 @@ export class RoleService {
       throw new BusinessError('更新失败', 'INTERNAL_ERROR', 500)
     }
 
-    return updated
+    // 返回时添加动态计算的用户数量
+    return {
+      ...updated,
+      userCount: await this.calculateUserCount(updated.id)
+    }
   }
 
   async deleteRole(id: number): Promise<void> {
@@ -81,8 +120,9 @@ export class RoleService {
       throw new BusinessError('角色不存在', 'NOT_FOUND', 404)
     }
 
-    // 检查是否有用户使用该角色
-    if (role.userCount && role.userCount > 0) {
+    // 动态检查是否有用户使用该角色
+    const userCount = await this.calculateUserCount(id)
+    if (userCount > 0) {
       throw new BusinessError('该角色下还有用户，无法删除', 'HAS_USERS', 400)
     }
 

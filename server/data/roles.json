@@ -4,7 +4,6 @@
     "name": "管理员",
     "code": "admin",
     "description": "系统管理员，拥有所有权限",
-    "userCount": 1,
     "createdTime": "2024-01-01T00:00:00.000Z",
     "updateTime": "2024-01-01T00:00:00.000Z",
     "permissions": [
@@ -43,7 +42,6 @@
     "name": "普通用户",
     "code": "user",
     "description": "普通用户，拥有基础功能权限",
-    "userCount": 1,
     "createdTime": "2024-01-01T00:00:00.000Z",
     "updateTime": "2024-01-01T00:00:00.000Z",
     "permissions": [
@@ -62,7 +60,6 @@
     "name": "权限测试",
     "code": "test",
     "description": "测试",
-    "userCount": 0,
     "createdTime": "2025-12-05T07:45:03.904Z",
     "updateTime": "2026-02-03T09:22:48.202Z"
   }
