@@ -84,5 +84,27 @@
         "permissionCode": "menu:system"
       }
     ]
+  },
+  {
+    "name": "新建角色",
+    "code": "",
+    "description": "",
+    "permissions": [
+      {
+        "permissionId": 1005,
+        "permissionCode": "menu:system_user"
+      },
+      {
+        "permissionId": 1001,
+        "permissionCode": "menu:welcome"
+      },
+      {
+        "permissionId": 1003,
+        "permissionCode": "menu:system"
+      }
+    ],
+    "id": 4,
+    "createdTime": "2026-02-04T03:11:38.354Z",
+    "updateTime": "2026-02-04T03:11:48.487Z"
   }
 ]

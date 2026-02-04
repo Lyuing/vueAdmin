@@ -57,14 +57,33 @@
     "phone": "",
     "roles": [
       {
+        "id": 4,
+        "name": "新建角色",
+        "code": ""
+      }
+    ],
+    "status": "ACTIVE",
+    "createdTime": "2026-02-03T09:59:09.693Z",
+    "updateTime": "2026-02-04T03:11:57.584Z",
+    "realName": "测试"
+  },
+  {
+    "id": "1765261005335",
+    "username": "test5",
+    "password": "123456",
+    "realName": "测试",
+    "avatar": "",
+    "email": "",
+    "phone": "",
+    "roles": [
+      {
         "id": 2,
         "name": "普通用户",
         "code": "user"
       }
     ],
     "status": "ACTIVE",
-    "createdTime": "2026-02-03T09:59:09.693Z",
-    "updateTime": "2026-02-03T12:41:28.818Z",
-    "realName": "测试"
+    "createdTime": "2026-02-04T03:13:13.686Z",
+    "updateTime": "2026-02-04T03:13:13.686Z"
   }
 ]
