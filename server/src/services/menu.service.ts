@@ -43,7 +43,7 @@ export class MenuService {
     return flatMenus
       .filter(menu => {
         // 查找menus.json中的parentId字段
-        const menuParentId = (menu as any).parentId
+        const menuParentId = menu.parentId
         if (parentId === null) {
           // 顶级菜单：parentId为null或undefined
           return menuParentId === null || menuParentId === undefined
@@ -166,9 +166,80 @@ export class MenuService {
       flatMenus = menus
     }
 
-    // 保存扁平结构的菜单数据
-    await menuRepository.saveAll(flatMenus)
-    console.log(`已保存 ${flatMenus.length} 个菜单项（扁平结构）`)
+    // 部分更新：只更新传入的菜单项，不替换整个列表
+    await this.updateMenusPartially(flatMenus)
+    console.log(`已更新 ${flatMenus.length} 个菜单项`)
+  }
+
+  /**
+   * 部分更新菜单：只更新传入的菜单项，保留其他菜单
+   */
+  private async updateMenusPartially(updatedMenus: MenuConfig[]): Promise<void> {
+    // 获取当前所有菜单
+    const currentMenus = await menuRepository.findAll()
+
+    // 创建一个Map用于快速查找当前菜单
+    const currentMenuMap = new Map<number, MenuConfig>()
+    currentMenus.forEach(menu => {
+      currentMenuMap.set(menu.id, menu)
+    })
+
+    // 处理传入的菜单更新
+    const updatedMenuMap = new Map<number, MenuConfig>()
+    for (const updatedMenu of updatedMenus) {
+      const currentMenu = currentMenuMap.get(updatedMenu.id)
+
+      if (currentMenu) {
+        // 菜单存在，合并更新（排除children字段）
+        const { children, ...updateFields } = updatedMenu as any
+        const mergedMenu = {
+          ...currentMenu,
+          ...updateFields,
+          updateTime: new Date().toISOString()
+        }
+        updatedMenuMap.set(updatedMenu.id, mergedMenu)
+        console.log(`更新菜单: ${updatedMenu.id} - ${updatedMenu.title}`)
+      } else {
+        // 菜单不存在，作为新菜单添加（排除children字段）
+        const { children, ...newMenuFields } = updatedMenu as any
+        const newMenu = {
+          ...newMenuFields,
+          createdTime: new Date().toISOString(),
+          updateTime: new Date().toISOString()
+        }
+        updatedMenuMap.set(updatedMenu.id, newMenu)
+        console.log(`新增菜单: ${updatedMenu.id} - ${updatedMenu.title}`)
+      }
+    }
+
+    // 构建最终的菜单列表：保留未更新的菜单 + 更新/新增的菜单
+    const finalMenus: MenuConfig[] = []
+
+    // 先添加所有当前菜单，如果有更新则使用更新后的版本
+    currentMenus.forEach(currentMenu => {
+      const updatedMenu = updatedMenuMap.get(currentMenu.id)
+      if (updatedMenu) {
+        finalMenus.push(updatedMenu)
+      } else {
+        finalMenus.push(currentMenu)
+      }
+    })
+
+    // 添加新菜单（在当前菜单中不存在的）
+    updatedMenus.forEach(updatedMenu => {
+      if (!currentMenuMap.has(updatedMenu.id)) {
+        const { children, ...newMenuFields } = updatedMenu as any
+        const newMenu = {
+          ...newMenuFields,
+          createdTime: new Date().toISOString(),
+          updateTime: new Date().toISOString()
+        }
+        finalMenus.push(newMenu)
+      }
+    })
+
+    // 保存最终的菜单列表
+    await menuRepository.saveAll(finalMenus)
   }
 
   /**
