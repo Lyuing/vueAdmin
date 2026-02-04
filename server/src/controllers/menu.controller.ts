@@ -28,7 +28,7 @@ export class MenuController {
   }
 
   async deleteMenu(ctx: Context): Promise<void> {
-    const { id } = ctx.request.body as { id: string }
+    const { id } = ctx.request.body as { id: number }
     await menuService.deleteMenu(id)
     success(ctx, null, '删除成功')
   }

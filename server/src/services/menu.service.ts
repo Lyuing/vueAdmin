@@ -6,9 +6,40 @@ import type { MenuConfig } from '../types/menu.types.js'
 
 export class MenuService {
   /**
+   * 将树结构菜单转换为扁平结构
+   */
+  private flattenMenuTree(treeMenus: MenuConfig[]): MenuConfig[] {
+    const flatMenus: MenuConfig[] = []
+
+    const flatten = (menus: MenuConfig[], parentId: number | null = null) => {
+      for (const menu of menus) {
+        // 创建扁平菜单项，移除children字段
+        const flatMenu: MenuConfig = {
+          ...menu,
+          // 确保parentId正确设置
+          ...(parentId && { parentId })
+        }
+
+        // 移除children字段，因为扁平结构不需要
+        delete (flatMenu as any).children
+
+        flatMenus.push(flatMenu)
+
+        // 递归处理子菜单
+        if (menu.children && menu.children.length > 0) {
+          flatten(menu.children, menu.id)
+        }
+      }
+    }
+
+    flatten(treeMenus)
+    return flatMenus
+  }
+
+  /**
    * 将扁平菜单列表构建为树结构
    */
-  private buildMenuTree(flatMenus: MenuConfig[], parentId: string | null = null): MenuConfig[] {
+  private buildMenuTree(flatMenus: MenuConfig[], parentId: number | null = null): MenuConfig[] {
     return flatMenus
       .filter(menu => {
         // 查找menus.json中的parentId字段
@@ -93,7 +124,7 @@ export class MenuService {
     return await menuRepository.create(newMenu)
   }
 
-  async updateMenu(menuId: string, menu: Partial<MenuConfig>): Promise<MenuConfig> {
+  async updateMenu(menuId: number, menu: Partial<MenuConfig>): Promise<MenuConfig> {
     const existing = await menuRepository.findById(menuId)
 
     if (!existing) {
@@ -109,7 +140,7 @@ export class MenuService {
     return updated
   }
 
-  async deleteMenu(menuId: string): Promise<void> {
+  async deleteMenu(menuId: number): Promise<void> {
     const success = await menuRepository.delete(menuId)
 
     if (!success) {
@@ -122,8 +153,22 @@ export class MenuService {
   }
 
   async saveAllMenus(menus: MenuConfig[]): Promise<void> {
-    // 直接保存菜单数据（扁平结构）
-    await menuRepository.saveAll(menus)
+    // 检查传入的数据是否为树结构（包含children字段）
+    const hasChildren = menus.some(menu => menu.children && menu.children.length > 0)
+
+    let flatMenus: MenuConfig[]
+    if (hasChildren) {
+      // 如果是树结构，转换为扁平结构
+      console.log('检测到树结构菜单数据，正在转换为扁平结构...')
+      flatMenus = this.flattenMenuTree(menus)
+    } else {
+      // 如果已经是扁平结构，直接使用
+      flatMenus = menus
+    }
+
+    // 保存扁平结构的菜单数据
+    await menuRepository.saveAll(flatMenus)
+    console.log(`已保存 ${flatMenus.length} 个菜单项（扁平结构）`)
   }
 
   /**
@@ -131,7 +176,7 @@ export class MenuService {
    * @param excludeMenuId 要排除的菜单ID（通常是当前编辑的菜单）
    * @returns 可绑定的菜单选项列表
    */
-  async getBindableMenuOptions(excludeMenuId?: string): Promise<MenuConfig[]> {
+  async getBindableMenuOptions(excludeMenuId?: number): Promise<MenuConfig[]> {
     const allMenus = await menuRepository.findAll()
 
     // 过滤出可用于绑定的菜单选项

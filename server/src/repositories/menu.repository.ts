@@ -43,7 +43,7 @@ export class MenuRepository extends BaseRepository<MenuConfig> {
   }
 
   // 通过菜单ID查找菜单 - 优化的递归算法
-  async findByMenuId(menuId: string): Promise<MenuConfig | null> {
+  async findByMenuId(menuId: number): Promise<MenuConfig | null> {
     if (!menuId) return null
 
     // 使用深度优先搜索，提前终止优化
@@ -67,7 +67,7 @@ export class MenuRepository extends BaseRepository<MenuConfig> {
   }
 
   // 递归查找菜单（包括子菜单）
-  async findById(id: string): Promise<MenuConfig | null> {
+  async findById(id: number): Promise<MenuConfig | null> {
     const findInTree = (menus: MenuConfig[]): MenuConfig | null => {
       for (const menu of menus) {
         if (menu.id === id) {
@@ -85,7 +85,7 @@ export class MenuRepository extends BaseRepository<MenuConfig> {
   }
 
   // 递归删除菜单（包括子菜单）
-  async delete(id: string): Promise<boolean> {
+  async delete(id: number): Promise<boolean> {
     const deleteFromTree = (menus: MenuConfig[]): boolean => {
       for (let i = 0; i < menus.length; i++) {
         if (menus[i].id === id) {
@@ -113,7 +113,7 @@ export class MenuRepository extends BaseRepository<MenuConfig> {
   }
 
   // 清理绑定引用
-  private clearBindingReferences(deletedMenuId: string): void {
+  private clearBindingReferences(deletedMenuId: number): void {
     const clearReferences = (menus: MenuConfig[]) => {
       for (const menu of menus) {
         // 清理新的 bindMenuId 字段
@@ -161,7 +161,7 @@ export class MenuRepository extends BaseRepository<MenuConfig> {
   }
 
   // 递归更新菜单
-  async update(id: string, updates: Partial<MenuConfig>): Promise<MenuConfig | null> {
+  async update(id: number, updates: Partial<MenuConfig>): Promise<MenuConfig | null> {
     const updateInTree = (menus: MenuConfig[]): MenuConfig | null => {
       for (let i = 0; i < menus.length; i++) {
         if (menus[i].id === id) {

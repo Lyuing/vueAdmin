@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-export class BaseRepository<T extends { id: string }> {
+export class BaseRepository<T extends { id: string | number }> {
   protected filePath: string
   protected data: T[] = []
 
@@ -36,7 +36,7 @@ export class BaseRepository<T extends { id: string }> {
     return this.data
   }
 
-  async findById(id: string): Promise<T | null> {
+  async findById(id: string | number): Promise<T | null> {
     return this.data.find(item => item.id === id) || null
   }
 
@@ -46,7 +46,7 @@ export class BaseRepository<T extends { id: string }> {
     return item
   }
 
-  async update(id: string, updates: Partial<T>): Promise<T | null> {
+  async update(id: string | number, updates: Partial<T>): Promise<T | null> {
     const index = this.data.findIndex(item => item.id === id)
     if (index === -1) return null
 
@@ -55,7 +55,7 @@ export class BaseRepository<T extends { id: string }> {
     return this.data[index]
   }
 
-  async delete(id: string): Promise<boolean> {
+  async delete(id: string | number): Promise<boolean> {
     const index = this.data.findIndex(item => item.id === id)
     if (index === -1) return false
 
