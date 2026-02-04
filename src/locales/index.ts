@@ -20,9 +20,9 @@ export const LANGUAGE_OPTIONS: {
   label: string
 }[] = [
   { code: 'zh-CN', label: '简体中文' },
-  { code: 'en-US', label: 'English' }
-  // { code: 'zh-TW', label: '繁體中文' },
-  // { code: 'ja-JP', label: '日本語' }
+  { code: 'en-US', label: 'English' },
+  { code: 'zh-TW', label: '繁體中文' },
+  { code: 'ja-JP', label: '日本語' }
 ]
 
 // 自定义语言包 映射
