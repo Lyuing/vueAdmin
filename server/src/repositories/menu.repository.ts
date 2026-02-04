@@ -8,7 +8,7 @@ export class MenuRepository extends BaseRepository<MenuConfig> {
 
   async getAllPermissionCodes(): Promise<string[]> {
     const codes: string[] = []
-    
+
     const extractCodes = (menus: MenuConfig[]) => {
       for (const menu of menus) {
         if (menu.permissionCode) {
@@ -19,7 +19,7 @@ export class MenuRepository extends BaseRepository<MenuConfig> {
         }
       }
     }
-    
+
     extractCodes(this.data)
     return codes
   }
@@ -38,14 +38,14 @@ export class MenuRepository extends BaseRepository<MenuConfig> {
       }
       return null
     }
-    
+
     return findInTree(this.data)
   }
 
   // 通过菜单ID查找菜单 - 优化的递归算法
   async findByMenuId(menuId: string): Promise<MenuConfig | null> {
     if (!menuId) return null
-    
+
     // 使用深度优先搜索，提前终止优化
     const findInTree = (menus: MenuConfig[]): MenuConfig | null => {
       for (const menu of menus) {
@@ -53,7 +53,7 @@ export class MenuRepository extends BaseRepository<MenuConfig> {
         if (menu.id === menuId) {
           return menu
         }
-        
+
         // 递归搜索子菜单
         if (menu.children && menu.children.length > 0) {
           const found = findInTree(menu.children)
@@ -62,7 +62,7 @@ export class MenuRepository extends BaseRepository<MenuConfig> {
       }
       return null
     }
-    
+
     return findInTree(this.data)
   }
 
@@ -80,7 +80,7 @@ export class MenuRepository extends BaseRepository<MenuConfig> {
       }
       return null
     }
-    
+
     return findInTree(this.data)
   }
 
@@ -100,15 +100,15 @@ export class MenuRepository extends BaseRepository<MenuConfig> {
       }
       return false
     }
-    
+
     const deleted = deleteFromTree(this.data)
-    
+
     if (deleted) {
       // 清理相关的绑定引用
       this.clearBindingReferences(id)
       await this.save()
     }
-    
+
     return deleted
   }
 
@@ -121,28 +121,33 @@ export class MenuRepository extends BaseRepository<MenuConfig> {
           console.warn(`清理菜单 ${menu.id} 的无效绑定引用: ${deletedMenuId}`)
           menu.bindMenuId = undefined
         }
-        
+
         // 兼容性处理：同时清理旧的 parentMenuCode 字段（如果存在）
         if (menu.parentMenuCode) {
           // 通过权限码查找对应的菜单，如果该菜单的ID是被删除的ID，则清理引用
-          const referencedMenu = this.data.find(m => this.findMenuByPermissionCodeSync(m, menu.parentMenuCode!))
+          const referencedMenu = this.data.find(m =>
+            this.findMenuByPermissionCodeSync(m, menu.parentMenuCode!)
+          )
           if (referencedMenu?.id === deletedMenuId) {
             console.warn(`清理菜单 ${menu.id} 的无效权限码引用: ${menu.parentMenuCode}`)
             menu.parentMenuCode = undefined
           }
         }
-        
+
         if (menu.children && menu.children.length > 0) {
           clearReferences(menu.children)
         }
       }
     }
-    
+
     clearReferences(this.data)
   }
 
   // 同步版本的权限码查找（用于清理引用时的辅助方法）
-  private findMenuByPermissionCodeSync(menu: MenuConfig, permissionCode: string): MenuConfig | null {
+  private findMenuByPermissionCodeSync(
+    menu: MenuConfig,
+    permissionCode: string
+  ): MenuConfig | null {
     if (menu.permissionCode === permissionCode) {
       return menu
     }
@@ -170,7 +175,7 @@ export class MenuRepository extends BaseRepository<MenuConfig> {
       }
       return null
     }
-    
+
     const updated = updateInTree(this.data)
     if (updated) {
       await this.save()
@@ -179,10 +184,14 @@ export class MenuRepository extends BaseRepository<MenuConfig> {
   }
 
   // 数据迁移：将 parentMenuCode 转换为 bindMenuId
-  async migrateParentMenuCodeToBindMenuId(): Promise<{ success: boolean; migratedCount: number; errors: string[] }> {
+  async migrateParentMenuCodeToBindMenuId(): Promise<{
+    success: boolean
+    migratedCount: number
+    errors: string[]
+  }> {
     const errors: string[] = []
     let migratedCount = 0
-    
+
     const migrateInTree = (menus: MenuConfig[]) => {
       for (const menu of menus) {
         // 如果菜单有 parentMenuCode 但没有 bindMenuId，进行迁移
@@ -190,7 +199,7 @@ export class MenuRepository extends BaseRepository<MenuConfig> {
           try {
             // 通过权限码查找对应的菜单
             const referencedMenu = this.findMenuByPermissionCodeInData(menu.parentMenuCode)
-            
+
             if (referencedMenu) {
               // 找到对应菜单，设置 bindMenuId
               menu.bindMenuId = referencedMenu.id
@@ -208,23 +217,23 @@ export class MenuRepository extends BaseRepository<MenuConfig> {
             console.error(errorMsg)
           }
         }
-        
+
         // 递归处理子菜单
         if (menu.children && menu.children.length > 0) {
           migrateInTree(menu.children)
         }
       }
     }
-    
+
     try {
       migrateInTree(this.data)
-      
+
       // 保存迁移结果
       if (migratedCount > 0) {
         await this.save()
         console.log(`数据迁移完成，共迁移 ${migratedCount} 个菜单`)
       }
-      
+
       return {
         success: true,
         migratedCount,
@@ -234,7 +243,7 @@ export class MenuRepository extends BaseRepository<MenuConfig> {
       const errorMsg = `数据迁移过程中发生严重错误: ${error}`
       errors.push(errorMsg)
       console.error(errorMsg)
-      
+
       return {
         success: false,
         migratedCount,
@@ -257,7 +266,7 @@ export class MenuRepository extends BaseRepository<MenuConfig> {
       }
       return null
     }
-    
+
     return findInTree(this.data)
   }
 }
