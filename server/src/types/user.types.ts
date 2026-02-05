@@ -47,7 +47,7 @@ export interface CurrentUserResponse {
   username: string
   permissions: string[]
   roles: string[]
-  allMenuTree?: any[]
+  menuTree?: any[]
   departmentId?: number
   email?: string
   realName?: string

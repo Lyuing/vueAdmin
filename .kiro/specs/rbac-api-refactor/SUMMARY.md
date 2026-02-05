@@ -42,7 +42,7 @@
 **字段映射：**
 - `id` → `userId`
 - `realName` → `realName`
-- `allMenuTree` → `menus`
+- `menuTree` → `menus`
 - 所有字段类型与前端CurrentResponse匹配
 
 ### 4. 分页接口标准化 ✅

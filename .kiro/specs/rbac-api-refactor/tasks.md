@@ -74,7 +74,7 @@
 
   - 修改server/src/services/user.service.ts
   - 统一返回字段名称和数据类型
-  - 确保allMenuTree字段正确映射为menus
+  - 确保menuTree字段正确映射为menus
   - _需求: 2.1, 2.2_
 
 - [x] 3.2 修复用户控制器响应格式

@@ -61,7 +61,7 @@ export interface CurrentResponse {
   username: string
   permissions: string[]
   roles: string[]
-  allMenuTree?: any[] // 用户菜单配置
+  menuTree?: any[] // 用户菜单配置
   departmentId?: number
   email?: string
   realName?: string

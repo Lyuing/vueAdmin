@@ -68,14 +68,14 @@ export class UserService {
     }
 
     // 获取用户菜单树
-    const allMenuTree = await menuService.getUserMenus(userId)
+    const menuTree = await menuService.getUserMenus(userId)
 
     return {
       id: parseInt(user.id),
       username: user.username,
       permissions: Array.from(permissionSet),
       roles: roleNames,
-      allMenuTree,
+      menuTree,
       email: user.email,
       realName: user.realName,
       phone: user.phone,

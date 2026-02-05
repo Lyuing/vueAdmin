@@ -165,7 +165,7 @@ export const useAuthStore = defineStore('auth', () => {
     // 异步获取最新的用户信息（包含最新权限和菜单）
     try {
       const response = await getCurrentUser()
-      const { id: userId, allMenuTree: menus, ...userInfoData } = response || {}
+      const { id: userId, menuTree: menus, ...userInfoData } = response || {}
       // throw { status: 500 }
       userInfo.value = {
         userId,
